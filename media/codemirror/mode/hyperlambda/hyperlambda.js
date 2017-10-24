@@ -304,12 +304,15 @@ CodeMirror.defineMode("hyperlambda", function() {
             /*
              * Single line comment
              */
+            state.indent = pos;
             return this.parseSingleLineComment(stream, state);
           } else if (stream.peek() == '*') {
 
             /*
              * Multi line comment
              */
+            state.oldIndent = pos;
+            state.indent = pos + 1;
             state.mode = 'mcomment';
             return this.tokenizeMultiCommentMode(stream, state);
           }
@@ -533,6 +536,7 @@ CodeMirror.defineMode("hyperlambda", function() {
         /*
          * End of comment, hence name must follow
          */
+        state.indent = state.oldIndent;
         state.mode = 'name';
       } else if (cur.indexOf('*/') != -1) {
 
@@ -783,7 +787,7 @@ CodeMirror.defineMode("hyperlambda", function() {
              * The name of the node starts with an underscore "_", and hence is a "variable" (data segment)
              */
             return this.styles.variable;
-        } else if (word[0] == '.' || word.indexOf('on') == 0 || word.indexOf('_on') == 0) {
+        } else if (word[0] == '.') {
 
             /*
              * The name of the node starts with an underscore "_", and hence is a "variable" (data segment)

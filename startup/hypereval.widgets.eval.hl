@@ -17,6 +17,7 @@ create-event:hypereval.widgets.eval
         p5.web.include-javascript-file
           @HYPEREVAL/media/codemirror/lib/codemirror.js
           @HYPEREVAL/media/codemirror/addon/selection/active-line.js
+          @HYPEREVAL/media/codemirror/addon/display/fullscreen.js
           @HYPEREVAL/media/codemirror/addon/hint/show-hint.js
           @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.js
 
@@ -25,8 +26,9 @@ create-event:hypereval.widgets.eval
          */
         p5.web.include-css-file
           @HYPEREVAL/media/codemirror/lib/codemirror.css
-          @HYPEREVAL/media/codemirror/theme/3024-day.css
+          @HYPEREVAL/media/codemirror/theme/duotone-light.css
           @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
+          @HYPEREVAL/media/codemirror/addon/display/fullscreen.css
 
         /*
          * Including keywords JSON on page.
@@ -44,7 +46,7 @@ create-event:hypereval.widgets.eval
         p5.io.unroll-path:@HYPEREVAL/
         p5.web.send-javascript:@"p5.hypereval_input = CodeMirror.fromTextArea(p5.$('hypereval-input').el, {{
   mode:'hyperlambda',
-  theme:'3024-day',
+  theme:'duotone-light',
   lineNumbers:true,
   styleActiveLine:true,
   path:'{0}/media/codemirror/',
@@ -54,7 +56,15 @@ create-event:hypereval.widgets.eval
   extraKeys: {{
     'Ctrl-Space':'autocomplete',
     'Shift-Tab':'indentLess',
-    'Tab':'indentMore'
+    'Tab':'indentMore',
+    'Alt-F':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}},
+    'Alt-E':function(cm) {{
+      p5.$('hypereval-evaluate-button').raise('.onclick', {{
+        onsuccess:function(ret, evt) {{
+          p5.hypereval_output.getDoc().setValue(ret.code);
+        }}
+      }});
+    }}
   }}
 }});
 p5.hypereval_input.on('change',function (cMirror) {{
@@ -67,7 +77,7 @@ p5.hypereval_input.on('change',function (cMirror) {{
          */
         p5.web.send-javascript:@"p5.hypereval_output = CodeMirror.fromTextArea(p5.$('hypereval-output').el, {{
   mode:'hyperlambda',
-  theme:'3024-day',
+  theme:'duotone-light',
   lineNumbers:true,
   styleActiveLine:true,
   path:'{0}/media/codemirror/',
