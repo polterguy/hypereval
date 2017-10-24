@@ -1,0 +1,7 @@
+
+/*
+ * Creates version Active Event.
+ */
+create-event:hypereval.version
+
+  return:0.5
