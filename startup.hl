@@ -1,0 +1,44 @@
+
+/*
+ * File responsible for initializing Hypereval.
+ */
+
+
+/*
+ * Creates the "path" Active Event that points to our "/hypereval/" folder.
+ *
+ * This is done in such a way that we can install "Hypereval" in any folder we wish inside of 
+ * the "/modules/" folder.
+ */
+split:x:/..?name
+  =:/
+set:x:/@split/0/-
+join:x:/@split/*?name
+  sep:/
+eval-x:x:/+/*
+create-event:p5.io.unroll-path.@HYPEREVAL
+  return:/{0}
+    :x:/@join?value
+
+
+
+
+
+/*
+ * Evaluating all other startup files.
+ */
+micro.evaluate.folder:@HYPEREVAL/startup/
+
+
+
+
+
+/*
+ * Creates our version Active Event.
+ *
+ * Notice, this will be invoked by the core framework from the Bazar when the system is checking 
+ * for new versions, to see if it needs to upgrade your app.
+ */
+create-event:hypereval.version
+
+  return:decimal:5.1

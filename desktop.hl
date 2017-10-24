@@ -1,0 +1,19 @@
+
+/*
+ * Desktop widget file for Hypereval.
+ */
+container
+  element:a
+  class:desktop-app shaded rounded air-inner
+  href:/hypereval
+  title:Hypereval, allows you to evaluate Hyperlambda from within your browser
+  widgets
+    span
+      class:desktop-app-name
+      widgets
+        literal
+          element:span
+          class:icon-bolt desktop-app-icon
+        span
+          style:"position:absolute;top:5px;right:5px;font-size:.7rem;"
+          innerValue:Hypereval
