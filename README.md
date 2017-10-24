@@ -7,4 +7,5 @@ the server.
 
 ![alt screenshot](media/screenshot-1.png)
 
-It also allows you to inspect the code after it has been evaluated.
+It also allows you to inspect the code after it has been evaluated, to such more easily 
+understand what the results of your Hyperlambda evaluation is.
