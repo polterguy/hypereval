@@ -61,7 +61,9 @@ create-event:hypereval.widgets.eval
     'Alt-E':function(cm) {{
       p5.$('hypereval-evaluate-button').raise('.onclick', {{
         onsuccess:function(ret, evt) {{
-          p5.hypereval_output.getDoc().setValue(ret.code);
+          if (ret.code) {{
+            p5.hypereval_output.getDoc().setValue(ret.code);
+          }}
         }}
       }});
     }}
@@ -69,33 +71,14 @@ create-event:hypereval.widgets.eval
 }});
 p5.hypereval_input.on('change',function (cMirror) {{
   p5.$('hypereval-input').el.value = cMirror.getValue();
-}});"
-          :x:/@p5.io.unroll-path?value
-
-        /*
-         * Transforming output textarea to CodeMirror instance.
-         */
-        p5.web.send-javascript:@"p5.hypereval_output = CodeMirror.fromTextArea(p5.$('hypereval-output').el, {{
-  mode:'hyperlambda',
-  theme:'duotone-light',
-  lineNumbers:true,
-  styleActiveLine:true,
-  path:'{0}/media/codemirror/',
-  tabSize:2,
-  indentAuto:true,
-  extraKeys: {{
-    'Ctrl-Space':'autocomplete',
-    'Shift-Tab':'indentLess',
-    'Tab':'indentMore'
-  }}
-}});"
+}});
+p5.hypereval_input.setSize('100%', '500px');"
           :x:/@p5.io.unroll-path?value
 
       widgets
         literal:hypereval-input
           element:textarea
           class:fill
-          placeholder:Type in some Hyperlambda here ...
           rows:20
           oninit
 
@@ -115,38 +98,81 @@ p5.hypereval_input.on('change',function (cMirror) {{
         div
           class:right
           widgets
-            button:hypereval-evaluate-button
-              innerValue:Evaluate
-              onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_output.getDoc().setValue(ret.code);}});return false;"
-              .onclick
+            div
+              class:strip
+              style:"display:inline-block;"
+              widgets
+                button:hypereval-evaluate-button
+                  innerValue:Evaluate
+                  onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
+                  .onclick
+
+                    /*
+                     * Retrieving Hyperlambda and evaluating it.
+                     */
+                    .exe:node:"exe"
+                    get-widget-property:hypereval-input
+                      innerValue
+                    hyper2lambda:x:/@get-widget-property/*/*?value
+                    set:x:/@.exe/#/*
+                    add:x:/@.exe/#
+                      src:x:/@hyper2lambda/*
+                    eval-mutable:x:/@.exe/#
+
+                    /*
+                     * Then converting lambda result to Hyperlambda, and returning back to client as JSON
+                     */
+                    lambda2hyper:x:/@.exe/#/*
+                    get-widget-property:hypereval-output-wrapper
+                      visible
+                    if:x:/@get-widget-property/*/*?value
+                      p5.web.return-response-object:code
+                        src:x:/@lambda2hyper?value
+
+                    /*
+                     * Storing code in session, to make it more easily available.
+                     */
+                    p5.web.session.set:hypereval.code
+                      src:x:/../*/get-widget-property/[0,1]/*/*?value
+
+                button
+                  innerValue:Output
+                  onclick
+
+                    /*
+                     * Toggles visibility of output.
+                     */
+                    get-widget-property:hypereval-output-wrapper
+                      visible
+                    if:x:/@get-widget-property/*/*?value
+                      set-widget-property:hypereval-output-wrapper
+                        visible:false
+                    else
+                      set-widget-property:hypereval-output-wrapper
+                        visible:true
+
+        div:hypereval-output-wrapper
+          visible:false
+          style:"clear:both;"
+          widgets
+            literal:hypereval-output
+              element:textarea
+              class:fill
+              rows:10
+              oninit
 
                 /*
-                 * Retrieving Hyperlambda and evaluating it.
+                 * Transforming output textarea to CodeMirror instance.
                  */
-                .exe:node:"exe"
-                get-widget-property:hypereval-input
-                  innerValue
-                hyper2lambda:x:/@get-widget-property/*/*?value
-                set:x:/@.exe/#/*
-                add:x:/@.exe/#
-                  src:x:/@hyper2lambda/*
-                eval-mutable:x:/@.exe/#
-
-                /*
-                 * Then converting lambda result to Hyperlambda, and returning back to client as JSON
-                 */
-                lambda2hyper:x:/@.exe/#/*
-                p5.web.return-response-object:code
-                  src:x:/@lambda2hyper?value
-
-                /*
-                 * Storing code in session, to make it more easily available.
-                 */
-                p5.web.session.set:hypereval.code
-                  src:x:/@get-widget-property/*/*?value
-
-        literal:hypereval-output
-          element:textarea
-          class:fill
-          placeholder:Output after evaluation ends up here ...
-          rows:10
+                p5.io.unroll-path:@HYPEREVAL/
+                p5.web.send-javascript:@"p5.hypereval_output = CodeMirror.fromTextArea(p5.$('hypereval-output').el, {{
+mode:'hyperlambda',
+theme:'duotone-light',
+lineNumbers:true,
+styleActiveLine:true,
+path:'{0}/media/codemirror/',
+tabSize:2,
+indentAuto:true,
+readOnly:true
+}});"
+                  :x:/@p5.io.unroll-path?value
