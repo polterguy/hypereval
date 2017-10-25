@@ -135,6 +135,7 @@ p5.hypereval_input.setSize('100%', '500px');"
                  */
                 button:hypereval-evaluate-button
                   innerValue:Evaluate
+                  title:Evaluates the Hyperlambda in your editor
                   onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
                   .onupload
 
@@ -189,6 +190,7 @@ p5.hypereval_input.setSize('100%', '500px');"
                  */
                 button
                   innerValue:Output
+                  title:Display the output code, which results from evaluating your code
                   onclick
 
                     /*
@@ -208,25 +210,32 @@ p5.hypereval_input.setSize('100%', '500px');"
                  */
                 button:hypereval-download-button
                   innerValue:Download
+                  title:Downloads the Hyperlambda in your editor to your client
                   onclick
 
                     /*
                      * Creates a temporary file containing Hyperlambda, 
                      * and allows user to download it to his client.
                      */
+                    .defaults
+                      hypereval.snippet-name:hypereval
+                    p5.web.session.get:hypereval.snippet-name
                     get-widget-property:hypereval-input
                       innerValue
                     save-file:~/temp/hypereval-code.hl
                       src:x:/@get-widget-property/*/*?value
+                    eval-x:x:/+/*/Content-Disposition
                     micro.download.file:~/temp/hypereval-code.hl
                       Content-Type:x-application/hyperlambda
-                      Content-Disposition:@"attachment; filename=""hypereval.hl"""
+                      Content-Disposition:@"attachment; filename=""{0}.hl"""
+                        :x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
 
                 /*
                  * Upload Hyperlambda button.
                  */
                 button
                   innerValue:Upload
+                  title:Uploads a Hyperlambda file from your client
                   onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
 
                 /*
@@ -234,6 +243,7 @@ p5.hypereval_input.setSize('100%', '500px');"
                  */
                 button
                   innerValue:Save
+                  title:Saves your current Hyperlambda to your snippets collection
                   onclick
 
                     /*
@@ -304,6 +314,72 @@ p5.hypereval_input.setSize('100%', '500px');"
                                      */
                                     p5.web.session.set:hypereval.snippet-name
                                       src:x:/@micro.widgets.wizard-form.value/*/name?value
+
+                /*
+                 * Load Hyperlambda button.
+                 */
+                button
+                  innerValue:Load
+                  title:Loads a snippet from your snippets collection
+                  onclick
+
+                    /*
+                     * Displaying a modal window to user, to allow him to select 
+                     * a Hyperlambda snippet to load.
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-load-modal
+                        widgets
+                          h3
+                            innerValue:Select a snippet
+                          micro.widgets.grid:hypereval-snippet-grid
+                            class:hover
+                            oninit
+
+                              /*
+                               * Opening up database collection, selecting all snippets,
+                               * and populating grid.
+                               */
+                              p5.mysql.connect:[hypereval]
+                                p5.mysql.select:@"select name from snippets"
+
+                                /*
+                                 * Looping through each snippet, creating one grid item for each.
+                                 */
+                                for-each:x:/@p5.mysql.select/*/*?value
+                                  eval-x:x:/+/*/*/*|/+/*/*/*/*/.name
+                                  add:x:/..p5.mysql.connect/*/micro.widgets.grid.databind
+                                    src
+                                      item
+                                        .row
+                                          .name:x:/@_dp?value
+                                          role:button
+                                          onclick:@"p5.$(event.target.parentElement.id).raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});return false;"
+                                          .onclick
+
+                                            /*
+                                             * Retrieves name of snippet clicked, loading it from database, populating
+                                             * editor, and closing modal widget.
+                                             */
+                                            get-widget-property:x:/../*/_event?value
+                                              .name
+                                            p5.mysql.connect:[hypereval]
+                                              p5.mysql.select:@"select content from snippets where name = @name"
+                                                @name:x:/@get-widget-property/*/*?value
+                                              p5.web.return-response-object:code
+                                                src:x:/@p5.mysql.select/*/*/content?value
+
+                                            /*
+                                             * Closing modal window.
+                                             */
+                                            delete-widget:hypereval-load-modal
+
+                                        name:x:/@_dp?value
+
+                                /*
+                                 * Databinding grid.
+                                 */
+                                micro.widgets.grid.databind:hypereval-snippet-grid
 
         div:hypereval-output-wrapper
           visible:false
