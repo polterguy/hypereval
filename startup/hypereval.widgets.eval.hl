@@ -58,7 +58,7 @@ create-event:hypereval.widgets.eval
           @HYPEREVAL/media/codemirror/addon/display/fullscreen.css
 
         /*
-         * Including keywords JSON on page.
+         * Including Active Events JSON on page.
          */
         vocabulary
         join:x:/@vocabulary/*?value
@@ -129,6 +129,10 @@ p5.hypereval_input.setSize('100%', '500px');"
               class:strip
               style:"display:inline-block;"
               widgets
+
+                /*
+                 * Evaluate Hyperlambda button.
+                 */
                 button:hypereval-evaluate-button
                   innerValue:Evaluate
                   onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
@@ -180,6 +184,9 @@ p5.hypereval_input.setSize('100%', '500px');"
                     p5.web.session.set:hypereval.code
                       src:x:/../*/get-widget-property/[0,1]/*/*?value
 
+                /*
+                 * View "Output" button.
+                 */
                 button
                   innerValue:Output
                   onclick
@@ -196,6 +203,9 @@ p5.hypereval_input.setSize('100%', '500px');"
                       set-widget-property:hypereval-output-wrapper
                         visible:true
 
+                /*
+                 * Download Hyperlambda button.
+                 */
                 button:hypereval-download-button
                   innerValue:Download
                   onclick
@@ -211,6 +221,89 @@ p5.hypereval_input.setSize('100%', '500px');"
                     micro.download.file:~/temp/hypereval-code.hl
                       Content-Type:x-application/hyperlambda
                       Content-Disposition:@"attachment; filename=""hypereval.hl"""
+
+                /*
+                 * Upload Hyperlambda button.
+                 */
+                button
+                  innerValue:Upload
+                  onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
+
+                /*
+                 * Save Hyperlambda button.
+                 */
+                button
+                  innerValue:Save
+                  onclick
+
+                    /*
+                     * Saving Hyperlambda to database, by allowing user to associate a name with snippet,
+                     * through a modal window, for then to save the code with the specified name.
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-save-modal
+                        widgets
+                          h3
+                            innerValue:Supply a name please
+                          p
+                            innerValue:Notice, if you supply a name that already exists in your snippet collection, the old snippet will be deleted.
+                          micro.widgets.wizard-form:hypereval-save-form
+                            text
+                              info:Name
+                              .data-field:name
+                              onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-save-modal-button').raise('onclick');return false;}"
+                              oninit
+
+                                /*
+                                 * Setting initial focus to "Name" textbox.
+                                 */
+                                micro.page.set-focus:x:/../*/_event?value
+
+                                /*
+                                 * Checking if we have a snippet name in session, and
+                                 * if so, we make sure we default our name to that value.
+                                 */
+                                p5.web.session.get:hypereval.snippet-name
+                                if:x:/-/*?value
+                                  set-widget-property:x:/../*/_event?value
+                                    value:x:/@p5.web.session.get/*?value
+
+                            div
+                              class:right
+                              widgets
+                                button:hypereval-save-modal-button
+                                  innerValue:Save
+                                  style:"margin-bottom:0;"
+                                  onclick
+
+                                    /*
+                                     * Serializing form, opening database connection,
+                                     * deleting snippets with similar name, and saving snippet
+                                     * into database.
+                                     */
+                                    get-widget-property:hypereval-input
+                                      innerValue
+                                    micro.widgets.wizard-form.value:hypereval-save-form
+                                    p5.mysql.connect:[hypereval]
+                                      p5.mysql.delete:@"delete from snippets where name = @name"
+                                        @name:x:/@micro.widgets.wizard-form.value/*/name?value
+                                      p5.mysql.insert:@"insert into snippets (name, content) values (@name, @content)"
+                                        @name:x:/@micro.widgets.wizard-form.value/*/name?value
+                                        @content:x:/@get-widget-property/*/*?value
+
+                                    /*
+                                     * Closing modal window, and giving user some feedback.
+                                     */
+                                    delete-widget:hypereval-save-modal
+                                    micro.windows.info:Snippet was successfully saved
+                                      class:micro-windows-info success
+
+                                    /*
+                                     * Making sure we store name used into session, in case
+                                     * user wants to save the same snippet again.
+                                     */
+                                    p5.web.session.set:hypereval.snippet-name
+                                      src:x:/@micro.widgets.wizard-form.value/*/name?value
 
         div:hypereval-output-wrapper
           visible:false

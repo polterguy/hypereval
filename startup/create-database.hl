@@ -1,0 +1,41 @@
+
+/*
+ * Creating database schema for snippets if it doesn't exist.
+ */
+try
+  p5.mysql.connect:[hypereval]
+    p5.mysql.execute:@"
+CREATE TABLE IF NOT EXISTS `snippets` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `content` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+
+catch
+
+  /*
+   * Attempting to create database, unless this is our second invocation, for then
+   * to invoke self again, for simplicity reasons.
+   */
+  if:x:/../*/second?value
+    not
+
+    /*
+     * Making sure we prepend the database prefix in front of schema name.
+     */
+    p5.config.get:p5.data.prefix
+
+    /*
+     * Creating database schema.
+     */
+    p5.mysql.connect:[sys]
+      p5.mysql.execute:@"CREATE SCHEMA `{0}hypereval`;"
+        :x:/@p5.config.get/*?value
+
+    /*
+     * Invoking self, with [second] being true, to avoid never ending recursion.
+     */
+    micro.evaluate.file:x:/..?name
+      second:bool:true
