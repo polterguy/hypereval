@@ -43,6 +43,7 @@ CodeMirror.defineMode("hyperlambda", function() {
      *  - property     ==> Used for a node's value, unless it's an expression or a string literal value
      *  - error        ==> Used for syntactic Hyperlambda errors. Normally this means that the entire rest of the document goes into "error mode"
      *  - bracket      ==> Used for smaller error, such as Active Event invocation that was not found, etc.
+     *  - variable-3   ==> Used for lambda segments, nodes starting with ".".
      *
      * The following CodeMirror theme classes are NOT used by the Hyperlambda CodeMirror plugin
      *  - link
@@ -103,7 +104,12 @@ CodeMirror.defineMode("hyperlambda", function() {
       /*
        * Displayed when there is a small error, such as wrong name of Active Event.
        */
-      small_error:'bracket'
+      small_error:'bracket',
+
+      /*
+       * Lambda blocks (node starting with ".").
+       */
+      lambda:'variable-3'
   },
 
 
@@ -792,7 +798,7 @@ CodeMirror.defineMode("hyperlambda", function() {
             /*
              * The name of the node starts with an underscore "_", and hence is a "variable" (data segment)
              */
-            return this.styles.keyword;
+            return this.styles.lambda;
         } else if (word.indexOf('.') != -1) {
 
             /*

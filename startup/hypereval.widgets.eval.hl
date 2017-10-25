@@ -53,7 +53,7 @@ create-event:hypereval.widgets.eval
          */
         p5.web.include-css-file
           @HYPEREVAL/media/codemirror/lib/codemirror.css
-          @HYPEREVAL/media/codemirror/theme/duotone-light.css
+          @HYPEREVAL/media/codemirror/theme/hyperlambda.css
           @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
           @HYPEREVAL/media/codemirror/addon/display/fullscreen.css
 
@@ -73,7 +73,7 @@ create-event:hypereval.widgets.eval
         p5.io.unroll-path:@HYPEREVAL/
         p5.web.send-javascript:@"p5.hypereval_input = CodeMirror.fromTextArea(p5.$('hypereval-input').el, {{
   mode:'hyperlambda',
-  theme:'duotone-light',
+  theme:'hyperlambda',
   lineNumbers:true,
   styleActiveLine:true,
   path:'{0}/media/codemirror/',
@@ -376,12 +376,55 @@ p5.hypereval_input.setSize('100%', '500px');"
                                              */
                                             delete-widget:hypereval-load-modal
 
+                                            /*
+                                             * Making sure our Hypereval remembers that this is our
+                                             * "current code".
+                                             */
+                                            p5.web.session.set:hypereval.code
+                                              src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
+
                                         name:x:/@_dp?value
 
                                 /*
                                  * Databinding grid.
                                  */
                                 micro.widgets.grid.databind:hypereval-snippet-grid
+
+                /*
+                 * Delete Hyperlambda snippet button.
+                 */
+                button
+                  innerValue:Delete
+                  title:Deletes the currently active snippet, if any
+                  onclick
+
+                    /*
+                     * Retrieving snippet's name.
+                     */
+                    p5.web.session.get:hypereval.snippet-name
+                    if:x:/-/*?value
+                      not
+
+                      /*
+                       * No active snippet, warning use.
+                       */
+                      micro.windows.info:No active snippet
+                        class:micro-windows-info
+
+                    else
+
+                      /*
+                       * Opening up database connection, and deleting snippet.
+                       */
+                      p5.mysql.connect:[hypereval]
+                        p5.mysql.delete:@"delete from snippets where name = @name"
+                          @name:x:/@p5.web.session.get/*?value
+
+                      /*
+                       * Providing feedback to user.
+                       */
+                      micro.windows.info:Snippet was successfully deleted
+                        class:micro-windows-info success
 
         div:hypereval-output-wrapper
           visible:false
@@ -399,7 +442,7 @@ p5.hypereval_input.setSize('100%', '500px');"
                 p5.io.unroll-path:@HYPEREVAL/
                 p5.web.send-javascript:@"p5.hypereval_output = CodeMirror.fromTextArea(p5.$('hypereval-output').el, {{
 mode:'hyperlambda',
-theme:'duotone-light',
+theme:'hyperlambda',
 lineNumbers:true,
 styleActiveLine:true,
 path:'{0}/media/codemirror/',

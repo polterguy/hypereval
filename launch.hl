@@ -15,6 +15,7 @@
 p5.web.include-css-file:@MICRO/media/main.css
 p5.web.include-css-file:@MICRO/media/skins/serious.css
 p5.web.include-css-file:@MICRO/media/fonts.css
+p5.web.include-css-file:"https://fonts.googleapis.com/css?family=Anonymous+Pro"
 
 
 
@@ -63,8 +64,12 @@ if:x:/@split/0/-?name
     convert:false
   p5.web.session.set:hypereval.uploaded-file
     src:x:/@load-file/*?value
+  split:x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
+    =:.
   p5.web.session.set:hypereval.snippet-name
-    src:x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
+    src:x:/@split/0?name
+  p5.web.session.set:hypereval.code
+    src:x:/@load-file/*?value
 
   /*
    * Returning early to avoid evaluation of the rest of our file.
