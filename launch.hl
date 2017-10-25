@@ -44,6 +44,37 @@ if:x:/@whoami/*/role?value
 
 
 /*
+ * Checking if this is an upload request.
+ */
+split:x:/../*/url?value
+  =:/
+if:x:/@split/0/-?name
+  =:upload
+
+  /*
+   * Parsing MIME message, and reading file, and stuffing content into session.
+   */
+  p5.web.request.parse-mime
+    attachment-folder:~/temp/
+  load-file:{0}{1}{2}
+    :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/folder?value
+    :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/prefix?value
+    :x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
+    convert:false
+  p5.web.session.set:hypereval.uploaded-file
+    src:x:/@load-file/*?value
+
+  /*
+   * Returning early to avoid evaluation of the rest of our file.
+   */
+  p5.web.echo:SUCCESS
+  return
+
+
+
+
+
+/*
  * Creating main content container.
  */
 create-widget:hypereval-main-container

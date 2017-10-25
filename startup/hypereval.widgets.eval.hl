@@ -5,11 +5,38 @@
 create-event:hypereval.widgets.eval
 
   /*
+   * Used to separate arguments from the rest of our lambda.
+   */
+  .signal
+
+  /*
+   * Decorating widget with arguments.
+   */
+  add:x:/../*/return/*/container
+    src:x:/@.signal/--(!/_arg)
+
+  /*
    * Returning widget to caller.
    */
   return
     container
+      style:"margin-bottom:150px;"
       oninit
+
+        /*
+         * Making sure our page becomes a "dropzone" to allow user to upload 
+         * a Hyperlambda file (which will populate the CodeMirror module with its code).
+         */
+        p5.io.unroll-path:@HYPEREVAL/
+        split:x:/@p5.io.unroll-path?value
+          =:/
+        eval-x:x:/+/*/url
+        micro.page.create-dropzone
+          filter:hl
+          multiple:false
+          url:{0}/upload
+            :x:/@split/0/-?name
+          .onfinish:@"function(){p5.$('hypereval-evaluate-button').raise('.onupload',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});}"
 
         /*
          * Including CodeMirror JavaScript.
@@ -105,6 +132,24 @@ p5.hypereval_input.setSize('100%', '500px');"
                 button:hypereval-evaluate-button
                   innerValue:Evaluate
                   onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
+                  .onupload
+
+                    /*
+                     * Invoked after uploading of file has occurred, at which point our 
+                     * session is supposed to contain the file's content.
+                     *
+                     * Hence, first we retrieve session value, before we return it to
+                     * client, which updates the value of our "input CodeMirror" widget.
+                     */
+                    p5.web.session.get:hypereval.uploaded-file
+                    p5.web.return-response-object:code
+                      src:x:/@p5.web.session.get/*?value
+
+                    /*
+                     * Deleting session object.
+                     */
+                    p5.web.session.set:hypereval.uploaded-file
+
                   .onclick
 
                     /*
@@ -150,6 +195,22 @@ p5.hypereval_input.setSize('100%', '500px');"
                     else
                       set-widget-property:hypereval-output-wrapper
                         visible:true
+
+                button:hypereval-download-button
+                  innerValue:Download
+                  onclick
+
+                    /*
+                     * Creates a temporary file containing Hyperlambda, 
+                     * and allows user to download it to his client.
+                     */
+                    get-widget-property:hypereval-input
+                      innerValue
+                    save-file:~/temp/hypereval-code.hl
+                      src:x:/@get-widget-property/*/*?value
+                    micro.download.file:~/temp/hypereval-code.hl
+                      Content-Type:x-application/hyperlambda
+                      Content-Disposition:@"attachment; filename=""hypereval.hl"""
 
         div:hypereval-output-wrapper
           visible:false
