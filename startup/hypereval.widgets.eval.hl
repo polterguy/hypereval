@@ -425,17 +425,37 @@ p5.hypereval_input.setSize('100%', '600px');"
                                  * and creating one grid item for each record.
                                  */
                                 p5.mysql.connect:[hypereval]
+                                  p5.mysql.select:@"select * from snippets"
+
+                                  /*
+                                   * Necessary to find the relative URL of module.
+                                   */
                                   p5.io.unroll-path:@HYPEREVAL/
                                   split:x:/@p5.io.unroll-path?value
                                     =:/
-                                  p5.mysql.select:@"select * from snippets"
+
+                                  /*
+                                   * Looping through each snippet, creating one datagrid item
+                                   * for each.
+                                   */
                                   for-each:x:/@p5.mysql.select/*
                                     p5.html.url-encode:x:/@_dp/#/*/name?value
                                     eval-x:x:/+/*/*/*
+
+                                    /*
+                                     * Adding "name" cell.
+                                     */
                                     add:x:/../*/micro.widgets.grid.databind
                                       src
                                         item
                                           name:x:/@_dp/#/*/name?value
+
+                                    /*
+                                     * Adding "radio buttons" cell and "preview page" cell.
+                                     *
+                                     * Notice, this first part simply adds to our [add] invocation below,
+                                     * according to the snippet's status.
+                                     */
                                     add:x:/+3/*/*/*/*/*/widgets/*/input/*(/.data-field/={0}|/.data-field/=default)/[0,1]/.
                                       :x:/@_dp/#/*/type?value
                                       src
@@ -446,6 +466,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                                       add:x:/./+/**/a
                                         src
                                           visible:false
+
+                                    /*
+                                     * This is where we actually add our "radio button" cells, and
+                                     * our "View page" cell.
+                                     */
                                     add:x:/../*/micro.widgets.grid.databind/0/-
                                       src
                                         type
@@ -461,12 +486,18 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                     :x:/@_dp/#/*/id?value
                                                   onchange
                                                     .id:x:/@_dp/#/*/id?value
+
+                                                    /*
+                                                     * Updating "type" of snippet, and setting
+                                                     * "View page"'s hyperlink to visible/invisible.
+                                                     */
                                                     p5.mysql.connect:[hypereval]
                                                       p5.mysql.update:@"update snippets set type = null where id = @id"
                                                         @id:x:/@.id?value
                                                     set-widget-property:hypereval-view-page-{0}
                                                       :x:/@.id?value
                                                       visible:false
+
                                                 span
                                                   innerValue:Default
                                             label
@@ -479,6 +510,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                   name:item-{0}
                                                     :x:/@_dp/#/*/id?value
                                                   onchange
+
+                                                    /*
+                                                     * Updating "type" of snippet, and setting
+                                                     * "View page"'s hyperlink to visible/invisible.
+                                                     */
                                                     .id:x:/@_dp/#/*/id?value
                                                     p5.mysql.connect:[hypereval]
                                                       p5.mysql.update:@"update snippets set type = 'page' where id = @id"
@@ -486,6 +522,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                     set-widget-property:hypereval-view-page-{0}
                                                       :x:/@.id?value
                                                       visible:true
+
                                                 span
                                                   innerValue:Page
                                             label
@@ -498,6 +535,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                   name:item-{0}
                                                     :x:/@_dp/#/*/id?value
                                                   onchange
+
+                                                    /*
+                                                     * Updating "type" of snippet, and setting
+                                                     * "View page"'s hyperlink to visible/invisible.
+                                                     */
                                                     .id:x:/@_dp/#/*/id?value
                                                     p5.mysql.connect:[hypereval]
                                                       p5.mysql.update:@"update snippets set type = 'startup' where id = @id"
@@ -505,6 +547,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                     set-widget-property:hypereval-view-page-{0}
                                                       :x:/@.id?value
                                                       visible:false
+
                                                 span
                                                   innerValue:Startup
                                         type

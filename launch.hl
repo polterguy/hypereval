@@ -25,7 +25,7 @@ if:x:/@p5.web.query.get/*?value
       not
 
       /*
-       * No such page
+       * No such page.
        */
       p5.web.response.set-status-code:404
       p5.web.echo:This is where URLs goes to die ...
