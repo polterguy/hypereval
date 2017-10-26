@@ -93,7 +93,10 @@ create-event:hypereval.widgets.eval
           }}
         }}
       }});
-    }}
+    }},
+    'Alt-S':function(cm) {{p5.$('hypereval-save-button').raise('onclick');}},
+    'Alt-L':function(cm) {{p5.$('hypereval-load-button').raise('onclick');}},
+    'Alt-O':function(cm) {{p5.$('hypereval-output-button').raise('onclick');}}
   }}
 }});
 p5.hypereval_input.on('change',function (cMirror) {{
@@ -135,7 +138,7 @@ p5.hypereval_input.setSize('100%', '500px');"
                  */
                 button:hypereval-evaluate-button
                   innerValue:Evaluate
-                  title:Evaluates the Hyperlambda in your editor
+                  title:Evaluates the Hyperlambda in your editor - Alt+E
                   onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
                   .onupload
 
@@ -188,9 +191,9 @@ p5.hypereval_input.setSize('100%', '500px');"
                 /*
                  * View "Output" button.
                  */
-                button
+                button:hypereval-output-button
                   innerValue:Output
-                  title:Display the output code, which results from evaluating your code
+                  title:Display the output code, which results from evaluating your code - Alt+O
                   onclick
 
                     /*
@@ -241,9 +244,9 @@ p5.hypereval_input.setSize('100%', '500px');"
                 /*
                  * Save Hyperlambda button.
                  */
-                button
+                button:hypereval-save-button
                   innerValue:Save
-                  title:Saves your current Hyperlambda to your snippets collection
+                  title:Saves your current Hyperlambda to your snippets collection - Alt+S
                   onclick
 
                     /*
@@ -318,9 +321,9 @@ p5.hypereval_input.setSize('100%', '500px');"
                 /*
                  * Load Hyperlambda button.
                  */
-                button
+                button:hypereval-load-button
                   innerValue:Load
-                  title:Loads a snippet from your snippets collection
+                  title:Loads a snippet from your snippets collection - Alt+L
                   onclick
 
                     /*
@@ -402,7 +405,7 @@ p5.hypereval_input.setSize('100%', '500px');"
                      * Retrieving snippet's name.
                      */
                     p5.web.session.get:hypereval.snippet-name
-                    if:x:/-/*?value
+                    if:x:/@p5.web.session.get/*?value
                       not
 
                       /*
@@ -410,21 +413,73 @@ p5.hypereval_input.setSize('100%', '500px');"
                        */
                       micro.windows.info:No active snippet
                         class:micro-windows-info
+                      return
 
-                    else
+                    /*
+                     * Asking user to confirm deletion.
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-confirm-deletion
+                        widgets
+                          h3
+                            innerValue:Please confirm deletion
+                          p
+                            innerValue:Are you sure you wish to delete this snippet? This action is permanent.
+                          div
+                            class:right
+                            widgets
+                              div
+                                class:strip
+                                style:"display:inline-block;"
+                                widgets
+                                  button:hypereval-confirm-deletion-button
+                                    innerValue:Yes
+                                    style:"margin-bottom:0;"
+                                    oninit
 
-                      /*
-                       * Opening up database connection, and deleting snippet.
-                       */
-                      p5.mysql.connect:[hypereval]
-                        p5.mysql.delete:@"delete from snippets where name = @name"
-                          @name:x:/@p5.web.session.get/*?value
+                                      /*
+                                       * Setting initial focus to "Yes" button.
+                                       */
+                                      micro.page.set-focus:x:/../*/_event?value
 
-                      /*
-                       * Providing feedback to user.
-                       */
-                      micro.windows.info:Snippet was successfully deleted
-                        class:micro-windows-info success
+                                    onclick:@"p5.$('hypereval-confirm-deletion-button').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue('');}});return false;"
+                                    .onclick
+
+                                      /*
+                                       * Retrieving snippet's name.
+                                       */
+                                      p5.web.session.get:hypereval.snippet-name
+
+                                      /*
+                                       * Opening up database connection, and deleting snippet.
+                                       */
+                                      p5.mysql.connect:[hypereval]
+                                        p5.mysql.delete:@"delete from snippets where name = @name"
+                                          @name:x:/@p5.web.session.get/*?value
+
+                                      /*
+                                       * Providing feedback to user, and deleting modal widget.
+                                       */
+                                      delete-widget:hypereval-confirm-deletion
+                                      micro.windows.info:Snippet was successfully deleted
+                                        class:micro-windows-info success
+
+                                      /*
+                                       * Clearing session for all relevant values.
+                                       */
+                                      p5.web.session.set:hypereval.uploaded-file
+                                      p5.web.session.set:hypereval.snippet-name
+                                      p5.web.session.set:hypereval.code
+
+                                  button
+                                    innerValue:No
+                                    style:"margin-bottom:0;"
+                                    onclick
+
+                                      /*
+                                       * Simply deleting modal widget.
+                                       */
+                                      delete-widget:hypereval-confirm-deletion
 
         div:hypereval-output-wrapper
           visible:false
