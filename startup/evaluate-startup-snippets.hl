@@ -20,7 +20,7 @@ try
     /*
      * Looping through each "startup" snippet, and evaluating it.
      */
-    for-each:x:/@p5.mysql.select/*/content?value
+    for-each:x:/@p5.mysql.select/*/*/content?value
 
       /*
        * Notice, in case there's an exception being thrown during evaluation of
