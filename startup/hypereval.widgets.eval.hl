@@ -364,6 +364,12 @@ p5.hypereval_input.setSize('100%', '600px');"
                                     p5.web.session.set:hypereval.snippet-name
                                       src:x:/@micro.widgets.wizard-form.value/*/name?value
 
+                                    /*
+                                     * Storing code in session, to make it more easily available.
+                                     */
+                                    p5.web.session.set:hypereval.code
+                                      src:x:/../*/get-widget-property/*/*?value
+
                 /*
                  * Download Hyperlambda button.
                  */
