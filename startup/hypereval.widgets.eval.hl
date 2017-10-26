@@ -395,6 +395,141 @@ p5.hypereval_input.setSize('100%', '600px');"
                   onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
 
                 /*
+                 * Manage "pages" button.
+                 */
+                button
+                  innerValue:@"<span class=""icon-th-large""></span>"
+                  title:Manage snippets ...
+                  onclick
+
+                    /*
+                     * Shows a modal widget with each snippet from database, allowing
+                     * the user to either mark it as a "startup snippet" or as a "page".
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-manage-snippets
+                        widgets
+                          h3
+                            innerValue:Manage snippets
+                          micro.widgets.grid:hypereval-snippets-grid
+                            class:striped
+                            events
+
+                              /*
+                               * Databinds snippets grid.
+                               */
+                              hypereval.snippets.databind
+
+                                /*
+                                 * Connecting to database, selecting all snippets, 
+                                 * and creating one grid item for each record.
+                                 */
+                                p5.mysql.connect:[hypereval]
+                                  p5.io.unroll-path:@HYPEREVAL/
+                                  split:x:/@p5.io.unroll-path?value
+                                    =:/
+                                  p5.mysql.select:@"select * from snippets"
+                                  for-each:x:/@p5.mysql.select/*
+                                    p5.html.url-encode:x:/@_dp/#/*/name?value
+                                    eval-x:x:/+/*/*/*
+                                    add:x:/../*/micro.widgets.grid.databind
+                                      src
+                                        item
+                                          name:x:/@_dp/#/*/name?value
+                                    add:x:/+3/*/*/*/*/*/widgets/*/input/*(/.data-field/={0}|/.data-field/=default)/[0,1]/.
+                                      :x:/@_dp/#/*/type?value
+                                      src
+                                        checked
+                                    eval-x:x:/+2/*/*/*/*/*/widgets/*/input/*/name|/+2/**(/.id|/href|/a)
+                                    if:x:/@_dp/#/*/type?value
+                                      !=:page
+                                      add:x:/./+/**/a
+                                        src
+                                          visible:false
+                                    add:x:/../*/micro.widgets.grid.databind/0/-
+                                      src
+                                        type
+                                          widgets
+                                            label
+                                              style:"margin-bottom:0;"
+                                              widgets
+                                                input
+                                                  type:radio
+                                                  .data-field:default
+                                                  style:"margin-bottom:0;"
+                                                  name:item-{0}
+                                                    :x:/@_dp/#/*/id?value
+                                                  onchange
+                                                    .id:x:/@_dp/#/*/id?value
+                                                    p5.mysql.connect:[hypereval]
+                                                      p5.mysql.update:@"update snippets set type = null where id = @id"
+                                                        @id:x:/@.id?value
+                                                    set-widget-property:hypereval-view-page-{0}
+                                                      :x:/@.id?value
+                                                      visible:false
+                                                span
+                                                  innerValue:Default
+                                            label
+                                              style:"margin-bottom:0;"
+                                              widgets
+                                                input
+                                                  type:radio
+                                                  .data-field:page
+                                                  style:"margin-bottom:0;margin-left:5px;"
+                                                  name:item-{0}
+                                                    :x:/@_dp/#/*/id?value
+                                                  onchange
+                                                    .id:x:/@_dp/#/*/id?value
+                                                    p5.mysql.connect:[hypereval]
+                                                      p5.mysql.update:@"update snippets set type = 'page' where id = @id"
+                                                        @id:x:/@.id?value
+                                                    set-widget-property:hypereval-view-page-{0}
+                                                      :x:/@.id?value
+                                                      visible:true
+                                                span
+                                                  innerValue:Page
+                                            label
+                                              style:"margin-bottom:0;"
+                                              widgets
+                                                input
+                                                  type:radio
+                                                  .data-field:startup
+                                                  style:"margin-bottom:0;margin-left:5px;"
+                                                  name:item-{0}
+                                                    :x:/@_dp/#/*/id?value
+                                                  onchange
+                                                    .id:x:/@_dp/#/*/id?value
+                                                    p5.mysql.connect:[hypereval]
+                                                      p5.mysql.update:@"update snippets set type = 'startup' where id = @id"
+                                                        @id:x:/@.id?value
+                                                    set-widget-property:hypereval-view-page-{0}
+                                                      :x:/@.id?value
+                                                      visible:false
+                                                span
+                                                  innerValue:Startup
+                                        type
+                                          widgets
+                                            a:hypereval-view-page-{0}
+                                              :x:/@_dp/#/*/id?value
+                                              target:_blank
+                                              href:/{0}?name={1}
+                                                :x:/@split/0/-?name
+                                                :x:/@p5.html.url-encode?value
+                                              innerValue:View page ...
+
+                                /*
+                                 * Databinds snippets.
+                                 */
+                                micro.widgets.grid.databind:hypereval-snippets-grid
+
+                            oninit
+
+                              /*
+                               * Initial databinding of snippets grid.
+                               */
+                              hypereval.snippets.databind
+
+                /*
                  * Delete Hyperlambda snippet button.
                  */
                 button

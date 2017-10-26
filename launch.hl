@@ -10,6 +10,22 @@
 
 
 /*
+ * Checking if this is a request for a specific page.
+ */
+p5.web.query.get:name
+if:x:/@p5.web.query.get/*?value
+  p5.mysql.connect:[hypereval]
+    p5.mysql.select:@"select content from snippets where name = @name and type = 'page'"
+      @name:x:/@p5.web.query.get/*?value
+    hyper2lambda:x:/@p5.mysql.select/*/*/content?value
+    eval:x:/@hyper2lambda
+  return
+
+
+
+
+
+/*
  * Including Micro and its "serious" skin.
  */
 p5.web.include-css-file:@MICRO/media/main.css
