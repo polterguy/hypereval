@@ -174,9 +174,6 @@ create-widget:hypereval-main-container
                                           src:x:/@micro.widgets.wizard-form.value/*
                                         insert-data
                                           hypereval.settings
-                                        set-widget-property:hypereval-codemirror-wrapper
-                                          style:"font-size:{0}pt;"
-                                            :x:/@micro.widgets.wizard-form.value/*/font-size?value
 
                                         /*
                                          * Refreshing page, since CodeMirror doesn't handle it very well

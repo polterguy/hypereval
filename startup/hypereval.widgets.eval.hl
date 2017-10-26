@@ -137,8 +137,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Evaluate Hyperlambda button.
                  */
                 button:hypereval-evaluate-button
-                  innerValue:Evaluate
+                  innerValue:@"<span class=""icon-flash""></span>"
                   title:Evaluates the Hyperlambda in your editor - Alt+E
+                  style:"width:100px;"
                   onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
                   .onupload
 
@@ -192,8 +193,8 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * View "Output" button.
                  */
                 button:hypereval-output-button
-                  innerValue:Output
-                  title:Display the output code, which results from evaluating your code - Alt+O
+                  innerValue:@"<span class=""icon-eye""></span>"
+                  title:View the output code, which results from evaluating your code - Alt+O
                   onclick
 
                     /*
@@ -212,7 +213,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Load Hyperlambda button.
                  */
                 button:hypereval-load-button
-                  innerValue:Load
+                  innerValue:@"<span class=""icon-folder-open""></span>"
                   title:Loads a snippet from your snippets collection - Alt+L
                   onclick
 
@@ -287,7 +288,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Save Hyperlambda button.
                  */
                 button:hypereval-save-button
-                  innerValue:Save
+                  innerValue:@"<span class=""icon-bookmark""></span>"
                   title:Saves your current Hyperlambda to your snippets collection - Alt+S
                   onclick
 
@@ -364,7 +365,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Download Hyperlambda button.
                  */
                 button:hypereval-download-button
-                  innerValue:Download
+                  innerValue:@"<span class=""icon-download""></span>"
                   title:Downloads the Hyperlambda in your editor to your client
                   onclick
 
@@ -389,7 +390,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Upload Hyperlambda button.
                  */
                 button
-                  innerValue:Upload
+                  innerValue:@"<span class=""icon-upload""></span>"
                   title:Uploads a Hyperlambda file from your client
                   onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
 
@@ -397,7 +398,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Delete Hyperlambda snippet button.
                  */
                 button
-                  innerValue:Delete
+                  innerValue:@"<span class=""icon-trash""></span>"
                   title:Deletes the currently active snippet, if any
                   onclick
 
