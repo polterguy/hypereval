@@ -15,7 +15,25 @@
 p5.web.include-css-file:@MICRO/media/main.css
 p5.web.include-css-file:@MICRO/media/skins/serious.css
 p5.web.include-css-file:@MICRO/media/fonts.css
-p5.web.include-css-file:"https://fonts.googleapis.com/css?family=Anonymous+Pro"
+
+
+
+
+
+/*
+ * Default values, if no settings have been applied.
+ */
+.defaults
+  font-size:9.25
+
+
+
+
+
+/*
+ * Selecting settings, if any.
+ */
+select-data:x:/*/*/hypereval.settings
 
 
 
@@ -96,20 +114,93 @@ create-widget:hypereval-main-container
             div
               class:right
               widgets
-                button
-                  innerValue:@"<span class=""icon-home""></span>"
-                  onclick
+                div
+                  class:strip
+                  style:"display:inline-block;"
+                  widgets
+                    button
+                      innerValue:@"<span class=""icon-cog""></span>"
+                      title:Settings ...
+                      onclick
 
-                    /*
-                     * Redirecting user to server's root URL.
-                     */
-                    p5.web.get-root-location
-                    p5.web.set-location:x:/-?value
+                        /*
+                         * Showing a modal window, allowing user to modify his settings.
+                         */
+                        create-widgets
+                          micro.widgets.modal:hypereval-settings-modal
+                            widgets
+                              h3
+                                innerValue:Settings
+                              micro.widgets.wizard-form:hypereval-settings-data
+                                text
+                                  info:Font size
+                                  .data-field:font-size
+                                  type:number
+                                  min:8
+                                  max:20
+                                  step:.25
+                                  onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-settings-ok-button').raise('onclick');return false;}"
+                                  oninit
+
+                                    /*
+                                     * Making sure we set value to whatever it already is, if anything.
+                                     */
+                                    .defaults
+                                      font-size:9.25
+                                    select-data:x:/*/*/hypereval.settings
+                                    set-widget-property:x:/../*/_event?value
+                                      value:x:(/@select-data/*/*/font-size|/@.defaults/*/font-size)/$?value
+
+                                    /*
+                                     * Setting initial focus to font-size widget.
+                                     */
+                                    micro.page.set-focus:x:/../*/_event?value
+
+                                div
+                                  class:right
+                                  widgets
+                                    button:hypereval-settings-ok-button
+                                      style:"margin-bottom:0;"
+                                      innerValue:OK
+                                      onclick
+
+                                        /*
+                                         * Serializing form, saving settings to p5.data database, 
+                                         * and applying new settings.
+                                         */
+                                        micro.widgets.wizard-form.value:hypereval-settings-data
+                                        delete-data:x:/*/*/hypereval.settings
+                                        add:x:/../*/insert-data/*
+                                          src:x:/@micro.widgets.wizard-form.value/*
+                                        insert-data
+                                          hypereval.settings
+                                        set-widget-property:hypereval-codemirror-wrapper
+                                          style:"font-size:{0}pt;"
+                                            :x:/@micro.widgets.wizard-form.value/*/font-size?value
+
+                                        /*
+                                         * Refreshing page, since CodeMirror doesn't handle it very well
+                                         * when font is changed dynamically.
+                                         */
+                                        p5.web.reload-location
+
+                    button
+                      innerValue:@"<span class=""icon-home""></span>"
+                      title:Close Hypereval
+                      onclick
+
+                        /*
+                         * Redirecting user to server's root URL.
+                         */
+                        p5.web.get-root-location
+                        p5.web.set-location:x:/-?value
 
     div
       class:row
       widgets
-        div
+        div:hypereval-codemirror-wrapper
           class:col-100
+          style:"font-size:{0}pt;"
+            :x:(/@select-data/*/*/font-size|/../*/.defaults/*/font-size)/$?value
           widgets
             hypereval.widgets.eval

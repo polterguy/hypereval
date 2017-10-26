@@ -42,7 +42,6 @@ CodeMirror.defineMode("hyperlambda", function() {
      *  - number       ==> Used for p5.lambda expressions
      *  - property     ==> Used for a node's value, unless it's an expression or a string literal value
      *  - error        ==> Used for syntactic Hyperlambda errors. Normally this means that the entire rest of the document goes into "error mode"
-     *  - bracket      ==> Used for smaller error, such as Active Event invocation that was not found, etc.
      *  - variable-3   ==> Used for lambda segments, nodes starting with ".".
      *
      * The following CodeMirror theme classes are NOT used by the Hyperlambda CodeMirror plugin
@@ -100,11 +99,6 @@ CodeMirror.defineMode("hyperlambda", function() {
        * in front of name, or a string literal is not closed, etc.
        */
       error: 'error',
-
-      /*
-       * Displayed when there is a small error, such as wrong name of Active Event.
-       */
-      small_error:'bracket',
 
       /*
        * Lambda blocks (node starting with ".").
@@ -780,7 +774,8 @@ CodeMirror.defineMode("hyperlambda", function() {
         if (CodeMirror._hyperlispKeywords != null && CodeMirror._hyperlispKeywords.indexOf(word) != -1) {
 
             /*
-             * The name of the node starts with an underscore "_", and hence is a "variable" (data segment)
+             * The name was found in our Active Events JSON declaration, and is either a "keyword" or an Active Event.
+             * Which type it is, depends upon if it contains a "." or not.
              */
             if (word.indexOf('.') == -1) {
                 return this.styles.keyword;
@@ -799,12 +794,6 @@ CodeMirror.defineMode("hyperlambda", function() {
              * The name of the node starts with an underscore "_", and hence is a "variable" (data segment)
              */
             return this.styles.lambda;
-        } else if (word.indexOf('.') != -1) {
-
-            /*
-             * Syntax error in Active Event name!
-             */
-            return this.styles.small_error;
         }
     }
   };
