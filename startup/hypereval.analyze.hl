@@ -19,6 +19,69 @@ create-event:hypereval.analyze
     topic:string
 
   /*
+   * Loading decision tree, and displaying it in a modal window.
+   */
+  load-file:@HYPEREVAL/configuration/analyze-tree.hl
+  apply:x:/../*/create-widgets/**/micro.widgets.grid/*/rows
+    src:x:/@load-file/*/*
+    template
+      item
+        {option}:x:?value
+
+  /*
+   * Creating modal widget, with a datagrid in, which displays options to the user.
+   */
+  create-widgets
+    micro.widgets.modal:hypereval-analyze-modal
+      widgets
+        h3
+          innerValue:Please talk to me
+        p
+          innerValue:Tell me what parts of your code you'd like to discuss now.
+          events
+
+            /*
+             * Invoked when some part of our analyzing needs to display visual feedback.
+             */
+            hypereval.text-feedback
+              set-widget-property:x:/../*/_event?value
+                innerValue:x:/../*/_arg?value
+
+        micro.widgets.grid
+          rows
+        div
+          class:right
+          widgets
+            div
+              class:strip
+              style:"display:inline-block;"
+              widgets
+                button
+                  innerValue:Finish
+                  oninit
+
+                    /*
+                     * Setting initial focus to "Finish" button.
+                     */
+                    micro.page.set-focus:x:/../*/_event?value
+
+                  onclick
+
+                    /*
+                     * Deleting modal widget, and stopping any further listening.
+                     */
+                    delete-widget:hypereval-analyze-modal
+
+                button
+                  innerValue:Listen
+                  onclick
+
+                    /*
+                     * Retrieving user input again.
+                     */
+                    hypereval._continue-analyzing
+
+  /*
    * Checking is caller supplied a [topic], and if so, evaluating that topic
    * instead of the default parts.
    */
@@ -66,12 +129,15 @@ create-event:hypereval.analyze
         src:" Your code is fairly complex."
     else
       set:x:/@_complexity?value
-        src:" Your code would probably benefit from being broken up into smaller pieces."
+        src:" Your code should probably be broken up into smaller pieces."
 
     /*
      * Supplying feedback to user.
      */
-    micro.speak:@"Your code is valid Hyperlambda, it contains {0} nodes.{1} What do you want me to do now?"
+    hypereval.text-feedback:@"Your code contains {0} nodes.{1}"
+      :x:/@hyper2lambda/**?count
+      :x:/@_complexity?value
+    micro.speak:@"Your code is valid Hyperlambda, it contains {0} nodes.{1} What do you want to discuss now?"
       :x:/@hyper2lambda/**?count
       :x:/@_complexity?value
       voice:Karen
@@ -162,75 +228,3 @@ create-event:hypereval._continue-analyzing
              * Continue listening.
              */
             hypereval._continue-analyzing
-
-  /*
-   * Creating our decision tree options, but only if it doesn't exist from before.
-   */
-  if
-    fetch:x:/0/0?value
-      widget-exists:hypereval-analyze-modal
-    not
-
-    /*
-     * Loading decision tree, and displaying it in a modal window.
-     */
-    load-file:@HYPEREVAL/configuration/analyze-tree.hl
-    apply:x:/..if/*/create-widgets/**/micro.widgets.grid/*/rows
-      src:x:/@load-file/*/*
-      template
-        item
-          {option}:x:?value
-
-    /*
-     * Creating modal widget, with a datagrid in, which displays options to the user.
-     */
-    create-widgets
-      micro.widgets.modal:hypereval-analyze-modal
-        widgets
-          h3
-            innerValue:Please talk to me
-          p
-            innerValue:Tell me what parts of your code you'd like to discuss now.
-            events
-
-              /*
-               * Invoked when some part of our analyzing needs to display visual feedback.
-               */
-              hypereval.text-feedback
-                set-widget-property:x:/../*/_event?value
-                  innerValue:x:/../*/_arg?value
-
-          micro.widgets.grid
-            rows
-          div
-            class:right
-            widgets
-              div
-                class:strip
-                style:"display:inline-block;"
-                widgets
-                  button
-                    innerValue:Finish
-                    oninit
-
-                      /*
-                       * Setting initial focus to "Finish" button.
-                       */
-                      micro.page.set-focus:x:/../*/_event?value
-
-                    onclick
-
-                      /*
-                       * Deleting modal widget, and stopping any further listening.
-                       */
-                      delete-widget:hypereval-analyze-modal
-
-                  button
-                    innerValue:Listen
-                    onclick
-
-                      /*
-                       * Retrieving user input again.
-                       */
-                      hypereval._continue-analyzing
-
