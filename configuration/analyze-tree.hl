@@ -382,6 +382,18 @@ analyse-concepts:Discuss concepts
         keywords
           ~micro.
       concept
+        text:" Your code is including CSS files, please make sure these files actually exists."
+        keywords
+          p5.web.include-css-file
+      concept
+        text:" Your code is including JavaScript files, please make sure these files actually exists, and that they have no syntactis errors."
+        keywords
+          p5.web.include-javascript-file
+      concept
+        text:" Your code is returning inline JavaScript from your server, make sure there are no syntactic errors in your JavaScript by testing it thoroughly."
+        keywords
+          p5.web.send-javascript
+      concept
         text:" Your code is evaluating code, which implies you should be carefully looking for unintentional side-effects, such as evaluating malicious code by accident."
         keywords
           eval
@@ -390,6 +402,24 @@ analyse-concepts:Discuss concepts
         text:" Your code is evaluating code, but since it does this using a whitelist, this is probably OK."
         keywords
           eval-whitelist
+      concept
+        text:" Your code is evaluating Hyperlambda files, make sure that these files exists, and that there are no syntactic errors in them."
+        keywords
+          micro.evaluate.file
+      concept
+        text:" Your code is evaluating and entire Hyperlambda folder, which implies that it will evaluate every single Hyperlambda file, recursively found inside of the specified folder. Please make sure it's impossible to inject malicious code into this folder."
+        keywords
+          micro.evaluate.file
+      concept
+        text:" Your code is accessing the file system directly, make sure you don't accidentally delete files you are dependent upon, or access files that doesn't exist."
+        keywords
+          load-file
+          save-file
+          delete-file
+          move-file
+          copy-file
+          file-exists
+          ~p5.io.
 
     /*
      * Looping through each [.concept], and checking if we can find it in our code.
