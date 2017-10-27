@@ -1,0 +1,236 @@
+
+/*
+ * Creates analyze Active Event.
+ *
+ * This event will allow you to "discuss" your Hyperlambda code with your computer.
+ * Pass in Hyperlambda code as [_arg].
+ *
+ * Optionally pass in [topic] being the name of any root node from 
+ * your "/configuration/analyze-tree.hl" file.
+ */
+create-event:hypereval.analyze
+
+  /*
+   * Verifying mandatory argument are supplied.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+  micro.lambda.contract.optional:x:/..
+    topic:string
+
+  /*
+   * Checking is caller supplied a [topic], and if so, evaluating that topic
+   * instead of the default parts.
+   */
+  if:x:/../*/topic?value
+
+    /*
+     * Loading decision tree, and evaluating specified [topic] from it, instead
+     * of evaluating the default logic.
+     */
+    load-file:@HYPEREVAL/configuration/analyze-tree.hl
+
+  /*
+   * First trying to convert Hyperlambda into lambda, and inform user of whether
+   * or not it was successfully converted.
+   */
+  try
+
+    /*
+     * Converting code to lambda, and making sure we store it as lambda in our
+     * session, for making it easily accessible later for other parts of our
+     * analyzer.
+     */
+    hyper2lambda:x:/../*/_arg?value
+    add:x:/+/*/*
+      src:x:/@hyper2lambda/*
+    p5.web.session.set:hypereval.analyze-lambda
+      src
+        code
+
+    /*
+     * Making sure we analyze how complex the code is.
+     */
+    _complexity
+    if:x:/@hyper2lambda/**?count
+      <:int:30
+      set:x:/@_complexity?value
+        src:" Your code is probably easily understood for most others."
+    else-if:x:/@hyper2lambda/**?count
+      <:int:60
+      set:x:/@_complexity?value
+        src:" Your code is moderately complex."
+    else-if:x:/@hyper2lambda/**?count
+      <:int:100
+      set:x:/@_complexity?value
+        src:" Your code is fairly complex."
+    else
+      set:x:/@_complexity?value
+        src:" Your code would probably benefit from being broken up into smaller pieces."
+
+    /*
+     * Supplying feedback to user.
+     */
+    micro.speak:@"Your code is valid Hyperlambda, it contains {0} nodes.{1} What do you want me to do now?"
+      :x:/@hyper2lambda/**?count
+      :x:/@_complexity?value
+      voice:Karen
+      pitch:1.1
+      rate:0.75
+      onfinish
+
+        /*
+         * Evaluating event responsible for showing options, and getting input from
+         * the user.
+         */
+        hypereval._continue-analyzing
+
+  catch
+
+    /*
+     * Oops ...!!
+     */
+    micro.speak:Your code is not valid Hyperlambda, you have at least one syntax error in it, and I cannot understand it in its current form.
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+
+
+
+
+
+/*
+ * Helper event for above.
+ */
+create-event:hypereval._continue-analyzing
+
+  /*
+   * Listening for input from user.
+   */
+  micro.listen
+    onfinish
+
+      /*
+       * Figuring out if user said something that we can actually find in our
+       * decision tree, and if so, evaluating its lambda callback.
+       *
+       * Notice, we do a lower comparison.
+       */
+      to-lower:x:/../*/text?value
+      _found:bool:false
+      load-file:@HYPEREVAL/configuration/analyze-tree.hl
+
+      /*
+       * Looping through all options from our decision tree, and if we find a
+       * match, we evaluate its lambda, and break our loop.
+       */
+      for-each:x:/@load-file/*/*
+
+        /*
+         * Making sure we do a lower comparison.
+         */
+        to-lower:x:/@_dp/#?value
+        if:x:/@to-lower?value
+          =:x:/..for-each/@to-lower?value
+
+          /*
+           * We have a match.
+           */
+          set:x:/@_found?value
+            src:bool:true
+          eval:x:/@_dp/#/*/.evaluate
+
+      /*
+       * Verifying we actually found a match in our decision tree.
+       */
+      if:x:/@_found?value
+        not
+
+        hypereval.text-feedback:I do not understand '{0}'.
+          :x:/../*/text?value
+
+        /*
+         * We didn't find any match.
+         */
+        micro.speak:Sorry, I don't understand that.
+          voice:Karen
+          pitch:1.1
+          rate:0.85
+          onfinish
+
+            /*
+             * Continue listening.
+             */
+            hypereval._continue-analyzing
+
+  /*
+   * Creating our decision tree options, but only if it doesn't exist from before.
+   */
+  if
+    fetch:x:/0/0?value
+      widget-exists:hypereval-analyze-modal
+    not
+
+    /*
+     * Loading decision tree, and displaying it in a modal window.
+     */
+    load-file:@HYPEREVAL/configuration/analyze-tree.hl
+    apply:x:/..if/*/create-widgets/**/micro.widgets.grid/*/rows
+      src:x:/@load-file/*/*
+      template
+        item
+          {option}:x:?value
+
+    /*
+     * Creating modal widget, with a datagrid in, which displays options to the user.
+     */
+    create-widgets
+      micro.widgets.modal:hypereval-analyze-modal
+        widgets
+          h3
+            innerValue:Please talk to me
+          p
+            innerValue:Tell me what parts of your code you'd like to discuss now.
+            events
+
+              /*
+               * Invoked when some part of our analyzing needs to display visual feedback.
+               */
+              hypereval.text-feedback
+                set-widget-property:x:/../*/_event?value
+                  innerValue:x:/../*/_arg?value
+
+          micro.widgets.grid
+            rows
+          div
+            class:right
+            widgets
+              div
+                class:strip
+                style:"display:inline-block;"
+                widgets
+                  button
+                    innerValue:Finish
+                    oninit
+
+                      /*
+                       * Setting initial focus to "Finish" button.
+                       */
+                      micro.page.set-focus:x:/../*/_event?value
+
+                    onclick
+
+                      /*
+                       * Deleting modal widget, and stopping any further listening.
+                       */
+                      delete-widget:hypereval-analyze-modal
+
+                  button
+                    innerValue:Listen
+                    onclick
+
+                      /*
+                       * Retrieving user input again.
+                       */
+                      hypereval._continue-analyzing
+

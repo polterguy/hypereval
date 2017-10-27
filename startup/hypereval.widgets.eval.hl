@@ -582,6 +582,21 @@ p5.hypereval_input.setSize('100%', '600px');"
                               hypereval.snippets.databind
 
                 /*
+                 * Analyze Hyperlambda snippet button.
+                 */
+                button
+                  innerValue:@"<span class=""icon-info-circle""></span>"
+                  title:Discuss your code with your computer
+                  onclick
+
+                    /*
+                     * Evaluates event responsible for initiating an anlyze session of your snippet.
+                     */
+                    get-widget-property:hypereval-input
+                      innerValue
+                    hypereval.analyze:x:/@get-widget-property/*/*?value
+
+                /*
                  * Delete Hyperlambda snippet button.
                  */
                 button

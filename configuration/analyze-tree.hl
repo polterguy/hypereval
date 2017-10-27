@@ -1,0 +1,90 @@
+
+/*
+ * Contains our Hyperlambda analyze tree.
+ */
+
+
+
+
+
+/*
+ * Analyzing keywords in your code.
+ */
+quit:Thank you Elizabeth
+  .evaluate
+
+    /*
+     * Closing modal widget, and ending dialogue.
+     */
+    delete-widget:hypereval-analyze-modal
+    micro.speak:No problem, I am happy to be of assistance.
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+
+
+
+
+
+/*
+ * Analyzing keywords in your code.
+ */
+analyse-keywords:Analyse keywords
+
+
+
+
+
+/*
+ * Analyzing events in your code.
+ */
+analyse-events:Analyse events
+  .evaluate
+
+    /*
+     * Extracting code from session, figuring out how many references to different
+     * events the code contains, and giving user feedback about our findings.
+     */
+    _no:int:0
+    .events
+    p5.web.session.get:hypereval.analyze-lambda
+    vocabulary
+    for-each:x:/@vocabulary/*?value
+
+      /*
+       * Checking if Active Event exists in lambda, and if so, bumping number of events.
+       */
+      if:x:/@p5.web.session.get/*/*/*/\{0}
+        :x:/@_dp?value
+
+        /*
+         * Currently iterated Active Event was found in lambda from session.
+         */
+        set:x:/@_no?value
+          +:x:/@_no?value
+            _:1
+        add:x:/@.events
+          src:<strong>[{0}]</strong>
+            :x:/@_dp?value
+
+    /*
+     * Providing visual feedback about which events we found.
+     */
+    join:x:/@.events/*?name
+      sep:", "
+    hypereval.text-feedback:We found the following events in your code {0}
+      :x:/@join?value
+
+    /*
+     * Now we know how many events the code contains.
+     */
+    micro.speak:Your code contains {0} to Active Events.
+      :x:/@_no?value
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+
+    /*
+     * Continuing our discussion.
+     */
+    hypereval._continue-analyzing
