@@ -11,11 +11,6 @@
 create-event:hypereval.analyze
 
   /*
-   * Resetting speak API.
-   */
-  micro.listen.reset
-
-  /*
    * Checking if this is an empty code block.
    */
   trim:x:/../*/_arg?value
@@ -46,9 +41,8 @@ create-event:hypereval.analyze
         .row
           onclick
             {.id}:x:?name
-            micro.listen.quit
+            micro.listen.stop
             hypereval._analyze-selection:x:/@.id?value
-            micro.listen.reset
         {Command}:x:?value
         {Action}:x:/*/action-name?value
           style:"white-space:nowrap;"
@@ -101,7 +95,8 @@ create-event:hypereval.analyze
                     /*
                      * Deleting modal widget, and stopping any further listening.
                      */
-                    hypereval._analyze-selection:quit
+                    delete-widget:hypereval-analyze-modal
+                    micro.listen.stop
 
   /*
    * Checking is caller supplied a [topic], and if so, evaluating that topic

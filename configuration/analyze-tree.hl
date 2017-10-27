@@ -171,7 +171,7 @@ analyse-nodes:Is it dry
     else-if:x:/@*?value.int
       >:int:50
       set:x:/@_extra?value
-        src:" Your code is fairly dry, and does not repeat itself too much. This is OK."
+        src:" Your code is fairly dry, and does not repeat itself too much, this is OK."
     else-if:x:/@*?value.int
       >:int:20
       set:x:/@_extra?value
@@ -724,7 +724,6 @@ quit:Thank you Elizabeth
         widget-exists:hypereval-analyze-modal
       delete-widget:hypereval-analyze-modal
     p5.web.session.set:hypereval.analyze-lambda
-    micro.listen.quit
     micro.speak:No problem, live long and prosper
       voice:Karen
       pitch:1.1
@@ -744,46 +743,45 @@ create-report:Can you create a report for me
     /*
      * Acknowledging, and creating a report for the user.
      */
-    micro.speak:Sure, I'll just include it at the top of your code
+    micro.speak:Sure, I'll include it in your code.
       voice:Karen
       pitch:1.1
       rate:0.85
-      onfinish
 
-        /*
-         * Creating our report.
-         */
-        p5.web.session.set:hypereval.report
-        load-file:@HYPEREVAL/configuration/analyze-tree.hl
-        for-each:x:/@load-file/*/*/*/.is-report/.
+    /*
+     * Creating our report.
+     */
+    p5.web.session.set:hypereval.report
+    load-file:@HYPEREVAL/configuration/analyze-tree.hl
+    for-each:x:/@load-file/*/*/*/.is-report/.
 
-          /*
-           * Modifying each [micro.speak] instance, to become our "append to report"
-           * invocation instead.
-           */
-          set:x:/@_dp/#/**/micro.speak/*(!/)
-          set:x:/@_dp/#/**/~micro.listen/*
-          set:x:/@_dp/#/**/micro.speak?name
-            src:hypereval._append-to-report
+      /*
+       * Modifying each [micro.speak] instance, to become our "append to report"
+       * invocation instead.
+       */
+      set:x:/@_dp/#/**/micro.speak/*(!/)
+      set:x:/@_dp/#/**/~micro.listen/*
+      set:x:/@_dp/#/**/micro.speak?name
+        src:hypereval._append-to-report
 
-          /*
-           * Evaluating [.evaluate], now modified.
-           */
-          eval:x:/@_dp/#/*/.evaluate
+      /*
+       * Evaluating [.evaluate], now modified.
+       */
+      eval:x:/@_dp/#/*/.evaluate
 
-        /*
-         * Adds our report comment at the top of the CodeMirror code.
-         */
-        hypereval._create-report
+    /*
+     * Adds our report comment at the top of the CodeMirror code.
+     */
+    hypereval._create-report
 
-        /*
-         * Closing modal widget, clearing session, and ending dialogue, if widget exists.
-         */
-        if
-          fetch:x:/0/0?value
-            widget-exists:hypereval-analyze-modal
-          delete-widget:hypereval-analyze-modal
-        p5.web.session.set:hypereval.analyze-lambda
+    /*
+     * Closing modal widget, clearing session, and ending dialogue, if widget exists.
+     */
+    if
+      fetch:x:/0/0?value
+        widget-exists:hypereval-analyze-modal
+      delete-widget:hypereval-analyze-modal
+    p5.web.session.set:hypereval.analyze-lambda
 
 
 
@@ -950,7 +948,6 @@ fuck-you:F*** you
             widget-exists:hypereval-analyze-modal
           delete-widget:hypereval-analyze-modal
         p5.web.session.set:hypereval.analyze-lambda
-        micro.listen.quit
 
         /*
          * Continuing our discussion.
@@ -979,7 +976,6 @@ you-re-an-asshole:You're an a******
             widget-exists:hypereval-analyze-modal
           delete-widget:hypereval-analyze-modal
         p5.web.session.set:hypereval.analyze-lambda
-        micro.listen.quit
 
         /*
          * Continuing our discussion.
@@ -1027,7 +1023,6 @@ whats-your-favorite-song:What's your favourite song
             widget-exists:hypereval-analyze-modal
           delete-widget:hypereval-analyze-modal
         p5.web.session.set:hypereval.analyze-lambda
-        micro.listen.quit
 
         /*
          * Continuing our discussion.
