@@ -48,6 +48,7 @@ create-event:hypereval.analyze
             {.id}:x:?name
             micro.listen.quit
             hypereval._analyze-selection:x:/@.id?value
+            micro.listen.reset
         {Command}:x:?value
         {Action}:x:/*/action-name?value
           style:"white-space:nowrap;"
@@ -321,7 +322,8 @@ create-event:hypereval._continue-analyzing
    */
   if
     fetch:x:/0/0?value
-      not
+      widget-exists:hypereval-analyze-modal
+    not
     return
 
   /*
@@ -334,3 +336,55 @@ create-event:hypereval._continue-analyzing
        * Evaluating event responsible for continuing analysing.
        */
       hypereval._analyze-selection:x:/../*/text?value
+
+
+
+
+
+/*
+ * Appends given [_arg] to report object.
+ */
+create-event:hypereval._append-to-report
+
+  /*
+   * Retrieving previously added stuff, and appending [_arg] to it.
+   */
+  p5.web.session.get:hypereval.report
+  p5.web.session.set:hypereval.report
+    src:{0}{1}
+      :x:/@p5.web.session.get/*?value
+      :x:/../*/_arg?value
+
+
+
+
+
+/*
+ * Modifies the CodeMirror module with our report comments at the top.
+ */
+create-event:hypereval._create-report
+
+  /*
+   * Retrieving old code, and making sure we append our comment at the top of it.
+   */
+  p5.web.session.get:hypereval.report
+  split:x:/@p5.web.session.get/*?value
+    =:.
+    trim:true
+  join:x:/@split/*?name
+    sep:".\r\n * "
+  set:x:/@join?value
+    src:"\r\n\r\n/*\r\n * A Homeopathic code evaluation of your Hyperlambda by Lisbeth\r\n *\r\n * {0}.\r\n */\r\n\r\n"
+      :x:/@join?value
+  get-widget-property:hypereval-input
+    innerValue
+  _code:x:/@join?value
+  eval-x:x:/-
+  set:x:/@_code?value
+    src:{0}{1}
+      :x:/@_code?value
+      :x:/@get-widget-property/*/*?value
+  set-widget-property:hypereval-input
+    innerValue:x:/@_code?value
+  p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(p5.$('hypereval-input').el.value);"
+  p5.web.session.set:hypereval.report

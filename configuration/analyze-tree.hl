@@ -12,6 +12,7 @@
  */
 analyse-keywords:Discuss keywords
   action-name:Analyse keywords
+  .is-report
   .evaluate
 
     /*
@@ -73,6 +74,7 @@ analyse-keywords:Discuss keywords
  */
 analyse-events:Discuss events
   action-name:Analyse keywords
+  .is-report
   .evaluate
 
     /*
@@ -133,6 +135,7 @@ analyse-events:Discuss events
  */
 analyse-nodes:Is it dry
   action-name:Analyse DRYness of code
+  .is-report
   .evaluate
 
     /*
@@ -155,7 +158,7 @@ analyse-nodes:Is it dry
     -:x:/@_nodes?value
       _:x:/@_unique-nodes?value
     -:x:/@_unique-nodes?value
-      :x:/./-?value
+      _:x:/./-?value
     /:x:/@-?value.decimal
       _:x:/@_nodes?value.decimal
     *:x:/-?value
@@ -164,7 +167,7 @@ analyse-nodes:Is it dry
     if:x:/@*?value.int
       >:int:80
       set:x:/@_extra?value
-        src:" Your code is very dry, and does not repeat itself much at all. This is very good."
+        src:" Your code is very dry, and does not repeat itself much at all, which is a good thing."
     else-if:x:/@*?value.int
       >:int:50
       set:x:/@_extra?value
@@ -201,6 +204,7 @@ analyse-nodes:Is it dry
  */
 analyse-commenting:What about comments
   action-name:Analyse comments
+  .is-report
   .evaluate
 
     /*
@@ -226,18 +230,18 @@ analyse-commenting:What about comments
     if:x:/@-?value.int
       >:int:80
       set:x:/@_extra?value
-        src:" You have commented your code very well."
+        src:" and have commented your code very well."
     else-if:x:/@-?value.int
       >:int:50
       set:x:/@_extra?value
-        src:" You have commented your code fairly well."
+        src:" and have commented your code fairly well."
     else-if:x:/@-?value.int
       >:int:20
       set:x:/@_extra?value
-        src:" You should comment your code more."
+        src:" and should comment your code more."
     else
       set:x:/@_extra?value
-        src:" This is not good, not good at all."
+        src:" which is not good, in fact it is quite terrible, and makes your code more difficult to understand."
 
 
     /*
@@ -249,7 +253,7 @@ analyse-commenting:What about comments
     /*
      * Now we know how many events the code contains.
      */
-    micro.speak:{0} percent of your code is comments. {1}
+    micro.speak:{0} percent of your code is comments, {1}
       :x:/@-?value.int
       :x:/@_extra?value
       voice:Karen
@@ -271,6 +275,7 @@ analyse-commenting:What about comments
  */
 analyse-concepts:Discuss concepts
   action-name:Analyse concepts
+  .is-report
   .evaluate
 
     /*
@@ -413,7 +418,7 @@ analyse-concepts:Discuss concepts
       concept
         text:" Your code is evaluating and entire Hyperlambda folder, which implies that it will evaluate every single Hyperlambda file, recursively found inside of the specified folder. Please make sure it's impossible to inject malicious code into this folder."
         keywords
-          micro.evaluate.file
+          micro.evaluate.folder
       concept
         text:" Your code is accessing the file system directly, make sure you don't accidentally delete files you are dependent upon, or access files that doesn't exist."
         keywords
@@ -625,6 +630,7 @@ analyse-concepts:Discuss concepts
  */
 analyse-idea:Discuss ideas
   action-name:Analyse ideas
+  .is-report
   .evaluate
 
     /*
@@ -723,6 +729,61 @@ quit:Thank you Elizabeth
       voice:Karen
       pitch:1.1
       rate:0.85
+
+
+
+
+
+/*
+ * Creating a report.
+ */
+create-report:Can you create a report for me
+  action-name:Create a report
+  .evaluate
+
+    /*
+     * Acknowledging, and creating a report for the user.
+     */
+    micro.speak:Sure, I'll just include it at the top of your code
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Creating our report.
+         */
+        p5.web.session.set:hypereval.report
+        load-file:@HYPEREVAL/configuration/analyze-tree.hl
+        for-each:x:/@load-file/*/*/*/.is-report/.
+
+          /*
+           * Modifying each [micro.speak] instance, to become our "append to report"
+           * invocation instead.
+           */
+          set:x:/@_dp/#/**/micro.speak/*(!/)
+          set:x:/@_dp/#/**/~micro.listen/*
+          set:x:/@_dp/#/**/micro.speak?name
+            src:hypereval._append-to-report
+
+          /*
+           * Evaluating [.evaluate], now modified.
+           */
+          eval:x:/@_dp/#/*/.evaluate
+
+        /*
+         * Adds our report comment at the top of the CodeMirror code.
+         */
+        hypereval._create-report
+
+        /*
+         * Closing modal widget, clearing session, and ending dialogue, if widget exists.
+         */
+        if
+          fetch:x:/0/0?value
+            widget-exists:hypereval-analyze-modal
+          delete-widget:hypereval-analyze-modal
+        p5.web.session.set:hypereval.analyze-lambda
 
 
 
@@ -943,3 +1004,33 @@ can-u-sing:Can you sing for me
          * Continuing our discussion.
          */
         hypereval._continue-analyzing
+
+whats-your-favorite-song:What's your favourite song
+  action-name:What's your favourite song
+  .invisible
+  .evaluate
+
+    /*
+     * Easter egg'ish.
+     */
+    micro.speak:I like all sorts of music, but here's one of my favourites.
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Closing modal widget, clearing session, and ending dialogue, if widget exists.
+         */
+        if
+          fetch:x:/0/0?value
+            widget-exists:hypereval-analyze-modal
+          delete-widget:hypereval-analyze-modal
+        p5.web.session.set:hypereval.analyze-lambda
+        micro.listen.quit
+
+        /*
+         * Continuing our discussion.
+         */
+        p5.web.send-javascript:@"window.open('https://www.youtube.com/watch?v=KfvplbJnzao', '_blank')"
+
