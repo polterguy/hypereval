@@ -884,3 +884,41 @@ fuck-you:F*** you
          * Continuing our discussion.
          */
         p5.web.send-javascript:@"window.open('https://www.youtube.com/watch?v=fHC05_9b0gw', '_blank')"
+
+you-re-an-asshole:You're an a******
+  action-name:You're an asshole
+  .invisible
+  .evaluate
+
+    /*
+     * Easter egg'ish.
+     */
+    micro.speak:And fuck you too
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        p5.web.send-javascript:@"window.open('https://www.youtube.com/watch?v=UrgpZ0fUixs', '_blank')"
+
+can-u-sing:Can you sing for me
+  action-name:Can you sing for me
+  .invisible
+  .evaluate
+
+    /*
+     * Easter egg'ish.
+     */
+    micro.speak:do re mi fa so la ti to, tra-la-la
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing

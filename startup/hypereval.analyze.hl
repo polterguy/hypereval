@@ -236,7 +236,7 @@ create-event:hypereval._analyze-selection
     /*
      * No input.
      */
-    micro.speak:Sorry, I didn't get that. Say thank you Elizabeth to quit.
+    micro.speak:Sorry, I didn't get that.
       voice:Karen
       pitch:1.1
       rate:0.85
