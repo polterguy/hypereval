@@ -21,7 +21,7 @@ create-event:hypereval.analyze
   trim:x:/../*/_arg?value
   if:x:/@trim?value
     =:
-    micro.speak:Your code is 100 percent zen, ha-ha.
+    micro.speak:Your code is 100 percent zen, and the only piece of perfect code to have ever been known to exist. Congratulations, you have created perfect code, and I have nothing to add! You are truly the Buddha of system development!
       voice:Karen
       pitch:1.1
       rate:0.75
@@ -40,7 +40,7 @@ create-event:hypereval.analyze
    */
   load-file:@HYPEREVAL/configuration/analyze-tree.hl
   apply:x:/../*/create-widgets/**/micro.widgets.grid/*/rows
-    src:x:/@load-file/*/*
+    src:x:/@load-file/*/*(!/*/.invisible/.)
     template
       item
         .row
