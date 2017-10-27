@@ -199,7 +199,7 @@ analyse-nodes:Is it dry
 /*
  * Analyzing comments in your code.
  */
-analyse-commenting:Comments
+analyse-commenting:What about comments
   action-name:Analyse comments
   .evaluate
 
@@ -357,6 +357,10 @@ analyse-concepts:Discuss concepts
           p5.web.widgets.create-container/**/~on
           create-widgets/**/style
       concept
+        text:" Your code seems to be using extension widgets, please make sure that these extension widgets actually exists in the environment where you intend to evaluate this code."
+        keywords
+          ~.widgets.
+      concept
         text:" Your code seems to be creating events, which modifies the state of your server. Be on alert here, such that you make sure your events have a unique name space, such that they don't clash with other pre existing events."
         keywords
           create-event
@@ -420,6 +424,158 @@ analyse-concepts:Discuss concepts
           copy-file
           file-exists
           ~p5.io.
+      concept
+        text:" Your code is creating a PayPal button, may you be rich and have everything your heart desires."
+        keywords
+          micro.widgets.paypal-button
+      concept
+        text:" Your code is consuming the cryptographic services of phosphorus five."
+        keywords
+          ~p5.crypto.
+      concept
+        text:" Your code is searching for images on flickr."
+        keywords
+          p5.flickr.search
+      concept
+        text:" Your code is parsing or creating CSV files."
+        keywords
+          ~p5.csv.
+          lambda2csv
+      concept
+        text:" Your code is semantically parsing HTML."
+        keywords
+          html2lambda
+          p5.html.html2lambda
+      concept
+        text:" Your code is semantically creating HTML."
+        keywords
+          lambda2html
+          p5.html.lambda2html
+      concept
+        text:" Your code seems to be directly manipulating images, make sure these images actually exists on disc."
+        keywords
+          ~p5.http.
+      concept
+        text:" Your code is creating HTTP requests, make sure you accommodate for networking errors by for instance wrapping your HTTP requests inside of a try catch block."
+        keywords
+          ~p5.imaging.
+      concept
+        text:" Your code is creating zip files."
+        keywords
+          zip
+          p5.io.zip
+      concept
+        text:" Your code is parsing zip files."
+        keywords
+          unzip
+          p5.io.unzip
+      concept
+        text:" Your code is semantically parsing JSON."
+        keywords
+          json2lambda
+          p5.json.json2lambda
+      concept
+        text:" Your code is semantically creating JSON from a lambda object."
+        keywords
+          lambda2json
+          p5.json.lambda2json
+      concept
+        text:" Your code is checking for emails using the pop 3 events in phosphorus five."
+        keywords
+          p5.pop3.get
+      concept
+        text:" Your code is sending emails."
+        keywords
+          p5.smtp.send
+      concept
+        text:" Your code is semantically parsing markdown, and transforming it into HTML."
+        keywords
+          markdown2html
+          p5.markdown.markdown2html
+      concept
+        text:" Your code is using the MIME services of phosphorus five, to either create a MIME message, or to parse one."
+        keywords
+          ~p5.mime
+      concept
+        text:" Your code is creating PDF files from HTML."
+        keywords
+          html2pdf
+          p5.pdf.html2pdf
+      concept
+        text:" Your code is using multiple threads, this is notoriously difficult to handle correctly, and I wish you good luck."
+        keywords
+          fork
+          lock
+          write-lock
+          p5.threading.lock
+          p5.threading.write-lock
+          read-lock
+          p5.threading.read-lock
+          sleep
+          p5.threading.sleep
+          wait
+          p5.threading.wait
+      concept
+        text:" Your code is creating XML snippets."
+        keywords
+          lambda2xml
+          p5.xml.lambda2xml
+      concept
+        text:" Your code is semantically parsing XML snippets."
+        keywords
+          xml2lambda
+          p5.xml.xml2lambda
+      concept
+        text:" Your code is dependent upon configuration settings from your app's configuration file, please make sure these configuration settings actually exists in your configuration file."
+        keywords
+          ~p5.config.
+      concept
+        text:" Your code is looping."
+        keywords
+          for-each
+          while
+      concept
+        text:" Your code is branching."
+        keywords
+          if
+          switch
+      concept
+        text:" Your code is modifying its execution tree."
+        keywords
+          set
+          add
+          insert-before
+          insert-after
+          apply
+      concept
+        text:" Your code is handling exceptions, good work. Creating defensive code is always smart."
+        keywords
+          throw
+          try
+          catch
+          finally
+      concept
+        text:" Your code is doing mathematical operations."
+        keywords
+          \+
+          \-
+          \*
+          \/
+          \%
+      concept
+        text:" Your code is manipulating strings."
+        keywords
+          ends-with
+          index-of
+          join
+          length
+          match
+          replace
+          split
+          starts-with
+          to-lower
+          to-upper
+          trim
 
     /*
      * Looping through each [.concept], and checking if we can find it in our code.
@@ -465,6 +621,89 @@ analyse-concepts:Discuss concepts
 
 
 /*
+ * Analyzing main root of code.
+ */
+analyse-idea:Discuss ideas
+  action-name:Analyse ideas
+  .evaluate
+
+    /*
+     * Extracting lambda from session, figuring out which different (known) ideas are
+     * found in the code.
+     */
+    _extra
+    p5.web.session.get:hypereval.analyze-lambda
+
+    /*
+     * List of (known) ideas.
+     */
+    .ideas
+      idea
+        text:" Your code is creating one or more Active Events, and should probably be made into a startup object, unless it already is, since otherwise you'll loose these events when your server is restarted."
+        keywords
+          create-event
+          p5.events.create
+      idea
+        text:" Your code is creating widgets, and can probably successfully be turned into a page, unless you have already done this."
+        keywords
+          create-widget
+          create-void-widget
+          create-literal-widget
+          create-container-widget
+          p5.web.widgets.create
+          p5.web.widgets.create-void
+          p5.web.widgets.create-literal
+          p5.web.widgets.create-container
+          create-widgets
+      idea
+        text:" Your code is probably a web service or some sort, and should probably me made into a page, unless it already is."
+        keywords
+          p5.web.echo
+
+    /*
+     * Looping through each [.ideas], and checking if we can find it in our code.
+     */
+    for-each:x:/@.ideas/*
+      _break:bool:false
+      for-each:x:/@_dp/#/*/keywords/*?name
+        if:x:/@p5.web.session.get/*/*/*/{0}
+          :x:/@_dp?value
+
+          /*
+           * Concept found.
+           */
+          set:x:/@_break?value
+            src:bool:true
+          set:x:/@_extra?value
+            src:{0}{1}
+              :x:/@_extra?value
+              :x:/..for-each/@_dp/#/*/text?value
+          break
+        if:x:/@_break?value
+          set:x:/@_break?value
+            src:bool:false
+          break
+
+    /*
+     * Now we can return our concepts back to caller.
+     */
+    hypereval.text-feedback:These were the ideas I was able to find in your code.
+    micro.speak:x:/@_extra?value
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+
+
+
+
+/*
  * Analyzing keywords in your code.
  */
 quit:Thank you Elizabeth
@@ -480,7 +719,7 @@ quit:Thank you Elizabeth
       delete-widget:hypereval-analyze-modal
     p5.web.session.set:hypereval.analyze-lambda
     micro.listen.quit
-    micro.speak:No problem, I am happy to be of assistance.
+    micro.speak:No problem, live long and prosper
       voice:Karen
       pitch:1.1
       rate:0.85
