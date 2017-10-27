@@ -213,6 +213,81 @@ p5.hypereval_input.setSize('100%', '600px');"
                         visible:true
 
                 /*
+                 * Load Hyperlambda button.
+                 */
+                button:hypereval-load-button
+                  innerValue:@"<span class=""icon-folder-open""></span>"
+                  title:Loads a snippet from your snippets collection - Alt+L
+                  onclick
+
+                    /*
+                     * Displaying a modal window to user, to allow him to select 
+                     * a Hyperlambda snippet to load.
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-load-modal
+                        widgets
+                          h3
+                            innerValue:Select a snippet
+                          micro.widgets.grid:hypereval-snippet-grid
+                            class:hover
+                            oninit
+
+                              /*
+                               * Opening up database collection, selecting all snippets,
+                               * and populating grid.
+                               */
+                              p5.mysql.connect:[hypereval]
+                                p5.mysql.select:@"select name from snippets order by id desc"
+
+                                /*
+                                 * Looping through each snippet, creating one grid item for each.
+                                 */
+                                for-each:x:/@p5.mysql.select/*/*?value
+                                  eval-x:x:/+/*/*/*|/+/*/*/*/*/.name
+                                  add:x:/..p5.mysql.connect/*/micro.widgets.grid.databind
+                                    src
+                                      item
+                                        .row
+                                          .name:x:/@_dp?value
+                                          role:button
+                                          onclick:@"p5.$(event.target.parentElement.id).raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});return false;"
+                                          .onclick
+
+                                            /*
+                                             * Retrieves name of snippet clicked, loading it from database, populating
+                                             * editor, and closing modal widget.
+                                             */
+                                            get-widget-property:x:/../*/_event?value
+                                              .name
+                                            p5.mysql.connect:[hypereval]
+                                              p5.mysql.select:@"select content, name from snippets where name = @name"
+                                                @name:x:/@get-widget-property/*/*?value
+                                              p5.web.return-response-object:code
+                                                src:x:/@p5.mysql.select/*/*/content?value
+                                              p5.web.session.set:hypereval.snippet-name
+                                                src:x:/@p5.mysql.select/*/*/name?value
+
+                                            /*
+                                             * Closing modal window.
+                                             */
+                                            delete-widget:hypereval-load-modal
+
+                                            /*
+                                             * Making sure our Hypereval remembers that this is our
+                                             * "current code".
+                                             */
+                                            p5.web.session.set:hypereval.code
+                                              src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
+
+                                        name:x:/@_dp?value
+
+                                /*
+                                 * Databinding grid.
+                                 */
+                                micro.widgets.grid.databind:hypereval-snippet-grid
+
+                /*
                  * Save Hyperlambda button.
                  */
                 button:hypereval-save-button
@@ -297,81 +372,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                                      */
                                     p5.web.session.set:hypereval.code
                                       src:x:/../*/get-widget-property/*/*?value
-
-                /*
-                 * Load Hyperlambda button.
-                 */
-                button:hypereval-load-button
-                  innerValue:@"<span class=""icon-folder-open""></span>"
-                  title:Loads a snippet from your snippets collection - Alt+L
-                  onclick
-
-                    /*
-                     * Displaying a modal window to user, to allow him to select 
-                     * a Hyperlambda snippet to load.
-                     */
-                    create-widgets
-                      micro.widgets.modal:hypereval-load-modal
-                        widgets
-                          h3
-                            innerValue:Select a snippet
-                          micro.widgets.grid:hypereval-snippet-grid
-                            class:hover
-                            oninit
-
-                              /*
-                               * Opening up database collection, selecting all snippets,
-                               * and populating grid.
-                               */
-                              p5.mysql.connect:[hypereval]
-                                p5.mysql.select:@"select name from snippets order by id desc"
-
-                                /*
-                                 * Looping through each snippet, creating one grid item for each.
-                                 */
-                                for-each:x:/@p5.mysql.select/*/*?value
-                                  eval-x:x:/+/*/*/*|/+/*/*/*/*/.name
-                                  add:x:/..p5.mysql.connect/*/micro.widgets.grid.databind
-                                    src
-                                      item
-                                        .row
-                                          .name:x:/@_dp?value
-                                          role:button
-                                          onclick:@"p5.$(event.target.parentElement.id).raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});return false;"
-                                          .onclick
-
-                                            /*
-                                             * Retrieves name of snippet clicked, loading it from database, populating
-                                             * editor, and closing modal widget.
-                                             */
-                                            get-widget-property:x:/../*/_event?value
-                                              .name
-                                            p5.mysql.connect:[hypereval]
-                                              p5.mysql.select:@"select content, name from snippets where name = @name"
-                                                @name:x:/@get-widget-property/*/*?value
-                                              p5.web.return-response-object:code
-                                                src:x:/@p5.mysql.select/*/*/content?value
-                                              p5.web.session.set:hypereval.snippet-name
-                                                src:x:/@p5.mysql.select/*/*/name?value
-
-                                            /*
-                                             * Closing modal window.
-                                             */
-                                            delete-widget:hypereval-load-modal
-
-                                            /*
-                                             * Making sure our Hypereval remembers that this is our
-                                             * "current code".
-                                             */
-                                            p5.web.session.set:hypereval.code
-                                              src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
-
-                                        name:x:/@_dp?value
-
-                                /*
-                                 * Databinding grid.
-                                 */
-                                micro.widgets.grid.databind:hypereval-snippet-grid
 
                 /*
                  * Download Hyperlambda button.

@@ -11,19 +11,22 @@
  * Analyzing keywords in your code.
  */
 quit:Thank you Elizabeth
+  action-name:Quit
   .evaluate
 
     /*
-     * Closing modal widget, and ending dialogue, if widget exists.
+     * Closing modal widget, clearing session, and ending dialogue, if widget exists.
      */
     if
       fetch:x:/0/0?value
         widget-exists:hypereval-analyze-modal
       delete-widget:hypereval-analyze-modal
+    p5.web.session.set:hypereval.analyze-lambda
     micro.speak:No problem, I am happy to be of assistance.
       voice:Karen
       pitch:1.1
       rate:0.85
+    micro.listen.quit
 
 
 
@@ -32,12 +35,13 @@ quit:Thank you Elizabeth
 /*
  * Analyzing keywords in your code.
  */
-analyse-keywords:Analyse keywords
+analyse-keywords:Discuss keywords
+  action-name:Analyse keywords
   .evaluate
 
     /*
-     * Extracting code from session, figuring out how many references to different
-     * events the code contains, and giving user feedback about our findings.
+     * Extracting lambda from session, figuring out how many references to different
+     * events the lambda contains, and giving user feedback about our findings.
      */
     _no:int:0
     .events
@@ -92,12 +96,13 @@ analyse-keywords:Analyse keywords
 /*
  * Analyzing events in your code.
  */
-analyse-events:Analyse events
+analyse-events:Discuss events
+  action-name:Analyse keywords
   .evaluate
 
     /*
-     * Extracting code from session, figuring out how many references to different
-     * events the code contains, and giving user feedback about our findings.
+     * Extracting lambda from session, figuring out how many references to different
+     * events the lambda contains, and giving user feedback about our findings.
      */
     _no:int:0
     .events
@@ -134,6 +139,144 @@ analyse-events:Analyse events
      */
     micro.speak:Your code contains {0} Active Events.
       :x:/@_no?value
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+
+
+
+
+/*
+ * Analyzing nodes in your code.
+ */
+analyse-nodes:Is it dry
+  action-name:Analyse nodes
+  .evaluate
+
+    /*
+     * Extracting number of nodes, and number of unique nodes in lambda.
+     */
+    p5.web.session.get:hypereval.analyze-lambda
+
+    /*
+     * Providing visual feedback about results.
+     */
+    hypereval.text-feedback:There are {0} distinct nodes in your code.
+      :x:/@p5.web.session.get/*/*/**/$?count
+
+    /*
+     * Figuring out ratio of unique nodes to nodes in total.
+     */
+    eval-x:x:/+|/+2
+    _nodes:x:/@p5.web.session.get/*/*/**?count
+    _unique-nodes:x:/@p5.web.session.get/*/*/**/$?count
+    -:x:/@_nodes?value
+      _:x:/@_unique-nodes?value
+    -:x:/@_unique-nodes?value
+      :x:/./-?value
+    /:x:/@-?value.decimal
+      _:x:/@_nodes?value.decimal
+    *:x:/-?value
+      _:int:100
+    _extra
+    if:x:/@*?value.int
+      >:int:80
+      set:x:/@_extra?value
+        src:" Your code is very dry, and does not repeat itself much at all. This is very good."
+    else-if:x:/@*?value.int
+      >:int:50
+      set:x:/@_extra?value
+        src:" Your code is fairly dry, and does not repeat itself too much. This is OK."
+    else-if:x:/@*?value.int
+      >:int:20
+      set:x:/@_extra?value
+        src:" Your code is not dry, and does repeat itself too much. You should probably break it up more, by using loops, expressions, or by creating more supporting Active Events."
+
+    /*
+     * Now we know how many events the code contains.
+     */
+    micro.speak:You have {0} distinct nodes in your code, {1} nodes in total, and {2} percent of your nodes are unique. {3}
+      :x:/@p5.web.session.get/*/*/**/$?count
+      :x:/@p5.web.session.get/*/*/**?count
+      :x:/@*?value.int
+      :x:/@_extra?value
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+
+
+
+
+/*
+ * Analyzing comments in your code.
+ */
+analyse-commenting:Comments
+  action-name:Analyse comments
+  .evaluate
+
+    /*
+     * Extracting code and lambda from session, figuring out the ratio of comments
+     * to nodes, and providing feedback to user.
+     */
+    p5.web.session.get:hypereval.analyze-lambda
+    lambda2hyper:x:/@p5.web.session.get/*/*/*
+    p5.web.session.get:hypereval.analyze-code
+
+    /*
+     * Figuring out ratio of comments to code.
+     */
+    length:x:/@lambda2hyper?value
+    length:x:/@p5.web.session.get/*?value
+    /:x:/../*/length/[0,1]?value.decimal
+      _:x:/../*/length/[1,2]?value.decimal
+    *:x:/-?value
+      _:decimal:100
+    -:int:100
+      _:x:/@*?value.int
+    _extra
+    if:x:/@-?value.int
+      >:int:80
+      set:x:/@_extra?value
+        src:" You have commented your code very well."
+    else-if:x:/@-?value.int
+      >:int:50
+      set:x:/@_extra?value
+        src:" You have commented your code fairly well."
+    else-if:x:/@-?value.int
+      >:int:20
+      set:x:/@_extra?value
+        src:" You should comment your code more."
+    else
+      set:x:/@_extra?value
+        src:" This is not good, not good at all."
+
+
+    /*
+     * Providing visual feedback about which events we found.
+     */
+    hypereval.text-feedback:{0} percent is comments.
+      :x:/@-?value.int
+
+    /*
+     * Now we know how many events the code contains.
+     */
+    micro.speak:{0} percent of your code is comments. {1}
+      :x:/@-?value.int
+      :x:/@_extra?value
       voice:Karen
       pitch:1.1
       rate:0.85

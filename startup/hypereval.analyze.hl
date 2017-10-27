@@ -26,7 +26,13 @@ create-event:hypereval.analyze
     src:x:/@load-file/*/*
     template
       item
-        {option}:x:?value
+        .row
+          onclick
+            {.id}:x:?name
+            hypereval._analyze-selection:x:/@.id?value
+        {Speak}:x:?value
+        {Action}:x:/*/action-name?value
+          style:"white-space:nowrap;"
 
   /*
    * Creating modal widget, with a datagrid in, which displays options to the user.
@@ -48,6 +54,11 @@ create-event:hypereval.analyze
                 innerValue:x:/../*/_arg?value
 
         micro.widgets.grid
+          class:hover
+          columns
+            Speak
+              style:"width:100%;"
+            Action
           rows
         div
           class:right
@@ -71,17 +82,7 @@ create-event:hypereval.analyze
                     /*
                      * Deleting modal widget, and stopping any further listening.
                      */
-                    delete-widget:hypereval-analyze-modal
-
-                button
-                  innerValue:Listen
-                  style:"margin-bottom:0;"
-                  onclick
-
-                    /*
-                     * Retrieving user input again.
-                     */
-                    hypereval._continue-analyzing
+                    hypereval._analyze-selection:quit
 
   /*
    * Checking is caller supplied a [topic], and if so, evaluating that topic
@@ -112,6 +113,8 @@ create-event:hypereval.analyze
     p5.web.session.set:hypereval.analyze-lambda
       src
         code
+    p5.web.session.set:hypereval.analyze-code
+      src:x:/../*/_arg?value
 
     /*
      * Making sure we analyze how complex the code is.
@@ -139,7 +142,7 @@ create-event:hypereval.analyze
     hypereval.text-feedback:@"Your code contains {0} nodes.{1}"
       :x:/@hyper2lambda/**?count
       :x:/@_complexity?value
-    micro.speak:@"Your code is valid Hyperlambda, it contains {0} nodes.{1} What do you want to discuss now?"
+    micro.speak:@"Your code is valid Hyperlambda, it contains {0} nodes.{1}"
       :x:/@hyper2lambda/**?count
       :x:/@_complexity?value
       voice:Karen
@@ -170,6 +173,70 @@ create-event:hypereval.analyze
 /*
  * Helper event for above.
  */
+create-event:hypereval._analyze-selection
+
+  /*
+   * Figuring out if user said something that we can actually find in our
+   * decision tree, and if so, evaluating its lambda callback.
+   *
+   * Notice, we do a lower comparison.
+   */
+  to-lower:x:/../*/_arg?value
+  _found:bool:false
+  load-file:@HYPEREVAL/configuration/analyze-tree.hl
+
+  /*
+   * Looping through all options from our decision tree, and if we find a
+   * match, we evaluate its lambda, and break our loop.
+   */
+  for-each:x:/@load-file/*/*
+
+    /*
+     * Making sure we do a lower comparison.
+     */
+    to-lower:x:/@_dp/#?value
+    if:x:/@to-lower?value
+      =:x:/..for-each/@to-lower?value
+      or:x:/@_dp/#?name
+        =:x:/..for-each/@to-lower?value
+
+      /*
+       * We have a match.
+       */
+      set:x:/@_found?value
+        src:bool:true
+      eval:x:/@_dp/#/*/.evaluate
+
+  /*
+   * Verifying we actually found a match in our decision tree.
+   */
+  if:x:/@_found?value
+    not
+
+    hypereval.text-feedback:I do not understand '{0}'.
+      :x:/../*/_arg?value
+
+    /*
+     * We didn't find any match.
+     */
+    micro.speak:Sorry, I don't understand that.
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continue listening.
+         */
+        hypereval._continue-analyzing
+
+
+
+
+
+/*
+ * Helper event for above.
+ */
 create-event:hypereval._continue-analyzing
 
   /*
@@ -187,54 +254,6 @@ create-event:hypereval._continue-analyzing
     onfinish
 
       /*
-       * Figuring out if user said something that we can actually find in our
-       * decision tree, and if so, evaluating its lambda callback.
-       *
-       * Notice, we do a lower comparison.
+       * Evaluating event responsible for continuing analysing.
        */
-      to-lower:x:/../*/text?value
-      _found:bool:false
-      load-file:@HYPEREVAL/configuration/analyze-tree.hl
-
-      /*
-       * Looping through all options from our decision tree, and if we find a
-       * match, we evaluate its lambda, and break our loop.
-       */
-      for-each:x:/@load-file/*/*
-
-        /*
-         * Making sure we do a lower comparison.
-         */
-        to-lower:x:/@_dp/#?value
-        if:x:/@to-lower?value
-          =:x:/..for-each/@to-lower?value
-
-          /*
-           * We have a match.
-           */
-          set:x:/@_found?value
-            src:bool:true
-          eval:x:/@_dp/#/*/.evaluate
-
-      /*
-       * Verifying we actually found a match in our decision tree.
-       */
-      if:x:/@_found?value
-        not
-
-        hypereval.text-feedback:I do not understand '{0}'.
-          :x:/../*/text?value
-
-        /*
-         * We didn't find any match.
-         */
-        micro.speak:Sorry, I don't understand that.
-          voice:Karen
-          pitch:1.1
-          rate:0.85
-          onfinish
-
-            /*
-             * Continue listening.
-             */
-            hypereval._continue-analyzing
+      hypereval._analyze-selection:x:/../*/text?value
