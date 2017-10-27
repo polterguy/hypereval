@@ -129,145 +129,6 @@ analyse-events:Discuss events
 
 
 /*
- * Analyzing concepts in your code.
- */
-analyse-concepts:Discuss concepts
-  action-name:Analyse concepts
-  .evaluate
-
-    /*
-     * Extracting lambda from session, figuring out which different (known) concepts are
-     * found in the code.
-     */
-    _extra
-    p5.web.session.get:hypereval.analyze-lambda
-
-    /*
-     * List of (known) concepts.
-     */
-    .concepts
-      concept
-        text:" Your code is accessing your my sequel database."
-        keywords
-          ~p5.mysql.
-      concept
-        text:" Your code is creating widgets."
-        keywords
-          create-widget
-          create-void-widget
-          create-literal-widget
-          create-container-widget
-          p5.web.widgets.create
-          p5.web.widgets.create-void
-          p5.web.widgets.create-literal
-          p5.web.widgets.create-container
-          create-widgets
-      concept
-        text:" Your code is accessing your session collection."
-        keywords
-          ~p5.web.session
-      concept
-        text:" Your code seems to be using inline CSS styles. You might want to consider using CSS classes instead, which is arguably better, since it separates representation from content."
-        keywords
-          create-widget/**/style
-          create-void-widget/**/style
-          create-literal-widget/**/style
-          create-container-widget/**/style
-          p5.web.widgets.create/**/style
-          p5.web.widgets.create-void/**/style
-          p5.web.widgets.create-literal/**/style
-          p5.web.widgets.create-container/**/style
-          create-widgets/**/style
-      concept
-        text:" Your code seems to be handling Ajax events."
-        keywords
-          create-widget/**/~on
-          create-void-widget/**/~on
-          create-literal-widget/**/~on
-          create-container-widget/**/~on
-          p5.web.widgets.create/**/~on
-          p5.web.widgets.create-void/**/~on
-          p5.web.widgets.create-literal/**/~on
-          p5.web.widgets.create-container/**/~on
-          create-widgets/**/style
-      concept
-        text:" Your code seems to be creating events, which modifies the state of your server. Be on alert here, such that you make sure your events have a unique name space, such that they don't clash with other pre existing events."
-        keywords
-          create-event
-          p5.events.create
-      concept
-        text:" Your code seems to be deleting events, which modifies the state of your server. Be on alert here, such that you don't accidentally delete events you are dependent upon here."
-        keywords
-          delete-event
-          p5.events.delete
-      concept
-        text:" Your code is accessing your phosphorus five memory based database."
-        keywords
-          select-data
-          insert-data
-          append-data
-          delete-data
-          p5.data.select
-          p5.data.insert
-          p5.data.append
-          p5.data.delete
-      concept
-        text:" Your code is dependent upon Micro."
-        keywords
-          ~micro.
-      concept
-        text:" Your code is evaluating code, which implies you should be carefully looking for unintentional side-effects, such as evaluating malicious code by accident."
-        keywords
-          eval
-          eval-mutable
-      concept
-        text:" Your code is evaluating code, but since it does this using a whitelist, this is probably OK."
-        keywords
-          eval-whitelist
-
-    /*
-     * Looping through each [.concept], and checking if we can find it in our code.
-     */
-    for-each:x:/@.concepts/*
-      _break:bool:false
-      for-each:x:/@_dp/#/*/keywords/*?name
-        if:x:/@p5.web.session.get/*/*/**/{0}
-          :x:/@_dp?value
-
-          /*
-           * Concept found.
-           */
-          set:x:/@_break?value
-            src:bool:true
-          set:x:/@_extra?value
-            src:{0}{1}
-              :x:/@_extra?value
-              :x:/..for-each/@_dp/#/*/text?value
-          break
-        if:x:/@_break?value
-          set:x:/@_break?value
-            src:bool:false
-          break
-
-    /*
-     * Now we know how many events the code contains.
-     */
-    micro.speak:x:/@_extra?value
-      voice:Karen
-      pitch:1.1
-      rate:0.85
-      onfinish
-
-        /*
-         * Continuing our discussion.
-         */
-        hypereval._continue-analyzing
-
-
-
-
-
-/*
  * Analyzing nodes in your code.
  */
 analyse-nodes:Is it dry
@@ -391,6 +252,174 @@ analyse-commenting:Comments
     micro.speak:{0} percent of your code is comments. {1}
       :x:/@-?value.int
       :x:/@_extra?value
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+
+
+
+
+/*
+ * Analyzing concepts in your code.
+ */
+analyse-concepts:Discuss concepts
+  action-name:Analyse concepts
+  .evaluate
+
+    /*
+     * Extracting lambda from session, figuring out which different (known) concepts are
+     * found in the code.
+     */
+    _extra
+    p5.web.session.get:hypereval.analyze-lambda
+
+    /*
+     * List of (known) concepts.
+     */
+    .concepts
+      concept
+        text:" Your code is accessing your my sequel database."
+        keywords
+          ~p5.mysql.
+      concept
+        text:" Your code is creating widgets."
+        keywords
+          create-widget
+          create-void-widget
+          create-literal-widget
+          create-container-widget
+          p5.web.widgets.create
+          p5.web.widgets.create-void
+          p5.web.widgets.create-literal
+          p5.web.widgets.create-container
+          create-widgets
+      concept
+        text:" Your code is accessing your session collection."
+        keywords
+          ~p5.web.session
+      concept
+        text:" Your code is accessing your view state collection."
+        keywords
+          ~p5.web.viewstate
+      concept
+        text:" Your code is accessing your cookie collection, which means it seems like it is dependent upon state, across multiple http requests."
+        keywords
+          ~p5.web.cookie
+      concept
+        text:" Your code is accessing your http post parameter collection."
+        keywords
+          ~p5.web.post.
+      concept
+        text:" Your code is accessing the raw http request, which implies it can possibly be invoked by clients that are not browsers."
+        keywords
+          p5.web.request.get-method
+          p5.web.request.get-body
+          p5.web.request.parse-mime
+          p5.web.request.save-body
+          ~p5.web.header
+      concept
+        text:" Your code seems to be echoing its own response back to the client, which implies it's some sort of web service, and can be invoked by clients that are not browsers."
+        keywords
+          p5.web.echo
+      concept
+        text:" Your code seems to be echoing a file back to the client. Be on the lookout here for not accidentally echoing files back to the client, which allows a malicious adversary to gain access to information he shouldn't gain access to."
+        keywords
+          p5.web.echo-file
+      concept
+        text:" Your code seems to be using inline CSS styles. You might want to consider using CSS classes instead, which is arguably better, since it separates representation from content."
+        keywords
+          create-widget/**/style
+          create-void-widget/**/style
+          create-literal-widget/**/style
+          create-container-widget/**/style
+          p5.web.widgets.create/**/style
+          p5.web.widgets.create-void/**/style
+          p5.web.widgets.create-literal/**/style
+          p5.web.widgets.create-container/**/style
+          create-widgets/**/style
+      concept
+        text:" Your code seems to be handling Ajax events."
+        keywords
+          create-widget/**/~on
+          create-void-widget/**/~on
+          create-literal-widget/**/~on
+          create-container-widget/**/~on
+          p5.web.widgets.create/**/~on
+          p5.web.widgets.create-void/**/~on
+          p5.web.widgets.create-literal/**/~on
+          p5.web.widgets.create-container/**/~on
+          create-widgets/**/style
+      concept
+        text:" Your code seems to be creating events, which modifies the state of your server. Be on alert here, such that you make sure your events have a unique name space, such that they don't clash with other pre existing events."
+        keywords
+          create-event
+          p5.events.create
+      concept
+        text:" Your code seems to be deleting events, which modifies the state of your server. Be on alert here, such that you don't accidentally delete events you are dependent upon here."
+        keywords
+          delete-event
+          p5.events.delete
+      concept
+        text:" Your code is accessing your phosphorus five memory based database."
+        keywords
+          select-data
+          insert-data
+          append-data
+          delete-data
+          p5.data.select
+          p5.data.insert
+          p5.data.append
+          p5.data.delete
+      concept
+        text:" Your code is dependent upon Micro."
+        keywords
+          ~micro.
+      concept
+        text:" Your code is evaluating code, which implies you should be carefully looking for unintentional side-effects, such as evaluating malicious code by accident."
+        keywords
+          eval
+          eval-mutable
+      concept
+        text:" Your code is evaluating code, but since it does this using a whitelist, this is probably OK."
+        keywords
+          eval-whitelist
+
+    /*
+     * Looping through each [.concept], and checking if we can find it in our code.
+     */
+    for-each:x:/@.concepts/*
+      _break:bool:false
+      for-each:x:/@_dp/#/*/keywords/*?name
+        if:x:/@p5.web.session.get/*/*/**/{0}
+          :x:/@_dp?value
+
+          /*
+           * Concept found.
+           */
+          set:x:/@_break?value
+            src:bool:true
+          set:x:/@_extra?value
+            src:{0}{1}
+              :x:/@_extra?value
+              :x:/..for-each/@_dp/#/*/text?value
+          break
+        if:x:/@_break?value
+          set:x:/@_break?value
+            src:bool:false
+          break
+
+    /*
+     * Now we can return our concepts back to caller.
+     */
+    hypereval.text-feedback:These were the concepts I was able to find in your code.
+    micro.speak:x:/@_extra?value
       voice:Karen
       pitch:1.1
       rate:0.85
