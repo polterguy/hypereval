@@ -165,14 +165,14 @@ create-event:hypereval.analyze
      * Checking ViewState to see if we've already given "the ghist", and if so, we
      * don't repeat it.
      */
-    p5.web.viewstate.get:hypereval.ghist-given
-    if:x:/@p5.web.viewstate.get/*?value
+    p5.web.session.get:hypereval.ghist-given
+    if:x:/@p5.web.session.get/*?value
       not
 
       /*
        * Speaking the ghist of the code.
        */
-      p5.web.viewstate.set:hypereval.ghist-given
+      p5.web.session.set:hypereval.ghist-given
         src:bool:true
       micro.speak:@"Your code is valid Hyperlambda, it contains {0} nodes.{1}"
         :x:/@hyper2lambda/**?count

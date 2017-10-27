@@ -749,6 +749,7 @@ meaning-of-life:What is the meaning of life
          * Continuing our discussion.
          */
         hypereval._continue-analyzing
+
 meaning-of-life-override:What's the meaning of life
   action-name:Meaning of life II
   .invisible
@@ -881,6 +882,16 @@ fuck-you:F*** you
       onfinish
 
         /*
+         * Closing modal widget, clearing session, and ending dialogue, if widget exists.
+         */
+        if
+          fetch:x:/0/0?value
+            widget-exists:hypereval-analyze-modal
+          delete-widget:hypereval-analyze-modal
+        p5.web.session.set:hypereval.analyze-lambda
+        micro.listen.quit
+
+        /*
          * Continuing our discussion.
          */
         p5.web.send-javascript:@"window.open('https://www.youtube.com/watch?v=fHC05_9b0gw', '_blank')"
@@ -898,6 +909,16 @@ you-re-an-asshole:You're an a******
       pitch:1.1
       rate:0.85
       onfinish
+
+        /*
+         * Closing modal widget, clearing session, and ending dialogue, if widget exists.
+         */
+        if
+          fetch:x:/0/0?value
+            widget-exists:hypereval-analyze-modal
+          delete-widget:hypereval-analyze-modal
+        p5.web.session.set:hypereval.analyze-lambda
+        micro.listen.quit
 
         /*
          * Continuing our discussion.
