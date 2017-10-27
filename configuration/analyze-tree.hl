@@ -749,6 +749,20 @@ meaning-of-life:What is the meaning of life
          * Continuing our discussion.
          */
         hypereval._continue-analyzing
+meaning-of-life-override:What's the meaning of life
+  action-name:Meaning of life II
+  .invisible
+  .evaluate
+    micro.speak:42, dude!
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
 
 who-are-you:Who are you
   action-name:Who I am
@@ -768,3 +782,105 @@ who-are-you:Who are you
          * Continuing our discussion.
          */
         hypereval._continue-analyzing
+
+thank-you:Thank you
+  action-name:Thank you
+  .invisible
+  .evaluate
+
+    /*
+     * Identifying self.
+     */
+    micro.speak:No problem
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+what-time-is-it:What time is it
+  action-name:What time is it
+  .invisible
+  .evaluate
+
+    /*
+     * Easter egg'ish.
+     */
+    micro.speak:It is time to get rich
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+what-day-is-it:What day is it
+  action-name:What day is it
+  .invisible
+  .evaluate
+
+    /*
+     * Speaking the day of the week.
+     */
+    p5.types.date.now
+    p5.types.date.format:x:/-?value
+      format:dddd
+    micro.speak:It's a {0}
+      :x:/@p5.types.date.format?value
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+how-do-you-feel:How do you feel
+  action-name:How do you feel
+  .invisible
+  .evaluate
+
+    /*
+     * Easter egg'ish.
+     */
+    p5.types.date.now
+    p5.types.date.format:x:/-?value
+      format:dddd
+    micro.speak:I feel very good, very fine, and very sexy!
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        hypereval._continue-analyzing
+
+fuck-you:F*** you
+  action-name:Fuck you
+  .invisible
+  .evaluate
+
+    /*
+     * Easter egg'ish.
+     */
+    micro.speak:And fuck you too
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continuing our discussion.
+         */
+        p5.web.send-javascript:@"window.open('https://www.youtube.com/watch?v=fHC05_9b0gw', '_blank')"
