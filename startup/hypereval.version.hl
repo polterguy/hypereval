@@ -4,4 +4,4 @@
  */
 create-event:hypereval.version
 
-  return:decimal:1.0
+  return:decimal:1.1
