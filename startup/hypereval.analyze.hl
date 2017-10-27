@@ -11,6 +11,23 @@
 create-event:hypereval.analyze
 
   /*
+   * Resetting speak API.
+   */
+  micro.listen.reset
+
+  /*
+   * Checking if this is an empty code block.
+   */
+  trim:x:/../*/_arg?value
+  if:x:/@trim?value
+    =:
+    micro.speak:Your code is 100 percent zen, ha-ha.
+      voice:Karen
+      pitch:1.1
+      rate:0.75
+    return
+
+  /*
    * Verifying mandatory argument are supplied.
    */
   micro.lambda.contract.min:x:/..
@@ -29,6 +46,7 @@ create-event:hypereval.analyze
         .row
           onclick
             {.id}:x:?name
+            micro.listen.quit
             hypereval._analyze-selection:x:/@.id?value
         {Speak}:x:?value
         {Action}:x:/*/action-name?value
@@ -174,6 +192,34 @@ create-event:hypereval.analyze
  * Helper event for above.
  */
 create-event:hypereval._analyze-selection
+
+  /*
+   * Checking if input was actually supplied, and if not, informing user how to
+   * quit.
+   */
+  if:x:/../*/_arg?value
+    not
+    or:x:/../*/_arg?value
+      =:
+
+    /*
+     * No input.
+     */
+    micro.speak:Sorry, I didn't get that. Say thank you Elizabeth to quit.
+      voice:Karen
+      pitch:1.1
+      rate:0.85
+      onfinish
+
+        /*
+         * Continue listening.
+         */
+        hypereval._continue-analyzing
+
+    /*
+     * Returning early.
+     */
+    return
 
   /*
    * Figuring out if user said something that we can actually find in our

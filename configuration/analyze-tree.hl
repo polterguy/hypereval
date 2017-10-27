@@ -10,31 +10,6 @@
 /*
  * Analyzing keywords in your code.
  */
-quit:Thank you Elizabeth
-  action-name:Quit
-  .evaluate
-
-    /*
-     * Closing modal widget, clearing session, and ending dialogue, if widget exists.
-     */
-    if
-      fetch:x:/0/0?value
-        widget-exists:hypereval-analyze-modal
-      delete-widget:hypereval-analyze-modal
-    p5.web.session.set:hypereval.analyze-lambda
-    micro.speak:No problem, I am happy to be of assistance.
-      voice:Karen
-      pitch:1.1
-      rate:0.85
-    micro.listen.quit
-
-
-
-
-
-/*
- * Analyzing keywords in your code.
- */
 analyse-keywords:Discuss keywords
   action-name:Analyse keywords
   .evaluate
@@ -157,7 +132,7 @@ analyse-events:Discuss events
  * Analyzing nodes in your code.
  */
 analyse-nodes:Is it dry
-  action-name:Analyse nodes
+  action-name:Analyse DRYness of code
   .evaluate
 
     /*
@@ -286,3 +261,28 @@ analyse-commenting:Comments
          * Continuing our discussion.
          */
         hypereval._continue-analyzing
+
+
+
+
+
+/*
+ * Analyzing keywords in your code.
+ */
+quit:Thank you Elizabeth
+  action-name:Quit
+  .evaluate
+
+    /*
+     * Closing modal widget, clearing session, and ending dialogue, if widget exists.
+     */
+    if
+      fetch:x:/0/0?value
+        widget-exists:hypereval-analyze-modal
+      delete-widget:hypereval-analyze-modal
+    p5.web.session.set:hypereval.analyze-lambda
+    micro.listen.quit
+    micro.speak:No problem, I am happy to be of assistance.
+      voice:Karen
+      pitch:1.1
+      rate:0.85
