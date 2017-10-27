@@ -14,9 +14,12 @@ quit:Thank you Elizabeth
   .evaluate
 
     /*
-     * Closing modal widget, and ending dialogue.
+     * Closing modal widget, and ending dialogue, if widget exists.
      */
-    delete-widget:hypereval-analyze-modal
+    if
+      fetch:x:/0/0?value
+        widget-exists:hypereval-analyze-modal
+      delete-widget:hypereval-analyze-modal
     micro.speak:No problem, I am happy to be of assistance.
       voice:Karen
       pitch:1.1

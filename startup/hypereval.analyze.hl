@@ -57,7 +57,8 @@ create-event:hypereval.analyze
               style:"display:inline-block;"
               widgets
                 button
-                  innerValue:Finish
+                  innerValue:OK
+                  style:"margin-bottom:0;"
                   oninit
 
                     /*
@@ -74,6 +75,7 @@ create-event:hypereval.analyze
 
                 button
                   innerValue:Listen
+                  style:"margin-bottom:0;"
                   onclick
 
                     /*
@@ -169,6 +171,14 @@ create-event:hypereval.analyze
  * Helper event for above.
  */
 create-event:hypereval._continue-analyzing
+
+  /*
+   * Checking if modal widget was closed, and if so, simply stopping evaluation early.
+   */
+  if
+    fetch:x:/0/0?value
+      not
+    return
 
   /*
    * Listening for input from user.
