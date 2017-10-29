@@ -12,7 +12,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
   /*
    * Decorating widget with arguments.
    */
-  add:x:/../*/return/*/container
+  add:x:/../*/return/*/literal
     src:x:/@.signal/--(!/_arg)
 
   /*
@@ -57,7 +57,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
         p5.web.send-javascript:@"p5.hypereval_input = CodeMirror.fromTextArea(p5.$('{0}').el, {{
   mode:'hyperlambda',
   theme:'hyperlambda',
-  lineNumbers:true,
+  lineNumbers:false,
   styleActiveLine:true,
   path:'{1}/media/codemirror/',
   autofocus:true,
