@@ -1,0 +1,77 @@
+
+/*
+ * Responsible for creating the CodeMirror Hyperlambda textarea widget.
+ */
+create-event:hypereval.widgets.hyperlambda-textarea
+
+  /*
+   * Used to separate arguments from the rest of our lambda.
+   */
+  .signal
+
+  /*
+   * Decorating widget with arguments.
+   */
+  add:x:/../*/return/*/container
+    src:x:/@.signal/--(!/_arg)
+
+  /*
+   * Returning widget to caller.
+   */
+  return
+    literal
+      element:textarea
+      oninit
+
+        /*
+         * Including CodeMirror JavaScript.
+         */
+        p5.web.include-javascript-file
+          @HYPEREVAL/media/codemirror/lib/codemirror.js
+          @HYPEREVAL/media/codemirror/addon/selection/active-line.js
+          @HYPEREVAL/media/codemirror/addon/hint/show-hint.js
+          @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.js
+
+        /*
+         * Making sure necessary Stylesheet files are included
+         */
+        p5.web.include-css-file
+          @HYPEREVAL/media/codemirror/lib/codemirror.css
+          @HYPEREVAL/media/codemirror/theme/hyperlambda.css
+          @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
+
+        /*
+         * Including Active Events JSON on page.
+         */
+        vocabulary
+        join:x:/@vocabulary/*?value
+          sep:,
+          wrap:'
+        p5.web.include-javascript:@"CodeMirror._hyperlispKeywords = [{0}];"
+          :x:/@join?value
+
+        /*
+         * Transforming input textarea to CodeMirror instance.
+         */
+        p5.io.unroll-path:@HYPEREVAL/
+        p5.web.send-javascript:@"p5.hypereval_input = CodeMirror.fromTextArea(p5.$('{0}').el, {{
+  mode:'hyperlambda',
+  theme:'hyperlambda',
+  lineNumbers:true,
+  styleActiveLine:true,
+  path:'{1}/media/codemirror/',
+  autofocus:true,
+  tabSize:2,
+  indentAuto:true,
+  extraKeys: {{
+    'Ctrl-Space':'autocomplete',
+    'Shift-Tab':'indentLess',
+    'Tab':'indentMore'
+  }}
+}});
+p5.hypereval_input.on('change',function (cMirror) {{
+  p5.$('{0}').el.value = cMirror.getValue();
+}});
+p5.hypereval_input.setSize('100%', '200px');"
+          :x:/../*/_event?value
+          :x:/@p5.io.unroll-path?value
