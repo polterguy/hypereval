@@ -149,7 +149,7 @@ create-widget:hypereval-main-container
               class:right
               widgets
                 div
-                  class:strip
+                  class:strip toolbar
                   style:"display:inline-block;"
                   widgets
                     button
