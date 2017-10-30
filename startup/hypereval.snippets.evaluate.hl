@@ -1,0 +1,23 @@
+
+/*
+ * Creates evaluate snippet Active Event.
+ *
+ * This event will allow you to evaluate a snippet by name.
+ * Pass in the name of the snippet you want to evaluate as [_arg].
+ */
+create-event:hypereval.snippets.evaluate
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+
+  /*
+   * Opening up database connection, selecting snippet, and evaluating it.
+   */
+  p5.mysql.connect:[hypereval]
+    p5.mysql.scalar:@"select content from snippets where name = @name limit 1"
+      @name:x:/../*/_arg?value
+    hyper2lambda:x:/@p5.mysql.scalar?value
+    eval:x:/@hyper2lambda
