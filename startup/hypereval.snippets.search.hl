@@ -1,0 +1,24 @@
+
+/*
+ * Creates search for snippet Active Event.
+ *
+ * This event will allow you to search for a snippet matching the specified [_arg].
+ */
+create-event:hypereval.snippets.search
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+
+  /*
+   * Opening up database connection, selecting snippet, and evaluating it.
+   */
+  p5.mysql.connect:[hypereval]
+    p5.mysql.select:@"select name from snippets where name like @name"
+      @name:%{0}%
+        :x:/../*/_arg?value
+    add:x:/+
+      src:x:/@p5.mysql.select/*/*/name
+    return
