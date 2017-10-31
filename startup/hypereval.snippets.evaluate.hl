@@ -8,16 +8,24 @@
 create-event:hypereval.snippets.evaluate
 
   /*
+   * Separating arguments from the rest of the lambda.
+   */
+  .signal
+
+  /*
    * Sanity checking arguments.
    */
   micro.lambda.contract.min:x:/..
     _arg:string
 
   /*
-   * Opening up database connection, selecting snippet, and evaluating it.
+   * Opening up database connection, selecting snippet, and evaluating it, making
+   * sure we pass in arguments as we do it.
    */
   p5.mysql.connect:[hypereval]
     p5.mysql.scalar:@"select content from snippets where name = @name limit 1"
       @name:x:/../*/_arg?value
     hyper2lambda:x:/@p5.mysql.scalar?value
+    add:x:/+
+      src:x:/@.signal/--(!/_arg)
     eval:x:/@hyper2lambda
