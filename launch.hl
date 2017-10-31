@@ -106,22 +106,67 @@ if:x:/@split/0/-?name
 
   /*
    * Parsing MIME message, and reading file, and stuffing content into session.
+   *
+   * Notice, we have different logic for zip files here.
    */
   p5.web.request.parse-mime
     attachment-folder:~/temp/
-  load-file:{0}{1}{2}
-    :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/folder?value
-    :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/prefix?value
-    :x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
-    convert:false
-  p5.web.session.set:hypereval.uploaded-file
-    src:x:/@load-file/*?value
   split:x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
     =:.
-  p5.web.session.set:hypereval.snippet-name
-    src:x:/@split/0?name
-  p5.web.session.set:hypereval.code
-    src:x:/@load-file/*?value
+  if:x:/@split/0/-?name
+    =:zip
+
+    /*
+     * Zip file.
+     */
+    if
+      fetch:x:/0/0?value
+        folder-exists:~/temp/hyperlambda/
+      not
+      create-folder:~/temp/hyperlambda/
+    list-files:~/temp/hyperlambda/
+    delete-file:x:/-/*?name
+    unzip:{0}{1}{2}
+      :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/folder?value
+      :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/prefix?value
+      :x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
+      dest:~/temp/hyperlambda/
+    p5.mysql.connect:[hypereval]
+      for-each:x:/@unzip/*?name
+        if
+          ends-with:x:/@_dp?value
+            src:.hl
+          not
+          continue
+        split:x:/@_dp?value
+          =:/
+          =:.
+        load-file:x:/@_dp?value
+          convert:false
+        p5.mysql.delete:@"delete from snippets where name = @name"
+          @name:x:/@split/0/-2?name
+        p5.mysql.insert:@"insert into snippets (name, content) values (@name, @content)"
+          @name:x:/@split/0/-2?name
+          @content:x:/@load-file/*?value
+
+  else
+
+    /*
+     * Hyperlambda file.
+     */
+    load-file:{0}{1}{2}
+      :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/folder?value
+      :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/prefix?value
+      :x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
+      convert:false
+    p5.web.session.set:hypereval.uploaded-file
+      src:x:/@load-file/*?value
+    split:x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
+      =:.
+    p5.web.session.set:hypereval.snippet-name
+      src:x:/@split/0?name
+    p5.web.session.set:hypereval.code
+      src:x:/@load-file/*?value
 
   /*
    * Returning early to avoid evaluation of the rest of our file.

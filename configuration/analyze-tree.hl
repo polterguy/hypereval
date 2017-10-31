@@ -459,11 +459,11 @@ analyse-concepts:Discuss concepts
       concept
         text:" Your code seems to be directly manipulating images, make sure these images actually exists on disc."
         keywords
-          ~p5.http.
+          ~p5.imaging.
       concept
         text:" Your code is creating HTTP requests, make sure you accommodate for networking errors by for instance wrapping your HTTP requests inside of a try catch block."
         keywords
-          ~p5.imaging.
+          ~p5.http.
       concept
         text:" Your code is creating zip files."
         keywords
@@ -475,7 +475,7 @@ analyse-concepts:Discuss concepts
           unzip
           p5.io.unzip
       concept
-        text:" Your code is semantically parsing JSON."
+        text:" Your code is semantically parsing Jason."
         keywords
           json2lambda
           p5.json.json2lambda

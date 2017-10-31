@@ -32,7 +32,7 @@ create-event:hypereval.widgets.eval
           =:/
         eval-x:x:/+/*/url
         micro.page.create-dropzone
-          filter:hl
+          filter:hl|zip
           multiple:false
           url:{0}/upload
             :x:/@split/0/-?name
@@ -161,6 +161,12 @@ p5.hypereval_input.setSize('100%', '600px');"
                      * Deleting session object.
                      */
                     p5.web.session.set:hypereval.uploaded-file
+
+                    /*
+                     * Giving user some feedback.
+                     */
+                    micro.windows.info:File successfully imported
+                      class:micro-windows-info success
 
                   .onclick
 
@@ -602,6 +608,48 @@ p5.hypereval_input.setSize('100%', '600px');"
                                * Initial databinding of snippets grid.
                                */
                               hypereval.snippets.databind
+                          div
+                            class:right
+                            widgets
+                              button
+                                innerValue:Export all
+                                style:"margin-bottom:0;"
+                                onclick
+
+                                  /*
+                                   * Exports all snippets to a zip file.
+                                   *
+                                   * First we make sure our temp folder exists, and
+                                   * if it does, we empty it for any previous files.
+                                   */
+                                  if
+                                    fetch:x:/0/0?value
+                                      folder-exists:~/temp/hypereval/
+                                    not
+                                    create-folder:~/temp/hypereval/
+                                  list-files:~/temp/hypereval/
+                                  delete-file:x:/-/*?name
+
+                                  /*
+                                   * Then we select all snippets, and create on Hyperlambda file
+                                   * for each, and save to our temporary folder.
+                                   */
+                                  p5.mysql.connect:[hypereval]
+                                    p5.mysql.select:@"select * from snippets"
+                                    for-each:x:/@p5.mysql.select/*
+                                      save-file:~/temp/hypereval/{0}.hl
+                                        :x:/@_dp/#/*/name?value
+                                        src:x:/@_dp/#/*/content?value
+
+                                  /*
+                                   * Creating a zip file of entire folder, and downloading
+                                   * it to client.
+                                   */
+                                  zip:~/temp/hypereval-export.zip
+                                    src:~/temp/hypereval/
+                                  micro.download.file:~/temp/hypereval-export.zip
+                                    Content-Type:application/zip
+                                    Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
 
                 /*
                  * Analyze Hyperlambda snippet button.

@@ -11,12 +11,30 @@ create-event:hypereval.snippets.search
    */
   micro.lambda.contract.min:x:/..
     _arg:string
+  micro.lambda.contract.optional:x:/..
+    type
 
   /*
    * Opening up database connection, selecting snippet, and evaluating it.
+   *
+   * Making sure we check if caller supplied a [type] argument, and accommodate 
+   * for it if it was supplied.
    */
+  _where
+  if:x:/../*/type
+    if:x:/../*/type?value
+      not
+      set:x:/@_where?value
+        src:"and type is null"
+    else
+      set:x:/@_where?value
+        src:"and type = @type"
+      add:x:/../*/p5.mysql.connect/*/p5.mysql.select
+        src
+          @type:x:/../*/type?value
   p5.mysql.connect:[hypereval]
-    p5.mysql.select:@"select name from snippets where name like @name"
+    p5.mysql.select:@"select name from snippets where name like @name {0}"
+      :x:/@_where?value
       @name:%{0}%
         :x:/../*/_arg?value
     add:x:/+
