@@ -281,6 +281,25 @@ p5.hypereval_input.setSize('100%', '600px');"
                                               src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
 
                                         name:x:/@_dp?value
+                                        delete
+                                          widgets
+                                            a
+                                              href:#
+                                              role:button
+                                              innerValue:@"<span class=""icon-trash""></span>"
+                                              onclick
+
+                                                /*
+                                                 * Deleting snippet from grid and database.
+                                                 */
+                                                p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+                                                  .name
+                                                get-widget-property:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                                  .name
+                                                delete-widget:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                                p5.mysql.connect:[hypereval]
+                                                  p5.mysql.delete:@"delete from snippets where name = @name"
+                                                    @name:x:/@get-widget-property/*/*?value
 
                                 /*
                                  * Databinding grid.
