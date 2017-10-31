@@ -1,0 +1,20 @@
+
+/*
+ * Deletes a new snippet.
+ *
+ * It expects the snippet's name to be given as [_arg].
+ */
+create-event:hypereval.snippets.delete
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+
+  /*
+   * Opening up database connection, and deleting snippet.
+   */
+  p5.mysql.connect:[hypereval]
+    p5.mysql.delete:@"delete from snippets where name = @name"
+      @name:x:/../*/_arg?value

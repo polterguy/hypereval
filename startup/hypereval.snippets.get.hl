@@ -1,0 +1,21 @@
+
+/*
+ * Retrieves the named snippet's Hyperlambda.
+ *
+ * This event will return the Hyperlambda of the [_arg] snippet.
+ */
+create-event:hypereval.snippets.get
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+
+  /*
+   * Opening up database connection, selecting snippet, and evaluating it.
+   */
+  p5.mysql.connect:[hypereval]
+    p5.mysql.select:@"select content from snippets where name = @name"
+      @name:x:/../*/_arg?value
+    return:x:/@p5.mysql.select/*/*/content?value

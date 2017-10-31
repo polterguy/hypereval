@@ -1,0 +1,42 @@
+
+/*
+ * Creates a new snippet.
+ *
+ * It expects the snippet's name to be given as [_arg], and its Hyperlambda to
+ * be found in [content]. In addition, you can optionally pass in [type] being
+ * the type of snippet, which must be either "page" or "startup".
+ */
+create-event:hypereval.snippets.create
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+    content:string
+  micro.lambda.contract.optional:x:/..
+    type:string
+  if:x:/../*/type?value
+    switch:x:/../*/type?value
+      case:page
+      case:startup
+
+        /*
+         * Legal type.
+         */
+        .foo
+      default
+        throw:'{0}' is not a legal type
+          :x:/../*/type?value
+
+  /*
+   * Opening up database connection, and inserting snippet, making sure we delete
+   * any old snippets with the same name.
+   */
+  p5.mysql.connect:[hypereval]
+    p5.mysql.delete:@"delete from snippets where name = @name"
+      @name:x:/../*/_arg?value
+    p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
+      @name:x:/../*/_arg?value
+      @content:x:/../*/content?value
+      @type:x:/../*/type?value
