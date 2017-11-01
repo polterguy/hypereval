@@ -29,3 +29,12 @@ create-event:hypereval.snippets.evaluate
     add:x:/+
       src:x:/@.signal/--(!/_arg)
     eval:x:/@hyper2lambda
+
+    /*
+     * Returning results back to caller.
+     */
+    set:x:/./*/return?value
+      src:x:/@eval?value
+    add:x:/./*/return
+      src:x:/@eval/*
+    return
