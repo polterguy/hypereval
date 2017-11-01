@@ -131,6 +131,7 @@ if:x:/@split/0/-?name
       :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/prefix?value
       :x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
       dest:~/temp/hyperlambda/
+    _count:int:0
     p5.mysql.connect:[hypereval]
       for-each:x:/@unzip/*?name
         if
@@ -138,16 +139,28 @@ if:x:/@split/0/-?name
             src:.hl
           not
           continue
+        set:x:/@_count?value
+          +:x:/@_count?value
+            _:1
+        _type
         split:x:/@_dp?value
           =:/
+        split:x:/@split/0/-?name
           =:.
+        if:x:/@split/*?count
+          =:int:3
+          set:x:/@_type?value
+            src:x:/@split/0/-2?name
         load-file:x:/@_dp?value
           convert:false
         p5.mysql.delete:@"delete from snippets where name = @name"
-          @name:x:/@split/0/-2?name
-        p5.mysql.insert:@"insert into snippets (name, content) values (@name, @content)"
-          @name:x:/@split/0/-2?name
+          @name:x:/@split/@split/@split/0/-2?name
+        p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
+          @name:x:/@split/0?name
           @content:x:/@load-file/*?value
+          @type:x:/@_type?value
+    p5.web.session.set:hypereval.snippet-import-count
+      src:x:/@_count?value
 
   else
 

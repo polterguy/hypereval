@@ -95,7 +95,7 @@ create-event:hypereval.widgets.eval
       }});
     }},
     'Alt-S':function(cm) {{p5.$('hypereval-save-button').raise('onclick');}},
-    'Alt-L':function(cm) {{p5.$('hypereval-load-button').raise('onclick');}},
+    'Alt-L':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
     'Alt-V':function(cm) {{p5.$('hypereval-output-button').raise('onclick');}},
     'Alt-M':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
     'Alt-D':function(cm) {{p5.$('hypereval-discuss-code').raise('onclick');}},
@@ -165,7 +165,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                     /*
                      * Giving user some feedback.
                      */
-                    micro.windows.info:File successfully imported
+                    p5.web.session.get:hypereval.snippet-import-count
+                    micro.windows.info:{0} snippets successfully imported
+                      :x:/@p5.web.session.get/*?value
                       class:micro-windows-info success
 
                   .onclick
@@ -219,98 +221,302 @@ p5.hypereval_input.setSize('100%', '600px');"
                         visible:true
 
                 /*
-                 * Load Hyperlambda button.
+                 * Manage "pages" button.
                  */
-                button:hypereval-load-button
+                button:hypereval-manage-snippets-button
                   innerValue:@"<span class=""icon-folder-open""></span>"
-                  title:Loads a snippet from your snippets collection - Alt+L
+                  title:Load snippet - Alt+L
                   onclick
 
                     /*
-                     * Displaying a modal window to user, to allow him to select 
-                     * a Hyperlambda snippet to load.
+                     * Shows a modal widget with each snippet from database, allowing
+                     * the user to either mark it as a "startup snippet" or as a "page".
                      */
                     create-widgets
-                      micro.widgets.modal:hypereval-load-modal
+                      micro.widgets.modal:hypereval-manage-snippets
                         widgets
                           h3
-                            innerValue:Select a snippet
-                          micro.widgets.grid:hypereval-snippet-grid
+                            innerValue:Manage snippets
+                          micro.widgets.grid:hypereval-snippets-grid
                             class:hover
-                            oninit
+                            events
 
                               /*
-                               * Opening up database collection, selecting all snippets,
-                               * and populating grid.
+                               * Databinds snippets grid.
                                */
-                              p5.mysql.connect:[hypereval]
-                                p5.mysql.select:@"select name from snippets order by id desc"
+                              hypereval.snippets.databind
 
                                 /*
-                                 * Looping through each snippet, creating one grid item for each.
+                                 * Connecting to database, selecting all snippets, 
+                                 * and creating one grid item for each record.
                                  */
-                                for-each:x:/@p5.mysql.select/*/*?value
-                                  eval-x:x:/+/*/*/*|/+/*/*/*/*/.name
-                                  add:x:/..p5.mysql.connect/*/micro.widgets.grid.databind
-                                    src
-                                      item
-                                        .row
-                                          .name:x:/@_dp?value
-                                          role:button
-                                          onclick:@"p5.$(event.target.parentElement.id).raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});return false;"
-                                          .onclick
+                                p5.mysql.connect:[hypereval]
+                                  p5.mysql.select:@"select * from snippets order by id desc"
 
-                                            /*
-                                             * Retrieves name of snippet clicked, loading it from database, populating
-                                             * editor, and closing modal widget.
-                                             */
-                                            get-widget-property:x:/../*/_event?value
-                                              .name
-                                            p5.mysql.connect:[hypereval]
-                                              p5.mysql.select:@"select content, name from snippets where name = @name"
-                                                @name:x:/@get-widget-property/*/*?value
-                                              p5.web.return-response-object:code
-                                                src:x:/@p5.mysql.select/*/*/content?value
-                                              p5.web.session.set:hypereval.snippet-name
-                                                src:x:/@p5.mysql.select/*/*/name?value
+                                  /*
+                                   * Necessary to find the relative URL of module.
+                                   */
+                                  p5.io.unroll-path:@HYPEREVAL/
+                                  split:x:/@p5.io.unroll-path?value
+                                    =:/
 
-                                            /*
-                                             * Closing modal window.
-                                             */
-                                            delete-widget:hypereval-load-modal
+                                  /*
+                                   * Looping through each snippet, creating one datagrid item
+                                   * for each.
+                                   */
+                                  for-each:x:/@p5.mysql.select/*
+                                    p5.html.url-encode:x:/@_dp/#/*/name?value
+                                    eval-x:x:/+/*/*/*
 
-                                            /*
-                                             * Making sure our Hypereval remembers that this is our
-                                             * "current code".
-                                             */
-                                            p5.web.session.set:hypereval.code
-                                              src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
+                                    /*
+                                     * Adding "name" cell.
+                                     */
+                                    add:x:/../*/micro.widgets.grid.databind
+                                      src
+                                        item
+                                          name:x:/@_dp/#/*/name?value
 
-                                        name:x:/@_dp?value
-                                        delete
+                                    /*
+                                     * Adding "radio buttons" cell and "preview page" cell.
+                                     *
+                                     * Notice, this first part simply adds to our [add] invocation below,
+                                     * according to the snippet's status.
+                                     */
+                                    add:x:/+3/*/*/*/*/*/widgets/*/input/*(/.data-field/={0}|/.data-field/=default)/[0,1]/.
+                                      :x:/@_dp/#/*/type?value
+                                      src
+                                        checked
+                                    eval-x:x:/+2/*/*/*/*/*/widgets/*/input/*/name|/+2/**(/.id|/href|/a)
+                                    if:x:/@_dp/#/*/type?value
+                                      !=:page
+                                      add:x:/./+/**/a
+                                        src
+                                          visible:false
+
+                                    /*
+                                     * This is where we actually add our "radio button" cells, and
+                                     * our "View page" cell.
+                                     */
+                                    add:x:/../*/micro.widgets.grid.databind/0/-
+                                      src
+                                        type
                                           widgets
-                                            a
-                                              href:#
-                                              role:button
+                                            label
+                                              style:"margin-bottom:0;"
+                                              title:Turns you snippet into a plain snippet
+                                              widgets
+                                                input
+                                                  type:radio
+                                                  .data-field:default
+                                                  style:"margin-bottom:0;"
+                                                  name:item-{0}
+                                                    :x:/@_dp/#/*/id?value
+                                                  onchange
+                                                    .id:x:/@_dp/#/*/id?value
+
+                                                    /*
+                                                     * Updating "type" of snippet, and setting
+                                                     * "View page"'s hyperlink to visible/invisible.
+                                                     */
+                                                    p5.mysql.connect:[hypereval]
+                                                      p5.mysql.update:@"update snippets set type = null where id = @id"
+                                                        @id:x:/@.id?value
+                                                    set-widget-property:hypereval-view-page-{0}
+                                                      :x:/@.id?value
+                                                      visible:false
+
+                                                span
+                                                  innerValue:Snippet
+                                            label
+                                              style:"margin-bottom:0;"
+                                              title:Turns you snippet into a page you can load through a unique URL
+                                              widgets
+                                                input
+                                                  type:radio
+                                                  .data-field:page
+                                                  style:"margin-bottom:0;margin-left:5px;"
+                                                  name:item-{0}
+                                                    :x:/@_dp/#/*/id?value
+                                                  onchange
+
+                                                    /*
+                                                     * Updating "type" of snippet, and setting
+                                                     * "View page"'s hyperlink to visible/invisible.
+                                                     */
+                                                    .id:x:/@_dp/#/*/id?value
+                                                    p5.mysql.connect:[hypereval]
+                                                      p5.mysql.update:@"update snippets set type = 'page' where id = @id"
+                                                        @id:x:/@.id?value
+                                                    set-widget-property:hypereval-view-page-{0}
+                                                      :x:/@.id?value
+                                                      visible:true
+
+                                                span
+                                                  innerValue:Page
+                                            label
+                                              style:"margin-bottom:0;"
+                                              title:Turns you snippet into a startup object that will be automatically evaluated during server startup
+                                              widgets
+                                                input
+                                                  type:radio
+                                                  .data-field:startup
+                                                  style:"margin-bottom:0;margin-left:5px;"
+                                                  name:item-{0}
+                                                    :x:/@_dp/#/*/id?value
+                                                  onchange
+
+                                                    /*
+                                                     * Updating "type" of snippet, and setting
+                                                     * "View page"'s hyperlink to visible/invisible.
+                                                     */
+                                                    .id:x:/@_dp/#/*/id?value
+                                                    p5.mysql.connect:[hypereval]
+                                                      p5.mysql.update:@"update snippets set type = 'startup' where id = @id"
+                                                        @id:x:/@.id?value
+                                                    set-widget-property:hypereval-view-page-{0}
+                                                      :x:/@.id?value
+                                                      visible:false
+
+                                                span
+                                                  innerValue:Startup
+                                        type
+                                          widgets
+                                            a:hypereval-view-page-{0}
+                                              :x:/@_dp/#/*/id?value
+                                              target:_blank
+                                              href:/{0}?name={1}
+                                                :x:/@split/0/-?name
+                                                :x:/@p5.html.url-encode?value
+                                              innerValue:View page ...
+
+                                    /*
+                                     * Adding "load" and "delete" cells.
+                                     */
+                                    eval-x:x:/+/**/.name
+                                    add:x:/../*/micro.widgets.grid.databind/0/-
+                                      src
+                                        load
+                                          style:"width:5px;"
+                                          widgets
+                                            button
+                                              innerValue:@"<span class=""icon-folder-open"" style=""width:100%;height:100%;display:inline-block;""></span>"
+                                              style:"margin-bottom:0;"
+                                              title:Loads this snippet
+                                              onclick:@"p5.$(event.target.tagName.toLowerCase() == 'button' ? event.target.id : event.target.parentElement.id).raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});return false;"
+                                              .onclick
+
+                                                /*
+                                                 * Forward evaluated above.
+                                                 */
+                                                .name:x:/@_dp/#/*/name?value
+                                                p5.mysql.connect:[hypereval]
+                                                  p5.mysql.select:@"select content, name from snippets where name = @name"
+                                                    @name:x:/@.name?value
+                                                  p5.web.return-response-object:code
+                                                    src:x:/@p5.mysql.select/*/*/content?value
+                                                  p5.web.session.set:hypereval.snippet-name
+                                                    src:x:/@p5.mysql.select/*/*/name?value
+
+                                                /*
+                                                 * Closing modal window.
+                                                 */
+                                                delete-widget:hypereval-manage-snippets
+
+                                                /*
+                                                 * Making sure our Hypereval remembers that this is our
+                                                 * "current code".
+                                                 */
+                                                p5.web.session.set:hypereval.code
+                                                  src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
+
+                                        delete
+                                          style:"width:5px;"
+                                          widgets
+                                            button
                                               innerValue:@"<span class=""icon-trash""></span>"
+                                              style:"margin-bottom:0;"
+                                              title:Deletes this snippet, notice this action is permanent
                                               onclick
 
                                                 /*
-                                                 * Deleting snippet from grid and database.
+                                                 * Forward evaluated above.
+                                                 */
+                                                .name:x:/@_dp/#/*/name?value
+
+                                                /*
+                                                 * Deletes table row, and snippet.
                                                  */
                                                 p5.web.widgets.find-first-ancestor:x:/../*/_event?value
-                                                  .name
-                                                get-widget-property:x:/@p5.web.widgets.find-first-ancestor/*/*?value
-                                                  .name
+                                                  element:tr
                                                 delete-widget:x:/@p5.web.widgets.find-first-ancestor/*/*?value
                                                 p5.mysql.connect:[hypereval]
                                                   p5.mysql.delete:@"delete from snippets where name = @name"
-                                                    @name:x:/@get-widget-property/*/*?value
+                                                    @name:x:/@.name?value
 
                                 /*
-                                 * Databinding grid.
+                                 * Databinds snippets.
                                  */
-                                micro.widgets.grid.databind:hypereval-snippet-grid
+                                micro.widgets.grid.databind:hypereval-snippets-grid
+
+                            oninit
+
+                              /*
+                               * Initial databinding of snippets grid.
+                               */
+                              hypereval.snippets.databind
+                          div
+                            class:right
+                            widgets
+                              button
+                                innerValue:Export
+                                style:"margin-bottom:0;"
+                                title:Exports all your snippets to a zip file
+                                onclick
+
+                                  /*
+                                   * Exports all snippets to a zip file.
+                                   *
+                                   * First we make sure our temp folder exists, and
+                                   * if it does, we empty it for any previous files.
+                                   */
+                                  if
+                                    fetch:x:/0/0?value
+                                      folder-exists:~/temp/hypereval/
+                                    not
+                                    create-folder:~/temp/hypereval/
+                                  list-files:~/temp/hypereval/
+                                  delete-file:x:/-/*?name
+
+                                  /*
+                                   * Then we select all snippets, and create on Hyperlambda file
+                                   * for each, and save to our temporary folder.
+                                   */
+                                  p5.mysql.connect:[hypereval]
+                                    p5.mysql.select:@"select * from snippets"
+                                    for-each:x:/@p5.mysql.select/*
+                                      _type
+                                      if:x:/@_dp/#/*/type?value
+                                        set:x:/@_type?value
+                                          src:.{0}
+                                            :x:/@_dp/#/*/type?value
+                                      save-file:~/temp/hypereval/{0}{1}.hl
+                                        :x:/@_dp/#/*/name?value
+                                        :x:/@_type?value
+                                        src:x:/@_dp/#/*/content?value
+
+                                  /*
+                                   * Creating a zip file of entire folder, and downloading
+                                   * it to client.
+                                   */
+                                  if
+                                    fetch:x:/0/0?value
+                                      file-exists:~/temp/hypereval-export.zip
+                                    delete-file:~/temp/hypereval-export.zip
+                                  zip:~/temp/hypereval-export.zip
+                                    src:~/temp/hypereval/
+                                  micro.download.file:~/temp/hypereval-export.zip
+                                    Content-Type:application/zip
+                                    Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
 
                 /*
                  * Save Hyperlambda button.
@@ -412,7 +618,16 @@ p5.hypereval_input.setSize('100%', '600px');"
                      */
                     .defaults
                       hypereval.snippet-name:hypereval
+                      type
                     p5.web.session.get:hypereval.snippet-name
+                    if:x:/@p5.web.session.get/*?value
+                      p5.mysql.connect:[hypereval]
+                        p5.mysql.scalar:@"select type from snippets where name = @name"
+                          @name:x:/@p5.web.session.get/*?value
+                        if:x:/@p5.mysql.scalar?value
+                          set:x:/@.defaults/*/type?value
+                            src:.{0}
+                              :x:/@p5.mysql.scalar?value
                     get-widget-property:hypereval-input
                       innerValue
                     save-file:~/temp/hypereval-code.hl
@@ -420,8 +635,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                     eval-x:x:/+/*/Content-Disposition
                     micro.download.file:~/temp/hypereval-code.hl
                       Content-Type:x-application/hyperlambda
-                      Content-Disposition:@"attachment; filename=""{0}.hl"""
+                      Content-Disposition:@"attachment; filename=""{0}{1}.hl"""
                         :x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
+                        :x:/@.defaults/*/type?value
 
                 /*
                  * Upload Hyperlambda button.
@@ -430,226 +646,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                   innerValue:@"<span class=""icon-upload""></span>"
                   title:Uploads a Hyperlambda file from your client
                   onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
-
-                /*
-                 * Manage "pages" button.
-                 */
-                button:hypereval-manage-snippets-button
-                  innerValue:@"<span class=""icon-th-large""></span>"
-                  title:Manage snippets - Alt+M
-                  onclick
-
-                    /*
-                     * Shows a modal widget with each snippet from database, allowing
-                     * the user to either mark it as a "startup snippet" or as a "page".
-                     */
-                    create-widgets
-                      micro.widgets.modal:hypereval-manage-snippets
-                        widgets
-                          h3
-                            innerValue:Manage snippets
-                          micro.widgets.grid:hypereval-snippets-grid
-                            class:striped
-                            events
-
-                              /*
-                               * Databinds snippets grid.
-                               */
-                              hypereval.snippets.databind
-
-                                /*
-                                 * Connecting to database, selecting all snippets, 
-                                 * and creating one grid item for each record.
-                                 */
-                                p5.mysql.connect:[hypereval]
-                                  p5.mysql.select:@"select * from snippets order by id desc"
-
-                                  /*
-                                   * Necessary to find the relative URL of module.
-                                   */
-                                  p5.io.unroll-path:@HYPEREVAL/
-                                  split:x:/@p5.io.unroll-path?value
-                                    =:/
-
-                                  /*
-                                   * Looping through each snippet, creating one datagrid item
-                                   * for each.
-                                   */
-                                  for-each:x:/@p5.mysql.select/*
-                                    p5.html.url-encode:x:/@_dp/#/*/name?value
-                                    eval-x:x:/+/*/*/*
-
-                                    /*
-                                     * Adding "name" cell.
-                                     */
-                                    add:x:/../*/micro.widgets.grid.databind
-                                      src
-                                        item
-                                          name:x:/@_dp/#/*/name?value
-
-                                    /*
-                                     * Adding "radio buttons" cell and "preview page" cell.
-                                     *
-                                     * Notice, this first part simply adds to our [add] invocation below,
-                                     * according to the snippet's status.
-                                     */
-                                    add:x:/+3/*/*/*/*/*/widgets/*/input/*(/.data-field/={0}|/.data-field/=default)/[0,1]/.
-                                      :x:/@_dp/#/*/type?value
-                                      src
-                                        checked
-                                    eval-x:x:/+2/*/*/*/*/*/widgets/*/input/*/name|/+2/**(/.id|/href|/a)
-                                    if:x:/@_dp/#/*/type?value
-                                      !=:page
-                                      add:x:/./+/**/a
-                                        src
-                                          visible:false
-
-                                    /*
-                                     * This is where we actually add our "radio button" cells, and
-                                     * our "View page" cell.
-                                     */
-                                    add:x:/../*/micro.widgets.grid.databind/0/-
-                                      src
-                                        type
-                                          widgets
-                                            label
-                                              style:"margin-bottom:0;"
-                                              widgets
-                                                input
-                                                  type:radio
-                                                  .data-field:default
-                                                  style:"margin-bottom:0;"
-                                                  name:item-{0}
-                                                    :x:/@_dp/#/*/id?value
-                                                  onchange
-                                                    .id:x:/@_dp/#/*/id?value
-
-                                                    /*
-                                                     * Updating "type" of snippet, and setting
-                                                     * "View page"'s hyperlink to visible/invisible.
-                                                     */
-                                                    p5.mysql.connect:[hypereval]
-                                                      p5.mysql.update:@"update snippets set type = null where id = @id"
-                                                        @id:x:/@.id?value
-                                                    set-widget-property:hypereval-view-page-{0}
-                                                      :x:/@.id?value
-                                                      visible:false
-
-                                                span
-                                                  innerValue:Snippet
-                                            label
-                                              style:"margin-bottom:0;"
-                                              widgets
-                                                input
-                                                  type:radio
-                                                  .data-field:page
-                                                  style:"margin-bottom:0;margin-left:5px;"
-                                                  name:item-{0}
-                                                    :x:/@_dp/#/*/id?value
-                                                  onchange
-
-                                                    /*
-                                                     * Updating "type" of snippet, and setting
-                                                     * "View page"'s hyperlink to visible/invisible.
-                                                     */
-                                                    .id:x:/@_dp/#/*/id?value
-                                                    p5.mysql.connect:[hypereval]
-                                                      p5.mysql.update:@"update snippets set type = 'page' where id = @id"
-                                                        @id:x:/@.id?value
-                                                    set-widget-property:hypereval-view-page-{0}
-                                                      :x:/@.id?value
-                                                      visible:true
-
-                                                span
-                                                  innerValue:Page
-                                            label
-                                              style:"margin-bottom:0;"
-                                              widgets
-                                                input
-                                                  type:radio
-                                                  .data-field:startup
-                                                  style:"margin-bottom:0;margin-left:5px;"
-                                                  name:item-{0}
-                                                    :x:/@_dp/#/*/id?value
-                                                  onchange
-
-                                                    /*
-                                                     * Updating "type" of snippet, and setting
-                                                     * "View page"'s hyperlink to visible/invisible.
-                                                     */
-                                                    .id:x:/@_dp/#/*/id?value
-                                                    p5.mysql.connect:[hypereval]
-                                                      p5.mysql.update:@"update snippets set type = 'startup' where id = @id"
-                                                        @id:x:/@.id?value
-                                                    set-widget-property:hypereval-view-page-{0}
-                                                      :x:/@.id?value
-                                                      visible:false
-
-                                                span
-                                                  innerValue:Startup
-                                        type
-                                          widgets
-                                            a:hypereval-view-page-{0}
-                                              :x:/@_dp/#/*/id?value
-                                              target:_blank
-                                              href:/{0}?name={1}
-                                                :x:/@split/0/-?name
-                                                :x:/@p5.html.url-encode?value
-                                              innerValue:View page ...
-
-                                /*
-                                 * Databinds snippets.
-                                 */
-                                micro.widgets.grid.databind:hypereval-snippets-grid
-
-                            oninit
-
-                              /*
-                               * Initial databinding of snippets grid.
-                               */
-                              hypereval.snippets.databind
-                          div
-                            class:right
-                            widgets
-                              button
-                                innerValue:Export all
-                                style:"margin-bottom:0;"
-                                onclick
-
-                                  /*
-                                   * Exports all snippets to a zip file.
-                                   *
-                                   * First we make sure our temp folder exists, and
-                                   * if it does, we empty it for any previous files.
-                                   */
-                                  if
-                                    fetch:x:/0/0?value
-                                      folder-exists:~/temp/hypereval/
-                                    not
-                                    create-folder:~/temp/hypereval/
-                                  list-files:~/temp/hypereval/
-                                  delete-file:x:/-/*?name
-
-                                  /*
-                                   * Then we select all snippets, and create on Hyperlambda file
-                                   * for each, and save to our temporary folder.
-                                   */
-                                  p5.mysql.connect:[hypereval]
-                                    p5.mysql.select:@"select * from snippets"
-                                    for-each:x:/@p5.mysql.select/*
-                                      save-file:~/temp/hypereval/{0}.hl
-                                        :x:/@_dp/#/*/name?value
-                                        src:x:/@_dp/#/*/content?value
-
-                                  /*
-                                   * Creating a zip file of entire folder, and downloading
-                                   * it to client.
-                                   */
-                                  zip:~/temp/hypereval-export.zip
-                                    src:~/temp/hypereval/
-                                  micro.download.file:~/temp/hypereval-export.zip
-                                    Content-Type:application/zip
-                                    Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
 
                 /*
                  * Analyze Hyperlambda snippet button.
@@ -665,94 +661,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                     get-widget-property:hypereval-input
                       innerValue
                     hypereval.analyze:x:/@get-widget-property/*/*?value
-
-                /*
-                 * Delete Hyperlambda snippet button.
-                 */
-                button:hypereval-delete-snippet
-                  innerValue:@"<span class=""icon-trash""></span>"
-                  title:Deletes the currently active snippet, if any - Alt+T
-                  onclick
-
-                    /*
-                     * Retrieving snippet's name.
-                     */
-                    p5.web.session.get:hypereval.snippet-name
-                    if:x:/@p5.web.session.get/*?value
-                      not
-
-                      /*
-                       * No active snippet, warning use.
-                       */
-                      micro.windows.info:No active snippet
-                        class:micro-windows-info
-                      return
-
-                    /*
-                     * Asking user to confirm deletion.
-                     */
-                    create-widgets
-                      micro.widgets.modal:hypereval-confirm-deletion
-                        widgets
-                          h3
-                            innerValue:Please confirm deletion
-                          p
-                            innerValue:Are you sure you wish to delete this snippet? This action is permanent.
-                          div
-                            class:right
-                            widgets
-                              div
-                                class:strip
-                                style:"display:inline-block;"
-                                widgets
-                                  button:hypereval-confirm-deletion-button
-                                    innerValue:Yes
-                                    style:"margin-bottom:0;"
-                                    oninit
-
-                                      /*
-                                       * Setting initial focus to "Yes" button.
-                                       */
-                                      micro.page.set-focus:x:/../*/_event?value
-
-                                    onclick:@"p5.$('hypereval-confirm-deletion-button').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue('');}});return false;"
-                                    .onclick
-
-                                      /*
-                                       * Retrieving snippet's name.
-                                       */
-                                      p5.web.session.get:hypereval.snippet-name
-
-                                      /*
-                                       * Opening up database connection, and deleting snippet.
-                                       */
-                                      p5.mysql.connect:[hypereval]
-                                        p5.mysql.delete:@"delete from snippets where name = @name"
-                                          @name:x:/@p5.web.session.get/*?value
-
-                                      /*
-                                       * Providing feedback to user, and deleting modal widget.
-                                       */
-                                      delete-widget:hypereval-confirm-deletion
-                                      micro.windows.info:Snippet was successfully deleted
-                                        class:micro-windows-info success
-
-                                      /*
-                                       * Clearing session for all relevant values.
-                                       */
-                                      p5.web.session.set:hypereval.uploaded-file
-                                      p5.web.session.set:hypereval.snippet-name
-                                      p5.web.session.set:hypereval.code
-
-                                  button
-                                    innerValue:No
-                                    style:"margin-bottom:0;"
-                                    onclick
-
-                                      /*
-                                       * Simply deleting modal widget.
-                                       */
-                                      delete-widget:hypereval-confirm-deletion
 
         div:hypereval-output-wrapper
           visible:false
