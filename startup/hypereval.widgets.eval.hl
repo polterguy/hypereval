@@ -236,7 +236,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                       micro.widgets.modal:hypereval-manage-snippets
                         widgets
                           h3
-                            innerValue:Manage snippets
+                            innerValue:Your snippets
                           micro.widgets.grid:hypereval-snippets-grid
                             class:hover
                             events
@@ -380,6 +380,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                 span
                                                   innerValue:Startup
                                         type
+                                          style:"width:5px;"
                                           widgets
                                             a:hypereval-view-page-{0}
                                               :x:/@_dp/#/*/id?value
@@ -387,7 +388,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                               href:/{0}?name={1}
                                                 :x:/@split/0/-?name
                                                 :x:/@p5.html.url-encode?value
-                                              innerValue:View page ...
+                                              innerValue:View
 
                                     /*
                                      * Adding "load" and "delete" cells.
@@ -467,56 +468,72 @@ p5.hypereval_input.setSize('100%', '600px');"
                           div
                             class:right
                             widgets
-                              button
-                                innerValue:Export
-                                style:"margin-bottom:0;"
-                                title:Exports all your snippets to a zip file
-                                onclick
+                              div
+                                class:strip
+                                style:"display:inline-block;"
+                                widgets
+                                  button
+                                    innerValue:Export
+                                    style:"margin-bottom:0;"
+                                    title:Exports all your snippets to a zip file
+                                    onclick
 
-                                  /*
-                                   * Exports all snippets to a zip file.
-                                   *
-                                   * First we make sure our temp folder exists, and
-                                   * if it does, we empty it for any previous files.
-                                   */
-                                  if
-                                    fetch:x:/0/0?value
-                                      folder-exists:~/temp/hypereval/
-                                    not
-                                    create-folder:~/temp/hypereval/
-                                  list-files:~/temp/hypereval/
-                                  delete-file:x:/-/*?name
+                                      /*
+                                       * Exports all snippets to a zip file.
+                                       *
+                                       * First we make sure our temp folder exists, and
+                                       * if it does, we empty it for any previous files.
+                                       */
+                                      if
+                                        fetch:x:/0/0?value
+                                          folder-exists:~/temp/hypereval/
+                                        not
+                                        create-folder:~/temp/hypereval/
+                                      list-files:~/temp/hypereval/
+                                      delete-file:x:/-/*?name
 
-                                  /*
-                                   * Then we select all snippets, and create on Hyperlambda file
-                                   * for each, and save to our temporary folder.
-                                   */
-                                  p5.mysql.connect:[hypereval]
-                                    p5.mysql.select:@"select * from snippets"
-                                    for-each:x:/@p5.mysql.select/*
-                                      _type
-                                      if:x:/@_dp/#/*/type?value
-                                        set:x:/@_type?value
-                                          src:.{0}
-                                            :x:/@_dp/#/*/type?value
-                                      save-file:~/temp/hypereval/{0}{1}.hl
-                                        :x:/@_dp/#/*/name?value
-                                        :x:/@_type?value
-                                        src:x:/@_dp/#/*/content?value
+                                      /*
+                                       * Then we select all snippets, and create on Hyperlambda file
+                                       * for each, and save to our temporary folder.
+                                       */
+                                      p5.mysql.connect:[hypereval]
+                                        p5.mysql.select:@"select * from snippets"
+                                        for-each:x:/@p5.mysql.select/*
+                                          _type
+                                          if:x:/@_dp/#/*/type?value
+                                            set:x:/@_type?value
+                                              src:.{0}
+                                                :x:/@_dp/#/*/type?value
+                                          save-file:~/temp/hypereval/{0}{1}.hl
+                                            :x:/@_dp/#/*/name?value
+                                            :x:/@_type?value
+                                            src:x:/@_dp/#/*/content?value
 
-                                  /*
-                                   * Creating a zip file of entire folder, and downloading
-                                   * it to client.
-                                   */
-                                  if
-                                    fetch:x:/0/0?value
-                                      file-exists:~/temp/hypereval-export.zip
-                                    delete-file:~/temp/hypereval-export.zip
-                                  zip:~/temp/hypereval-export.zip
-                                    src:~/temp/hypereval/
-                                  micro.download.file:~/temp/hypereval-export.zip
-                                    Content-Type:application/zip
-                                    Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
+                                      /*
+                                       * Creating a zip file of entire folder, and downloading
+                                       * it to client.
+                                       */
+                                      if
+                                        fetch:x:/0/0?value
+                                          file-exists:~/temp/hypereval-export.zip
+                                        delete-file:~/temp/hypereval-export.zip
+                                      zip:~/temp/hypereval-export.zip
+                                        src:~/temp/hypereval/
+                                      micro.download.file:~/temp/hypereval-export.zip
+                                        Content-Type:application/zip
+                                        Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
+
+                                  button
+                                    innerValue:Close
+                                    style:"margin-bottom:0;"
+                                    title:Close window
+                                    onclick
+
+                                      /*
+                                       * Simply deletes the modal widget.
+                                       */
+                                      delete-widget:hypereval-manage-snippets
+
 
                 /*
                  * Save Hyperlambda button.
@@ -561,48 +578,62 @@ p5.hypereval_input.setSize('100%', '600px');"
                             div
                               class:right
                               widgets
-                                button:hypereval-save-modal-button
-                                  innerValue:Save
-                                  style:"margin-bottom:0;"
-                                  onclick
+                                div
+                                  class:strip
+                                  style:"display:inline-block;"
+                                  widgets
+                                    button:hypereval-save-modal-button
+                                      innerValue:Save
+                                      style:"margin-bottom:0;"
+                                      onclick
 
-                                    /*
-                                     * Serializing form, opening database connection,
-                                     * deleting snippets with similar name, and saving snippet
-                                     * into database.
-                                     */
-                                    get-widget-property:hypereval-input
-                                      innerValue
-                                    micro.widgets.wizard-form.value:hypereval-save-form
-                                    p5.mysql.connect:[hypereval]
-                                      p5.mysql.scalar:@"select type from snippets where name = @name"
-                                        @name:x:/@micro.widgets.wizard-form.value/*/name?value
-                                      p5.mysql.delete:@"delete from snippets where name = @name"
-                                        @name:x:/@micro.widgets.wizard-form.value/*/name?value
-                                      p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
-                                        @name:x:/@micro.widgets.wizard-form.value/*/name?value
-                                        @content:x:/@get-widget-property/*/*?value
-                                        @type::x:/@p5.mysql.scalar?value
+                                        /*
+                                         * Serializing form, opening database connection,
+                                         * deleting snippets with similar name, and saving snippet
+                                         * into database.
+                                         */
+                                        get-widget-property:hypereval-input
+                                          innerValue
+                                        micro.widgets.wizard-form.value:hypereval-save-form
+                                        p5.mysql.connect:[hypereval]
+                                          p5.mysql.scalar:@"select type from snippets where name = @name"
+                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
+                                          p5.mysql.delete:@"delete from snippets where name = @name"
+                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
+                                          p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
+                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
+                                            @content:x:/@get-widget-property/*/*?value
+                                            @type::x:/@p5.mysql.scalar?value
 
-                                    /*
-                                     * Closing modal window, and giving user some feedback.
-                                     */
-                                    delete-widget:hypereval-save-modal
-                                    micro.windows.info:Snippet was successfully saved
-                                      class:micro-windows-info success
+                                        /*
+                                         * Closing modal window, and giving user some feedback.
+                                         */
+                                        delete-widget:hypereval-save-modal
+                                        micro.windows.info:Snippet was successfully saved
+                                          class:micro-windows-info success
 
-                                    /*
-                                     * Making sure we store name used into session, in case
-                                     * user wants to save the same snippet again.
-                                     */
-                                    p5.web.session.set:hypereval.snippet-name
-                                      src:x:/@micro.widgets.wizard-form.value/*/name?value
+                                        /*
+                                         * Making sure we store name used into session, in case
+                                         * user wants to save the same snippet again.
+                                         */
+                                        p5.web.session.set:hypereval.snippet-name
+                                          src:x:/@micro.widgets.wizard-form.value/*/name?value
 
-                                    /*
-                                     * Storing code in session, to make it more easily available.
-                                     */
-                                    p5.web.session.set:hypereval.code
-                                      src:x:/../*/get-widget-property/*/*?value
+                                        /*
+                                         * Storing code in session, to make it more easily available.
+                                         */
+                                        p5.web.session.set:hypereval.code
+                                          src:x:/../*/get-widget-property/*/*?value
+
+                                    button
+                                      innerValue:Close
+                                      style:"margin-bottom:0;"
+                                      onclick
+
+                                        /*
+                                         * Simply closing modal window.
+                                         */
+                                        delete-widget:hypereval-save-modal
 
                 /*
                  * Download Hyperlambda button.

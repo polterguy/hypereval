@@ -81,7 +81,7 @@ create-event:hypereval.analyze
               style:"display:inline-block;"
               widgets
                 button
-                  innerValue:OK
+                  innerValue:Close
                   style:"margin-bottom:0;"
                   oninit
 
