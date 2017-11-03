@@ -21,6 +21,42 @@ create-event:hypereval.widgets.eval
   return
     container
       style:"margin-bottom:20px;"
+      events
+
+        /*
+         * Helper method to determine if Hypereval is already loaded on page.
+         */
+        hypereval.widgets.eval.exists
+          return:bool:true
+
+        /*
+         * Helper method to programmatically load the named snippet.
+         *
+         * Expects [_arg] to have snippet's name.
+         */
+        hypereval.widgets.eval.load
+
+          /*
+           * Using API method to make it simple.
+           */
+          hypereval.snippets.get:x:/../*/_arg?value
+
+          /*
+           * Modifying textarea's and CodeMirror's values.
+           */
+          set-widget-property:hypereval-input
+            innerValue:x:/@hypereval.snippets.get?value
+          p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(`{0}`);"
+            :x:/@hypereval.snippets.get?value
+
+          /*
+           * Storing into session the snippet's name, and its code.
+           */
+          p5.web.session.set:hypereval.snippet-name
+            src:x:/../*/_arg?value
+          p5.web.session.set:hypereval.code
+            src:x:/@hypereval.snippets.get?value
+
       oninit
 
         /*
@@ -113,6 +149,20 @@ p5.hypereval_input.setSize('100%', '600px');"
           element:textarea
           class:fill
           rows:20
+          events
+
+            /*
+             * Returns the current code.
+             */
+            hypereval.widgets.eval.get-code
+
+              /*
+               * Retrieving textarea's content to caller.
+               */
+              get-widget-property:x:/../*/_event?value
+                innerValue:x:/..
+              return:x:/@get-widget-property/*/*?value
+
           oninit
 
             /*
@@ -226,6 +276,32 @@ p5.hypereval_input.setSize('100%', '600px');"
                 button:hypereval-manage-snippets-button
                   innerValue:@"<span class=""icon-folder-open""></span>"
                   title:Load snippet - Alt+L
+                  events
+
+                    /*
+                     * Helper event to programatically open load snippet window.
+                     */
+                    hypereval.widgets.eval.show-load-window
+
+                      /*
+                       * To make it simple, we simply "click" button programmatically.
+                       */
+                      p5.web.widgets.ajax-events.raise:x:/../*/_event?value
+                        onclick
+
+                    /*
+                     * Helper event to programatically close load snippet window.
+                     */
+                    hypereval.widgets.eval.close-load-window
+
+                      /*
+                       * Closing modal window, if it exists.
+                       */
+                      if
+                        fetch:x:/0/0?value
+                          widget-exists:hypereval-manage-snippets
+                        delete-widget:hypereval-manage-snippets
+
                   onclick
 
                     /*
