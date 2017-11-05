@@ -134,7 +134,6 @@ create-event:hypereval.widgets.eval
     'Alt-L':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
     'Alt-V':function(cm) {{p5.$('hypereval-output-button').raise('onclick');}},
     'Alt-M':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
-    'Alt-D':function(cm) {{p5.$('hypereval-discuss-code').raise('onclick');}},
     'Alt-T':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}}
   }}
 }});
@@ -753,21 +752,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                   innerValue:@"<span class=""icon-upload""></span>"
                   title:Uploads a Hyperlambda file from your client
                   onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
-
-                /*
-                 * Analyze Hyperlambda snippet button.
-                 */
-                button:hypereval-discuss-code
-                  innerValue:@"<span class=""icon-info-circle""></span>"
-                  title:Discuss your code with your computer - Alt+D
-                  onclick
-
-                    /*
-                     * Evaluates event responsible for initiating an anlyze session of your snippet.
-                     */
-                    get-widget-property:hypereval-input
-                      innerValue
-                    hypereval.analyze:x:/@get-widget-property/*/*?value
 
         div:hypereval-output-wrapper
           visible:false
