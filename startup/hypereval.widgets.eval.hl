@@ -1,4 +1,4 @@
-
+﻿
 /*
  * Responsible for creating the CodeMirror Hyperlambda evaluator widget.
  */
@@ -509,7 +509,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                           style:"width:5px;"
                                           widgets
                                             button
-                                              innerValue:@"<span class=""icon-trash""></span>"
+                                              innerValue:@"<span class=""icon-bin""></span>"
                                               style:"margin-bottom:0;"
                                               title:Deletes this snippet, notice this action is permanent
                                               onclick
@@ -614,7 +614,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Save Hyperlambda button.
                  */
                 button:hypereval-save-button
-                  innerValue:@"<span class=""icon-floppy-o""></span>"
+                  innerValue:@"<span class=""icon-floppy-disk""></span>"
                   title:Saves your current Hyperlambda to your snippets collection - Alt+S
                   onclick
 
@@ -714,7 +714,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Download Hyperlambda button.
                  */
                 button:hypereval-download-button
-                  innerValue:@"<span class=""icon-download""></span>"
+                  innerValue:@"<span class=""icon-download2""></span>"
                   title:Downloads the Hyperlambda in your editor to your client
                   onclick
 
@@ -749,7 +749,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                  * Upload Hyperlambda button.
                  */
                 button
-                  innerValue:@"<span class=""icon-upload""></span>"
+                  innerValue:@"<span class=""icon-upload2""></span>"
                   title:Uploads a Hyperlambda file from your client
                   onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
 

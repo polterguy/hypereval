@@ -274,7 +274,7 @@ create-widget:hypereval-main-container
                                         p5.web.reload-location
 
                     button
-                      innerValue:@"<span class=""icon-home""></span>"
+                      innerValue:@"<span class=""icon-home3""></span>"
                       title:Close Hypereval
                       onclick
 
