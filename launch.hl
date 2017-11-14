@@ -161,6 +161,8 @@ if:x:/@split/0/-?name
           @type:x:/@_type?value
     p5.web.session.set:hypereval.snippet-import-count
       src:x:/@_count?value
+    p5.web.session.set:hypereval.file-type
+      src:zip
 
   else
 
@@ -180,6 +182,8 @@ if:x:/@split/0/-?name
       src:x:/@split/0?name
     p5.web.session.set:hypereval.code
       src:x:/@load-file/*?value
+    p5.web.session.set:hypereval.file-type
+      src:hl
 
   /*
    * Returning early to avoid evaluation of the rest of our file.

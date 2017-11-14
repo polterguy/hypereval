@@ -213,12 +213,21 @@ p5.hypereval_input.setSize('100%', '600px');"
                     p5.web.session.set:hypereval.uploaded-file
 
                     /*
-                     * Giving user some feedback.
+                     * Checking if this was a zip file, or a Hyperlambda file.
+                     * If zip file, we inform user that it was imported, otherwise
+                     * we give user feedback about that he'll have to evaluate or execute it.
                      */
-                    p5.web.session.get:hypereval.snippet-import-count
-                    micro.windows.info:{0} snippets successfully imported
-                      :x:/@p5.web.session.get/*?value
-                      class:micro-windows-info success
+                    p5.web.session.get:hypereval.file-type
+                    if:x:/-/*?value
+                      =:zip
+
+                      /*
+                       * Giving user some feedback.
+                       */
+                      p5.web.session.get:hypereval.snippet-import-count
+                      micro.windows.info:{0} snippets successfully imported
+                        :x:/@p5.web.session.get/*?value
+                        class:micro-windows-info success
 
                   .onclick
 
@@ -419,6 +428,12 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                   p5.mysql.delete:@"delete from snippets where name = @name"
                                                     @name:x:/@.name?value
 
+                                                /*
+                                                 * In case user deleted the "current snippet", we post the
+                                                 * changed event, to make sure UI is updated.
+                                                 */
+                                                hypereval.snippet.changed
+
                                 /*
                                  * Databinds snippets.
                                  */
@@ -591,11 +606,30 @@ p5.hypereval_input.setSize('100%', '600px');"
                                         get-widget-property:hypereval-input
                                           innerValue
                                         micro.widgets.wizard-form.value:hypereval-save-form
+
+                                        /*
+                                         * Sanity checking name of snippet.
+                                         */
+                                        match:x:/@micro.widgets.wizard-form.value/*/name?value
+                                          src:regex:/^[-a-z0-9_ ]*$/i
+                                        if:x:/@match/*?name
+                                          not
+                                          micro.windows.info:Only use spaces, a-z, 0-9 and '-' in your name
+                                            class:micro-windows-info warning
+                                          return
+
+                                        /*
+                                         * Making sure we insert page as correct type.
+                                         */
                                         _type
                                         if:x:/@micro.widgets.wizard-form.value/*/type?value
                                           !=:snippet
                                           set:x:/@_type?value
                                             src:x:/@micro.widgets.wizard-form.value/*/type?value
+
+                                        /*
+                                         * Inserting snippet into database.
+                                         */
                                         p5.mysql.connect:[hypereval]
                                           p5.mysql.delete:@"delete from snippets where name = @name"
                                             @name:x:/@micro.widgets.wizard-form.value/*/name?value
@@ -647,7 +681,13 @@ p5.hypereval_input.setSize('100%', '600px');"
                   title:Previews your page - Alt+P
                   disabled
                   oninit
+
+                    /*
+                     * Initially posting the "snippet changed" event, to make sure
+                     * we can preview snippet, if possible.
+                     */
                     hypereval.snippet.changed
+
                   events
 
                     /*
@@ -678,8 +718,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                      */
                     p5.web.session.get:hypereval.snippet-name
                     p5.mysql.connect:[hypereval]
-                      p5.mysql.scalar:"select name from snippets where name = @name"
+                      p5.mysql.scalar:"select name from snippets where name = @name and type = 'page'"
                         @name:x:/@p5.web.session.get/*?value
+                      if:x:/-?value
+                        not
+                        return
                       p5.html.url-encode:x:/@p5.mysql.scalar?value
                       p5.web.send-javascript:@"window.open('/hypereval?name={0}');"
                         :x:/@p5.html.url-encode?value
