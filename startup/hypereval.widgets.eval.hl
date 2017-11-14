@@ -263,11 +263,24 @@ p5.hypereval_input.setSize('100%', '600px');"
                     get-widget-property:hypereval-output-wrapper
                       visible
                     if:x:/@get-widget-property/*/*?value
+
+                      /*
+                       * Hiding "output" widget.
+                       */
                       set-widget-property:hypereval-output-wrapper
                         visible:false
+                      micro.css.delete:x:/../*/_event?value
+                        class:toggled
+
                     else
+
+                      /*
+                       * Showing "output" widget.
+                       */
                       set-widget-property:hypereval-output-wrapper
                         visible:true
+                      micro.css.add:x:/../*/_event?value
+                        class:toggled
 
                 /*
                  * Manage "pages" button.
@@ -341,129 +354,33 @@ p5.hypereval_input.setSize('100%', '600px');"
                                    */
                                   for-each:x:/@p5.mysql.select/*
                                     p5.html.url-encode:x:/@_dp/#/*/name?value
-                                    eval-x:x:/+/*/*/*
 
                                     /*
                                      * Adding "name" cell.
                                      */
-                                    add:x:/../*/micro.widgets.grid.databind
-                                      src
-                                        item
-                                          name:x:/@_dp/#/*/name?value
-
-                                    /*
-                                     * Adding "radio buttons" cell and "preview page" cell.
-                                     *
-                                     * Notice, this first part simply adds to our [add] invocation below,
-                                     * according to the snippet's status.
-                                     */
-                                    add:x:/+3/*/*/*/*/*/widgets/*/input/*(/.data-field/={0}|/.data-field/=default)/[0,1]/.
-                                      :x:/@_dp/#/*/type?value
-                                      src
-                                        checked
-                                    eval-x:x:/+2/*/*/*/*/*/widgets/*/input/*/name|/+2/**(/.id|/href|/a)
                                     if:x:/@_dp/#/*/type?value
-                                      !=:page
-                                      add:x:/./+/**/a
+
+                                      /*
+                                       * Snippet has a type declaration (either a "page" or a "startup" type of snippet).
+                                       */
+                                      eval-x:x:/+/*/*/*
+                                      add:x:/../*/micro.widgets.grid.databind
                                         src
-                                          visible:false
+                                          item
+                                            name:{0} ({1})
+                                              :x:/@_dp/#/*/name?value
+                                              :x:/@_dp/#/*/type?value
 
-                                    /*
-                                     * This is where we actually add our "radio button" cells, and
-                                     * our "View page" cell.
-                                     */
-                                    add:x:/../*/micro.widgets.grid.databind/0/-
-                                      src
-                                        type
-                                          widgets
-                                            label
-                                              style:"margin-bottom:0;"
-                                              title:Turns you snippet into a plain snippet
-                                              widgets
-                                                input
-                                                  type:radio
-                                                  .data-field:default
-                                                  style:"margin-bottom:0;"
-                                                  name:item-{0}
-                                                    :x:/@_dp/#/*/id?value
-                                                  onchange
-                                                    .id:x:/@_dp/#/*/id?value
+                                    else
 
-                                                    /*
-                                                     * Updating "type" of snippet, and setting
-                                                     * "View page"'s hyperlink to visible/invisible.
-                                                     */
-                                                    p5.mysql.connect:[hypereval]
-                                                      p5.mysql.update:@"update snippets set type = null where id = @id"
-                                                        @id:x:/@.id?value
-                                                    set-widget-property:hypereval-view-page-{0}
-                                                      :x:/@.id?value
-                                                      visible:false
-
-                                                span
-                                                  innerValue:Snippet
-                                            label
-                                              style:"margin-bottom:0;"
-                                              title:Turns you snippet into a page you can load through a unique URL
-                                              widgets
-                                                input
-                                                  type:radio
-                                                  .data-field:page
-                                                  style:"margin-bottom:0;margin-left:5px;"
-                                                  name:item-{0}
-                                                    :x:/@_dp/#/*/id?value
-                                                  onchange
-
-                                                    /*
-                                                     * Updating "type" of snippet, and setting
-                                                     * "View page"'s hyperlink to visible/invisible.
-                                                     */
-                                                    .id:x:/@_dp/#/*/id?value
-                                                    p5.mysql.connect:[hypereval]
-                                                      p5.mysql.update:@"update snippets set type = 'page' where id = @id"
-                                                        @id:x:/@.id?value
-                                                    set-widget-property:hypereval-view-page-{0}
-                                                      :x:/@.id?value
-                                                      visible:true
-
-                                                span
-                                                  innerValue:Page
-                                            label
-                                              style:"margin-bottom:0;"
-                                              title:Turns you snippet into a startup object that will be automatically evaluated during server startup
-                                              widgets
-                                                input
-                                                  type:radio
-                                                  .data-field:startup
-                                                  style:"margin-bottom:0;margin-left:5px;"
-                                                  name:item-{0}
-                                                    :x:/@_dp/#/*/id?value
-                                                  onchange
-
-                                                    /*
-                                                     * Updating "type" of snippet, and setting
-                                                     * "View page"'s hyperlink to visible/invisible.
-                                                     */
-                                                    .id:x:/@_dp/#/*/id?value
-                                                    p5.mysql.connect:[hypereval]
-                                                      p5.mysql.update:@"update snippets set type = 'startup' where id = @id"
-                                                        @id:x:/@.id?value
-                                                    set-widget-property:hypereval-view-page-{0}
-                                                      :x:/@.id?value
-                                                      visible:false
-
-                                                span
-                                                  innerValue:Startup
-                                        type
-                                          style:"width:5px;"
-                                          widgets
-                                            a:hypereval-view-page-{0}
-                                              :x:/@_dp/#/*/id?value
-                                              target:_blank
-                                              href:/{0}?name={1}
-                                                :x:/@split/0/-?name
-                                                :x:/@p5.html.url-encode?value
-                                              innerValue:View
+                                      /*
+                                       * Plain snippet.
+                                       */
+                                      eval-x:x:/+/*/*/*
+                                      add:x:/../*/micro.widgets.grid.databind
+                                        src
+                                          item
+                                            name:x:/@_dp/#/*/name?value
 
                                     /*
                                      * Adding "load" and "delete" cells.
@@ -619,6 +536,24 @@ p5.hypereval_input.setSize('100%', '600px');"
                   onclick
 
                     /*
+                     * Checking if we should provide a default alternative value for "type" of snippet
+                     * radio buttons.
+                     */
+                    p5.web.session.get:hypereval.snippet-name
+                    if:x:/@p5.web.session.get/*?value
+                      p5.mysql.connect:[hypereval]
+                        p5.mysql.scalar:@"select type from snippets where name = @name"
+                          @name:x:/@p5.web.session.get/*?value
+                        if:x:/@p5.mysql.scalar?value
+                          add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/={0}
+                            :x:/@p5.mysql.scalar?value
+                            src:checked
+                    if:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/checked
+                      not
+                      add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/=snippet
+                        src:checked
+
+                    /*
                      * Saving Hyperlambda to database, by allowing user to associate a name with snippet,
                      * through a modal window, for then to save the code with the specified name.
                      */
@@ -628,7 +563,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                           h3
                             innerValue:Supply a name please
                           p
-                            innerValue:Notice, if you supply a name that already exists in your snippet collection, the old snippet will be deleted.
+                            innerValue:And choose if you want to save your snippet as a page or a startup snippet.
                           micro.widgets.wizard-form:hypereval-save-form
                             text
                               info:Name
@@ -649,9 +584,16 @@ p5.hypereval_input.setSize('100%', '600px');"
                                 if:x:/-/*?value
                                   set-widget-property:x:/../*/_event?value
                                     value:x:/@p5.web.session.get/*?value
+                            radio-group
+                              .data-field:type
+                              options
+                                Snippet:snippet
+                                Page:page
+                                Startup:startup
 
                             div
                               class:right
+                              style:"margin-top:-1rem;"
                               widgets
                                 div
                                   class:strip
@@ -670,15 +612,18 @@ p5.hypereval_input.setSize('100%', '600px');"
                                         get-widget-property:hypereval-input
                                           innerValue
                                         micro.widgets.wizard-form.value:hypereval-save-form
+                                        _type
+                                        if:x:/@micro.widgets.wizard-form.value/*/type?value
+                                          !=:snippet
+                                          set:x:/@_type?value
+                                            src:x:/@micro.widgets.wizard-form.value/*/type?value
                                         p5.mysql.connect:[hypereval]
-                                          p5.mysql.scalar:@"select type from snippets where name = @name"
-                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
                                           p5.mysql.delete:@"delete from snippets where name = @name"
                                             @name:x:/@micro.widgets.wizard-form.value/*/name?value
                                           p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
                                             @name:x:/@micro.widgets.wizard-form.value/*/name?value
                                             @content:x:/@get-widget-property/*/*?value
-                                            @type::x:/@p5.mysql.scalar?value
+                                            @type::x:/@_type?value
 
                                         /*
                                          * Closing modal window, and giving user some feedback.
