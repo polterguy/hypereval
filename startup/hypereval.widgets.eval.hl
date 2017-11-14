@@ -134,7 +134,8 @@ create-event:hypereval.widgets.eval
     'Alt-L':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
     'Alt-V':function(cm) {{p5.$('hypereval-output-button').raise('onclick');}},
     'Alt-M':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
-    'Alt-T':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}}
+    'Alt-T':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}},
+    'Alt-P':function(cm) {{p5.$('hypereval-preview-snippet').raise('onclick');}}
   }}
 }});
 p5.hypereval_input.on('change',function (cMirror) {{
@@ -250,40 +251,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                       src:x:/../*/get-widget-property/[0,1]/*/*?value
 
                 /*
-                 * View "Output" button.
-                 */
-                button:hypereval-output-button
-                  innerValue:@"<span class=""icon-eye""></span>"
-                  title:View the output code, which results from evaluating your code - Alt+V
-                  onclick
-
-                    /*
-                     * Toggles visibility of output.
-                     */
-                    get-widget-property:hypereval-output-wrapper
-                      visible
-                    if:x:/@get-widget-property/*/*?value
-
-                      /*
-                       * Hiding "output" widget.
-                       */
-                      set-widget-property:hypereval-output-wrapper
-                        visible:false
-                      micro.css.delete:x:/../*/_event?value
-                        class:toggled
-
-                    else
-
-                      /*
-                       * Showing "output" widget.
-                       */
-                      set-widget-property:hypereval-output-wrapper
-                        visible:true
-                      micro.css.add:x:/../*/_event?value
-                        class:toggled
-
-                /*
-                 * Manage "pages" button.
+                 * Load snippet button.
                  */
                 button:hypereval-manage-snippets-button
                   innerValue:@"<span class=""icon-folder-open""></span>"
@@ -422,6 +390,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                                                 p5.web.session.set:hypereval.code
                                                   src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
 
+                                                /*
+                                                 * Signaling that current snippet was changed.
+                                                 */
+                                                hypereval.snippet.changed
+
                                         delete
                                           style:"width:5px;"
                                           widgets
@@ -548,6 +521,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                           add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/={0}
                             :x:/@p5.mysql.scalar?value
                             src:checked
+
+                    /*
+                     * Making sure we check of "Snippet" radio button, if no other radio buttons have been checked
+                     * by above logic.
+                     */
                     if:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/checked
                       not
                       add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/=snippet
@@ -584,6 +562,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                 if:x:/-/*?value
                                   set-widget-property:x:/../*/_event?value
                                     value:x:/@p5.web.session.get/*?value
+
                             radio-group
                               .data-field:type
                               options
@@ -645,6 +624,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                                         p5.web.session.set:hypereval.code
                                           src:x:/../*/get-widget-property/*/*?value
 
+                                        /*
+                                         * Signaling that snippet was changed.
+                                         */
+                                        hypereval.snippet.changed
+
                                     button
                                       innerValue:Close
                                       style:"margin-bottom:0;"
@@ -654,6 +638,84 @@ p5.hypereval_input.setSize('100%', '600px');"
                                          * Simply closing modal window.
                                          */
                                         delete-widget:hypereval-save-modal
+
+                /*
+                 * Preview button.
+                 */
+                button:hypereval-preview-snippet
+                  innerValue:@"<span class=""icon-play3""></span>"
+                  title:Previews your page - Alt+P
+                  disabled
+                  oninit
+                    hypereval.snippet.changed
+                  events
+
+                    /*
+                     * Invoked when "current snippet" has been changed, either loaded
+                     * from database, or saved to database.
+                     */
+                    hypereval.snippet.changed
+
+                      /*
+                       * Checking if this is a page, and if so, enabling button.
+                       */
+                      p5.web.session.get:hypereval.snippet-name
+                      p5.mysql.connect:[hypereval]
+                        p5.mysql.scalar:"select type from snippets where name = @name"
+                          @name:x:/@p5.web.session.get/*?value
+                        if:x:/@p5.mysql.scalar?value
+                          =:page
+                          delete-widget-property:x:/../*/_event?value
+                            disabled
+                        else
+                          set-widget-property:x:/../*/_event?value
+                            disabled
+
+                  onclick
+
+                    /*
+                     * Previewing "current snippet" in a new window.
+                     */
+                    p5.web.session.get:hypereval.snippet-name
+                    p5.mysql.connect:[hypereval]
+                      p5.mysql.scalar:"select name from snippets where name = @name"
+                        @name:x:/@p5.web.session.get/*?value
+                      p5.html.url-encode:x:/@p5.mysql.scalar?value
+                      p5.web.send-javascript:@"window.open('/hypereval?name={0}');"
+                        :x:/@p5.html.url-encode?value
+
+                /*
+                 * View "Output" button.
+                 */
+                button:hypereval-output-button
+                  innerValue:@"<span class=""icon-eye""></span>"
+                  title:View the output code, which results from evaluating your code - Alt+V
+                  onclick
+
+                    /*
+                     * Toggles visibility of output.
+                     */
+                    get-widget-property:hypereval-output-wrapper
+                      visible
+                    if:x:/@get-widget-property/*/*?value
+
+                      /*
+                       * Hiding "output" widget.
+                       */
+                      set-widget-property:hypereval-output-wrapper
+                        visible:false
+                      micro.css.delete:x:/../*/_event?value
+                        class:toggled
+
+                    else
+
+                      /*
+                       * Showing "output" widget.
+                       */
+                      set-widget-property:hypereval-output-wrapper
+                        visible:true
+                      micro.css.add:x:/../*/_event?value
+                        class:toggled
 
                 /*
                  * Download Hyperlambda button.
