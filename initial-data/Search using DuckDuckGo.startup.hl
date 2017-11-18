@@ -1,0 +1,87 @@
+/*
+ * Creates the Active Event that searches for something using DuckDuckGo.
+ *
+ * Expects [_arg] being some string to search for.
+ * Will return one [item] for each result, having one [url] and a [text] for
+ * each match given by DuckDuckGo.
+ *
+ * Also serves as an example of how to create an Active Event in Hyperlambda.
+ */
+create-event:duckduckgo.search
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+
+  /*
+   * Creates an HTTP GET request, that retrieves the search results from DuckDuckGo
+   * of the given [_arg] text, making sure we URL encode the specified search query.
+   *
+   * Notice, DuckDuckGo occassionally refuse to collaborate unless we pass in 
+   * a "User-Agent", hence we "fake" Chrome for simplicity.
+   */
+  p5.html.url-encode:x:/../*/_arg?value
+  p5.http.get:"https://duckduckgo.com/html/?q={0}"
+    :x:/@p5.html.url-encode?value
+    User-Agent:"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+
+  /*
+   * Transforming search results to lambda, and semantically parsing them,
+   * to find the links to the results yielded from above HTTP GET request.
+   */
+  html2lambda:x:/@p5.http.get/*/*/content?value
+
+  /*
+   * Looping through search results, extracting each "anchor" element's "href" attribute,
+   * to yield as return value from event.
+   */
+  for-each:x:/@html2lambda/**/a/*/\@class/=result__a/.
+
+    /*
+     * Making sure we only return 10 results.
+     */
+    if:x:/../*/return/*?count
+      =:int:10
+      break
+
+    /*
+     * DuckDuckGo also creates probably some "statistic link", which serves as a redirect
+     * link. Hence, to return the actual link, we'll need to extract this link's "uddg"
+     * result, and URL decode the HTTP GET query string parameter value of that query parameter.
+     */
+    split:x:/@_dp/#/*/\@href?value
+      =:uddg=
+    split:x:/@split/0/-?name
+      =:&
+    p5.html.url-decode:x:/@split/0?name
+
+    /*
+     * DuckDuckGo will return some results which are "weird links" pointing to some URL at DuckDuckGo
+     * itself, hence we make sure we don't return these types of results to the caller.
+     */
+    if
+      starts-with:x:/@p5.html.url-decode?value
+        src:"https://duckduckgo.com/"
+      continue
+
+    /*
+     * The result text is put into several children elements, such
+     * as "p" elements, etc. Hence, we combine all child elements' text values,
+     * of the "a" anchor containing the actual result, and create a combined string
+     * out of the result, as the "text value" describing the result.
+     */
+    join:x:/@_dp/#/**/\#text?value
+
+    /*
+     * Then returning the results, on [item] for each result, containing a [url] and a [text]
+     * for each result.
+     */
+    eval-x:x:/+/*/*/*
+    add:x:/../*/return
+      src
+        item
+          url:x:/@p5.html.url-decode?value
+          text:x:/@join?value
+  return

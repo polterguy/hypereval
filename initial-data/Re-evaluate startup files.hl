@@ -1,0 +1,7 @@
+/*
+ * Re-evaluates all startup files for Pohsphorus Five.
+ *
+ * Useful for "re-initialising" Phosphorus Five.
+ * Basically runs through the entire process of "re-starting" your web server process.
+ */
+micro.evaluate.file:/startup.hl

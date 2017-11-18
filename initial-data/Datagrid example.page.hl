@@ -1,0 +1,83 @@
+
+/*
+ * Example of how to create a datagrid.
+ * This little app will create a datagrid, simply displaying all "page snippets", 
+ * with a link, allowing user to open the page.
+ *
+ * First we must include Micro's CSS files.
+ */
+p5.web.include-css-file:@MICRO/media/main.css
+p5.web.include-css-file:@MICRO/media/skins/serious.css
+
+
+/*
+ * Then we create our "wire frame", or "grid template".
+ */
+create-widget:an-example-form-widget
+  class:container
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col air-inner shaded rounded bg
+          widgets
+
+            /*
+             * Our actual "datagrid".
+             */
+            micro.widgets.grid:my-datagrid
+              class:hover striped
+
+              // Columns, declares the headers for our grid.
+              columns
+                Page
+
+              /*
+               * Evaluated when widget is initialised.
+               *
+               * We simply selects all pages from our snippets collection, 
+               * and create one [item] for each, invoking [micro.widgets.grid.databind] to
+               * "databind" our datagrid.
+               */
+              oninit
+
+                // Necessary to parametrise our "href" attribute for our hyperlinks.
+                p5.web.get-root-location
+
+                /*
+                 * Connects to our database, and selects all of our "pages" from our "snippets" collection.
+                 */
+                p5.mysql.connect:[hypereval]
+                  p5.mysql.select:select name from snippets where type = 'page'
+
+                  /*
+                   * Iterating through our database result set, creating one [item] for each result.
+                   * Each [item] has a [Page], which refers to the column in our datagrid, and each
+                   * [Page] has a widget collection, containing one hyperlink, leading to the relevant page.
+                   */
+                  for-each:x:/@p5.mysql.select/*/*/name?value
+
+                    // URL encoding the "name" of our snippet.
+                    p5.html.url-encode:x:/@_dp?value
+
+                    // Forward evaluates all children of our [a] node inside of our [add] below.
+                    eval-x:x:/+/*/*/*/*/*/*
+                    add:x:/../*/micro.widgets.grid.databind
+                      src
+                        item
+                          Page
+                            widgets
+                              a
+                                style:"display:block;"
+                                href:"{0}/hypereval?name={1}"
+                                  :x:/@p5.web.get-root-location?value
+                                  :x:/@p5.html.url-encode?value
+                                innerValue:x:/@_dp?value
+                                target:_blank
+
+                /*
+                 * Invokes the event that actually "databinds" our grid, now parametrised 
+                 * with one [item] for each "page" in our snippets collection.
+                 */
+                micro.widgets.grid.databind:my-datagrid

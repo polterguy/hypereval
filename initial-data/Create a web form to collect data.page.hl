@@ -1,0 +1,89 @@
+
+/*
+ * Example of how to create a web form, to collect data from your users.
+ *
+ * Notice, most widgets are declared as their HTML counterpart, such as "h3" and "div".
+ * You can declare (most) widgets this way.
+ *
+ * First we must include Micro's CSS files.
+ */
+p5.web.include-css-file:@MICRO/media/main.css
+p5.web.include-css-file:@MICRO/media/skins/serious.css
+
+
+/*
+ * Then we create our "wire frame", or "grid template".
+ */
+create-widget:an-example-form-widget
+  class:container
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col air-inner shaded rounded bg
+          widgets
+
+            /*
+             * Header.
+             */
+            h3
+              innerValue:Web form example
+
+            /*
+             * Since we want our textbox to have a descriptive label, we wrap it inside of a "fill/strip" div,
+             * and associates a label with it.
+             */
+            div
+              class:strip fill
+              widgets
+                label
+                  innerValue:Textbox
+                input
+                  type:text
+                  placeholder:Some piece of text ...
+                  .data-field:text-value
+
+            /*
+             * Creating a descriptive label for our textarea, before we create our textarea widget.
+             */
+            label
+              innerValue:Textarea
+              style:"margin-bottom:0;"
+            textarea
+              placeholder:Some textarea widget ...
+              innerValue
+              .data-field:textarea
+              class:fill
+              rows:7
+
+            /*
+             * A simple "trick" to make sure our checkbox has a label associated with it.
+             */
+            label
+              widgets
+                input
+                  type:checkbox
+                  .data-field:checkbox
+                  checked
+                span
+                  innerValue:Some checkbox
+
+            /*
+             * A simple "trick" to have our button right aligned.
+             */
+            div
+              class:right
+              widgets
+                button
+                  innerValue:Save
+                  style:"margin-bottom:0;"
+                  onclick
+
+                    /*
+                     * Serialising our form, and create a "pre" widget displaying its content.
+                     */
+                    micro.form.serialize:an-example-form-widget
+                    create-widget
+                      element:pre
+                      innerValue:x:/@micro.form.serialize

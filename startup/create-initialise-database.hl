@@ -1,0 +1,90 @@
+
+/*
+ * Creating database schema for snippets if it doesn't exist.
+ */
+try
+  p5.mysql.connect:[hypereval]
+    p5.mysql.execute:@"
+create table if not exists `snippets` (
+  `id` int(10) unsigned not null auto_increment,
+  `name` varchar(256) collate utf8mb4_unicode_ci not null,
+  `content` longtext collate utf8mb4_unicode_ci not null,
+  `type` varchar(50) collate utf8mb4_unicode_ci null,
+  primary key (`id`),
+  unique key `id_UNIQUE` (`id`),
+  unique key `name_UNIQUE` (`name`)
+) engine=InnoDB auto_increment=0 default charset=utf8mb4 collate=utf8mb4_unicode_ci;"
+
+
+    /*
+     * Checking if snippets table is empty, at which point we insert everything
+     * we find in our "/initial-data/" folder.
+     */
+    p5.mysql.scalar:"select count(*) from snippets"
+    if:x:/@p5.mysql.scalar?value.long
+      =:long:0
+
+      /*
+       * Inserting everything we find in our "/initial-data/" folder as default snippets.
+       */
+      list-files:@HYPEREVAL/initial-data/
+        filter:.hl
+
+      /*
+       * Looping through each file from above [list-files] invocation.
+       */
+      for-each:x:/@list-files/*?name
+
+        /*
+         * Figuring out type of snippet, and its name.
+         */
+        _type
+        split:x:/@_dp?value
+          =:/
+        split:x:/@split/0/-?name
+          =:.
+        if:x:/@split/*?count
+          =:int:3
+
+          /*
+           * "Type declaration" found in filename.
+           */
+          set:x:/@_type?value
+            src:x:/@split/1?name
+
+        /*
+         * Loading snippet, and inserting it into our database.
+         */
+        load-file:x:/@_dp?value
+          convert:false
+        p5.mysql.insert:"insert into snippets (name, content, type) values (@name, @content, @type)"
+          @name:x:/@split/0?name
+          @content:x:/@load-file/*?value
+          @type:x:/@_type?value
+
+catch
+
+  /*
+   * Attempting to create database, unless this is our second invocation, for then
+   * to invoke self again, for simplicity reasons.
+   */
+  if:x:/../*/second?value
+    not
+
+    /*
+     * Making sure we prepend the database prefix in front of schema name.
+     */
+    p5.config.get:p5.data.prefix
+
+    /*
+     * Creating database schema.
+     */
+    p5.mysql.connect:[sys]
+      p5.mysql.execute:@"CREATE SCHEMA `{0}hypereval`;"
+        :x:/@p5.config.get/*?value
+
+    /*
+     * Invoking self, with [second] being true, to avoid never ending recursion.
+     */
+    micro.evaluate.file:x:/..?name
+      second:bool:true
