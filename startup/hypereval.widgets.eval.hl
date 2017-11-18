@@ -163,6 +163,19 @@ p5.hypereval_input.setSize('100%', '600px');"
                 innerValue:x:/..
               return:x:/@get-widget-property/*/*?value
 
+            /*
+             * Sets the current code to the given [_arg].
+             */
+            hypereval.widgets.eval.set-code
+
+              /*
+               * Retrieving textarea's content to caller.
+               */
+              set-widget-property:x:/../*/_event?value
+                innerValue:x:/../*/_arg?value
+              p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(`{0}`);"
+                :x:/../*/_arg?value
+
           oninit
 
             /*
