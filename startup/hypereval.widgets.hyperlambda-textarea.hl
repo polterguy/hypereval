@@ -1,6 +1,9 @@
 
 /*
  * Responsible for creating the CodeMirror Hyperlambda textarea widget.
+ *
+ * All arguments passed in will be added to main root widget, which is a textarea
+ * widget. To set its initial value, pass in [value] as its initial code value.
  */
 create-event:hypereval.widgets.hyperlambda-textarea
 
