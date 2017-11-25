@@ -28,17 +28,3 @@ create-event:p5.io.unroll-path.@HYPEREVAL
  * Evaluating all other startup files.
  */
 micro.evaluate.folder:@HYPEREVAL/startup/
-
-
-
-
-
-/*
- * Creates our version Active Event.
- *
- * Notice, this will be invoked by the core framework from the Bazar when the system is checking 
- * for new versions, to see if it needs to upgrade your app.
- */
-create-event:hypereval.version
-
-  return:decimal:5.1
