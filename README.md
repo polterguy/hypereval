@@ -40,12 +40,13 @@ arguably being the _"DBMS"_ for p5.data.
 
 You can also import snippets, either by dragging or dropping them directly unto the surface of your browser window, or by clicking the 
 upload snippet button. You can also export snippets. In addition, you can export all your snippets, and import a range of snippets, as a zip
-file, using the same logic. Below is a screenshot showing you the _"Load snippet window"_, which allows you to load a snippet from your snippet
+file, using similar logic. Below is a screenshot showing you the _"Load snippet window"_, which allows you to load a snippet from your snippet
 collection.
 
 ![alt screenshot](media/hypereval-load-snippet.png)
 
 Hypereval also creates a _"friendly URL"_ for all your snippets that are saved as _"page types"_, allowing you to literally create your apps,
 as a bunch of loosely coupled snippets, being composed of extension widgets as startup snippets, pages as _"views"_ and startup snippets/plain snippets
-as your controllers.
+as your controllers. For instance, from the above screenshot, to access the _"page-viewer"_ page snippet, you'd access it through a URL
+such as `your-domain.com/hypereval/page-viewer`.
 
