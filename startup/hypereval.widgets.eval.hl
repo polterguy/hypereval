@@ -737,7 +737,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                         not
                         return
                       p5.html.url-encode:x:/@p5.mysql.scalar?value
-                      p5.web.send-javascript:@"window.open('/hypereval?name={0}');"
+                      p5.web.send-javascript:@"window.open('/hypereval/{0}');"
                         :x:/@p5.html.url-encode?value
 
                 /*

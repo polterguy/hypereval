@@ -12,11 +12,15 @@
 /*
  * Checking if this is a request for a specific page.
  */
-p5.web.query.get:name
-if:x:/@p5.web.query.get/*?value
+split:x:/../*/url?value
+  =:?
+split:x:/@split/0?name
+  =:/
+if:x:/@split/*?count
+  >:int:1
   p5.mysql.connect:[hypereval]
     p5.mysql.select:@"select content from snippets where name = @name and type = 'page'"
-      @name:x:/@p5.web.query.get/*?value
+      @name:x:/@split/1?name
 
     /*
      * Verifying page actually exists.
