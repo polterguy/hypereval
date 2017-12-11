@@ -481,7 +481,7 @@ create-widget
 
                     div
                       class:strip
-                      style:"display:inline-block;"
+                      style:"display:inline-block;margin-left:1rem;"
                       widgets
                         button
                           style:"margin-bottom:0;"
