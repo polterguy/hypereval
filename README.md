@@ -48,5 +48,5 @@ collection.
 Hypereval also creates a _"friendly URL"_ for all your snippets that are saved as _"page types"_, allowing you to literally create your apps,
 as a bunch of loosely coupled snippets, being composed of extension widgets as startup snippets, pages as _"views"_ and startup snippets/plain snippets
 as your controllers. For instance, from the above screenshot, to access the _"page-viewer"_ page snippet, you'd access it through a URL
-such as `your-domain.com/hypereval/page-viewer`.
+such as `your-domain.com/hypereval/page-viewer`, while the data-viewer snippet can be found at `your-comain.som/hypereval/data-viewer`.
 
