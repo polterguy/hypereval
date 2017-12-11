@@ -788,9 +788,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                                        * Figuring out which snippet user wants to delete, if any.
                                        */
                                       p5.web.session.get:hypereval.snippet-name
-                                      create-widget
-                                        element:pre
-                                        innerValue:x:/..
                                       if:x:/@p5.web.session.get/*?value
                                         not
                                         or:x:/@p5.web.session.get/*?value
