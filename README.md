@@ -24,10 +24,10 @@ below.
 
 In addition, Hypereval creates two extension widgets, which you can use in your own apps.
 
-* __[hypereval.widgets.eval]__ - The entire Hypereval module as an extension widget, more or less. Useful to inject on pages during debugging sessions.
-* __[hypereval.widgets.hyperlambda-textarea]__ - A Hyperlambda _"textbox"_, using CodeMirror behind, to feature intellisense, autocomplete, etc. Highly useful for editing Hyperlambda.
+* __[hypereval.widgets.eval]__ - The entire Hypereval module as an extension widget, more or less. Useful to inject on pages during debugging sessions for instance.
+* __[hypereval.widgets.hyperlambda-textarea]__ - A Hyperlambda _"textbox"_, using CodeMirror behind to feature intellisense, autocomplete, etc. Highly useful for editing Hyperlambda.
 
-The Hyperlambda editor, or its _"code textarea"_ is based upon CodeMirror, giving you an extremely rich code editor, for editing Hyperlambda -
+The Hyperlambda editor, or its _"code textarea"_ is based upon CodeMirror, giving you an extremely rich code editor for editing Hyperlambda -
 Including for instance intellisense, autocomplete, syntax error feedback, etc, etc, etc.
 
 Hypereval is extremely powerful, and arguably an entire IDE, which you can run through your browser. Below is a screenshot of one of its default
@@ -35,4 +35,11 @@ snippets, which is created as you install Hypereval. The snippet below creates a
 arguably being the _"DBMS"_ for p5.data.
 
 ![alt screenshot](media/hypereval-data-editor-snippet.png)
+
+You can also import snippets, either by dragging or dropping them directly unto the surface of your browser window, or by clicking the 
+upload snippet button. You can also export snippet. In addition, you can export all your snippets, and import a range of snippets, as a zip
+file, using the same logic. Below is a screenshot showing you the _"Load snippet window"_, which allows you to load a snippet from your snippet
+collection.
+
+![alt screenshot](media/hypereval-load-snippet.png)
 
