@@ -84,4 +84,8 @@ create-event:duckduckgo.search
         item
           url:x:/@p5.html.url-decode?value
           text:x:/@join?value
+
+  /*
+   * Returning results to caller.
+   */
   return

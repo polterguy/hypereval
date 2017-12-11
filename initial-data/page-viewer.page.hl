@@ -1,19 +1,26 @@
 /*
- * Example of how to create a datagrid.
- * This little app will create a datagrid, simply displaying all "page snippets", 
- * with a link, allowing user to open the page.
+ * Page that allows user to view all pages in system.
+ * Notice, there are no requirements for an actual user being logged in
+ * to evaluate this page.
  *
- * First we must include Micro's CSS files.
+ * Since this snippet is so small, it also serves as a great example by
+ * itself, of how to use e.g. the Micro datagrid, etc.
  */
-p5.web.include-css-file:@MICRO/media/main.css
-p5.web.include-css-file:@MICRO/media/skins/serious.css
 
 
 /*
  * Then we create our "wire frame", or "grid template".
  */
-create-widget:an-example-form-widget
+create-widget:hypereval-page-viewer
   class:container
+  oninit
+
+    /*
+     * Including Micro CSS files.
+     */
+    p5.web.include-css-file:@MICRO/media/main.css
+    p5.web.include-css-file:@MICRO/media/skins/serious.css
+
   widgets
     div
       class:row
@@ -25,7 +32,7 @@ create-widget:an-example-form-widget
             /*
              * Our actual "datagrid".
              */
-            micro.widgets.grid:my-datagrid
+            micro.widgets.grid:page-viewer-datagrid
               class:hover striped
 
               // Columns, declares the headers for our grid.
@@ -78,4 +85,4 @@ create-widget:an-example-form-widget
                  * Invokes the event that actually "databinds" our grid, now parametrised 
                  * with one [item] for each "page" in our snippets collection.
                  */
-                micro.widgets.grid.databind:my-datagrid
+                micro.widgets.grid.databind:page-viewer-datagrid
