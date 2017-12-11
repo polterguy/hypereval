@@ -18,6 +18,8 @@ split:x:/@split/0?name
   =:/
 if:x:/@split/*?count
   >:int:1
+  and:x:/@split/1?name
+    !=:upload
   p5.mysql.connect:[hypereval]
     p5.mysql.select:@"select content from snippets where name = @name and type = 'page'"
       @name:x:/@split/1?name
@@ -103,8 +105,6 @@ if:x:/@whoami/*/role?value
 /*
  * Checking if this is an upload request.
  */
-split:x:/../*/url?value
-  =:/
 if:x:/@split/0/-?name
   =:upload
 

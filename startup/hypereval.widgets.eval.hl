@@ -242,6 +242,14 @@ p5.hypereval_input.setSize('100%', '600px');"
                         :x:/@p5.web.session.get/*?value
                         class:micro-windows-info success
 
+                    else
+
+                      /*
+                       * Giving user some feedback.
+                       */
+                      micro.windows.info:Notice, your snippet was not saved
+                        class:micro-windows-info success
+
                   .onclick
 
                     /*
@@ -271,369 +279,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                      */
                     p5.web.session.set:hypereval.code
                       src:x:/../*/get-widget-property/[0,1]/*/*?value
-
-                /*
-                 * Load snippet button.
-                 */
-                button:hypereval-manage-snippets-button
-                  innerValue:@"<span class=""icon-folder-open""></span>"
-                  title:Load snippet - Alt+L
-                  events
-
-                    /*
-                     * Helper event to programatically open load snippet window.
-                     */
-                    hypereval.widgets.eval.show-load-window
-
-                      /*
-                       * To make it simple, we simply "click" button programmatically.
-                       */
-                      p5.web.widgets.ajax-events.raise:x:/../*/_event?value
-                        onclick
-
-                    /*
-                     * Helper event to programatically close load snippet window.
-                     */
-                    hypereval.widgets.eval.close-load-window
-
-                      /*
-                       * Closing modal window, if it exists.
-                       */
-                      if
-                        fetch:x:/0/0?value
-                          widget-exists:hypereval-manage-snippets
-                        delete-widget:hypereval-manage-snippets
-
-                  onclick
-
-                    /*
-                     * Shows a modal widget with each snippet from database, allowing
-                     * the user to either mark it as a "startup snippet" or as a "page".
-                     */
-                    create-widgets
-                      micro.widgets.modal:hypereval-manage-snippets
-                        widgets
-                          h3
-                            innerValue:Your snippets
-                          micro.widgets.grid:hypereval-snippets-grid
-                            class:hover
-                            events
-
-                              /*
-                               * Databinds snippets grid.
-                               */
-                              hypereval.snippets.databind
-
-                                /*
-                                 * Connecting to database, selecting all snippets, 
-                                 * and creating one grid item for each record.
-                                 */
-                                p5.mysql.connect:[hypereval]
-                                  p5.mysql.select:@"select * from snippets order by id desc"
-
-                                  /*
-                                   * Necessary to find the relative URL of module.
-                                   */
-                                  p5.io.unroll-path:@HYPEREVAL/
-                                  split:x:/@p5.io.unroll-path?value
-                                    =:/
-
-                                  /*
-                                   * Looping through each snippet, creating one datagrid item
-                                   * for each.
-                                   */
-                                  for-each:x:/@p5.mysql.select/*
-                                    p5.html.url-encode:x:/@_dp/#/*/name?value
-
-                                    /*
-                                     * Adding "name" cell.
-                                     */
-                                    if:x:/@_dp/#/*/type?value
-
-                                      /*
-                                       * Snippet has a type declaration (either a "page" or a "startup" type of snippet).
-                                       */
-                                      eval-x:x:/+/*/*/*
-                                      add:x:/../*/micro.widgets.grid.databind
-                                        src
-                                          item
-                                            name:{0} ({1})
-                                              :x:/@_dp/#/*/name?value
-                                              :x:/@_dp/#/*/type?value
-
-                                    else
-
-                                      /*
-                                       * Plain snippet.
-                                       */
-                                      eval-x:x:/+/*/*/*
-                                      add:x:/../*/micro.widgets.grid.databind
-                                        src
-                                          item
-                                            name:x:/@_dp/#/*/name?value
-
-                                    /*
-                                     * Adding "load" and "delete" cells.
-                                     */
-                                    eval-x:x:/+/**/.name
-                                    add:x:/../*/micro.widgets.grid.databind/0/-
-                                      src
-                                        load
-                                          style:"width:5px;"
-                                          widgets
-                                            button
-                                              innerValue:@"<span class=""icon-folder-open"" style=""width:100%;height:100%;display:inline-block;""></span>"
-                                              style:"margin-bottom:0;"
-                                              title:Loads this snippet
-                                              onclick:@"p5.$(event.target.tagName.toLowerCase() == 'button' ? event.target.id : event.target.parentElement.id).raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});return false;"
-                                              .onclick
-
-                                                /*
-                                                 * Forward evaluated above.
-                                                 */
-                                                .name:x:/@_dp/#/*/name?value
-                                                p5.mysql.connect:[hypereval]
-                                                  p5.mysql.select:@"select content, name from snippets where name = @name"
-                                                    @name:x:/@.name?value
-                                                  p5.web.return-response-object:code
-                                                    src:x:/@p5.mysql.select/*/*/content?value
-                                                  p5.web.session.set:hypereval.snippet-name
-                                                    src:x:/@p5.mysql.select/*/*/name?value
-
-                                                /*
-                                                 * Closing modal window.
-                                                 */
-                                                delete-widget:hypereval-manage-snippets
-
-                                                /*
-                                                 * Making sure our Hypereval remembers that this is our
-                                                 * "current code".
-                                                 */
-                                                p5.web.session.set:hypereval.code
-                                                  src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
-
-                                                /*
-                                                 * Signaling that current snippet was changed.
-                                                 */
-                                                hypereval.snippet.changed
-
-                                        delete
-                                          style:"width:5px;"
-                                          widgets
-                                            button
-                                              innerValue:@"<span class=""icon-bin""></span>"
-                                              style:"margin-bottom:0;"
-                                              title:Deletes this snippet, notice this action is permanent
-                                              onclick
-
-                                                /*
-                                                 * Forward evaluated above.
-                                                 */
-                                                .name:x:/@_dp/#/*/name?value
-
-                                                /*
-                                                 * Deletes table row, and snippet.
-                                                 */
-                                                p5.web.widgets.find-first-ancestor:x:/../*/_event?value
-                                                  element:tr
-                                                delete-widget:x:/@p5.web.widgets.find-first-ancestor/*/*?value
-                                                p5.mysql.connect:[hypereval]
-                                                  p5.mysql.delete:@"delete from snippets where name = @name"
-                                                    @name:x:/@.name?value
-
-                                                /*
-                                                 * In case user deleted the "current snippet", we post the
-                                                 * changed event, to make sure UI is updated.
-                                                 */
-                                                hypereval.snippet.changed
-
-                                /*
-                                 * Databinds snippets.
-                                 */
-                                micro.widgets.grid.databind:hypereval-snippets-grid
-
-                            oninit
-
-                              /*
-                               * Initial databinding of snippets grid.
-                               */
-                              hypereval.snippets.databind
-                          div
-                            class:right
-                            widgets
-                              div
-                                class:strip
-                                style:"display:inline-block;"
-                                widgets
-                                  button
-                                    innerValue:Close
-                                    style:"margin-bottom:0;"
-                                    title:Close window
-                                    onclick
-
-                                      /*
-                                       * Simply deletes the modal widget.
-                                       */
-                                      delete-widget:hypereval-manage-snippets
-
-
-                /*
-                 * Save Hyperlambda button.
-                 */
-                button:hypereval-save-button
-                  innerValue:@"<span class=""icon-floppy-disk""></span>"
-                  title:Saves your current Hyperlambda to your snippets collection - Alt+S
-                  onclick
-
-                    /*
-                     * Checking if we should provide a default alternative value for "type" of snippet
-                     * radio buttons.
-                     */
-                    p5.web.session.get:hypereval.snippet-name
-                    if:x:/@p5.web.session.get/*?value
-                      p5.mysql.connect:[hypereval]
-                        p5.mysql.scalar:@"select type from snippets where name = @name"
-                          @name:x:/@p5.web.session.get/*?value
-                        if:x:/@p5.mysql.scalar?value
-                          add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/={0}
-                            :x:/@p5.mysql.scalar?value
-                            src:checked
-
-                    /*
-                     * Making sure we check of "Snippet" radio button, if no other radio buttons have been checked
-                     * by above logic.
-                     */
-                    if:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/checked
-                      not
-                      add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/=snippet
-                        src:checked
-
-                    /*
-                     * Saving Hyperlambda to database, by allowing user to associate a name with snippet,
-                     * through a modal window, for then to save the code with the specified name.
-                     */
-                    create-widgets
-                      micro.widgets.modal:hypereval-save-modal
-                        widgets
-                          h3
-                            innerValue:Supply a name please
-                          p
-                            innerValue:And choose if you want to save your snippet as a page or a startup snippet.
-                          micro.widgets.wizard-form:hypereval-save-form
-                            text
-                              info:Name
-                              .data-field:name
-                              onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-save-modal-button').raise('onclick');return false;}"
-                              oninit
-
-                                /*
-                                 * Setting initial focus to "Name" textbox.
-                                 */
-                                micro.page.set-focus:x:/../*/_event?value
-
-                                /*
-                                 * Checking if we have a snippet name in session, and
-                                 * if so, we make sure we default our name to that value.
-                                 */
-                                p5.web.session.get:hypereval.snippet-name
-                                if:x:/-/*?value
-                                  set-widget-property:x:/../*/_event?value
-                                    value:x:/@p5.web.session.get/*?value
-
-                            radio-group
-                              .data-field:type
-                              options
-                                Snippet:snippet
-                                Page:page
-                                Startup:startup
-
-                            div
-                              class:right
-                              style:"margin-top:-1rem;"
-                              widgets
-                                div
-                                  class:strip
-                                  style:"display:inline-block;"
-                                  widgets
-                                    button:hypereval-save-modal-button
-                                      innerValue:Save
-                                      style:"margin-bottom:0;"
-                                      onclick
-
-                                        /*
-                                         * Serializing form, opening database connection,
-                                         * deleting snippets with similar name, and saving snippet
-                                         * into database.
-                                         */
-                                        get-widget-property:hypereval-input
-                                          innerValue
-                                        micro.widgets.wizard-form.value:hypereval-save-form
-
-                                        /*
-                                         * Sanity checking name of snippet.
-                                         */
-                                        match:x:/@micro.widgets.wizard-form.value/*/name?value
-                                          src:regex:/^[-a-z0-9_ ]*$/i
-                                        if:x:/@match/*?name
-                                          not
-                                          micro.windows.info:Only use spaces, a-z, 0-9 and '-' in your name
-                                            class:micro-windows-info warning
-                                          return
-
-                                        /*
-                                         * Making sure we insert page as correct type.
-                                         */
-                                        _type
-                                        if:x:/@micro.widgets.wizard-form.value/*/type?value
-                                          !=:snippet
-                                          set:x:/@_type?value
-                                            src:x:/@micro.widgets.wizard-form.value/*/type?value
-
-                                        /*
-                                         * Inserting snippet into database.
-                                         */
-                                        p5.mysql.connect:[hypereval]
-                                          p5.mysql.delete:@"delete from snippets where name = @name"
-                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
-                                          p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
-                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
-                                            @content:x:/@get-widget-property/*/*?value
-                                            @type::x:/@_type?value
-
-                                        /*
-                                         * Closing modal window, and giving user some feedback.
-                                         */
-                                        delete-widget:hypereval-save-modal
-                                        micro.windows.info:Snippet was successfully saved
-                                          class:micro-windows-info success
-
-                                        /*
-                                         * Making sure we store name used into session, in case
-                                         * user wants to save the same snippet again.
-                                         */
-                                        p5.web.session.set:hypereval.snippet-name
-                                          src:x:/@micro.widgets.wizard-form.value/*/name?value
-
-                                        /*
-                                         * Storing code in session, to make it more easily available.
-                                         */
-                                        p5.web.session.set:hypereval.code
-                                          src:x:/../*/get-widget-property/*/*?value
-
-                                        /*
-                                         * Signaling that snippet was changed.
-                                         */
-                                        hypereval.snippet.changed
-
-                                    button
-                                      innerValue:Close
-                                      style:"margin-bottom:0;"
-                                      onclick
-
-                                        /*
-                                         * Simply closing modal window.
-                                         */
-                                        delete-widget:hypereval-save-modal
 
                 /*
                  * Preview button.
@@ -728,6 +373,477 @@ p5.hypereval_input.setSize('100%', '600px');"
               widgets
 
                 /*
+                 * Load snippet button.
+                 */
+                button:hypereval-manage-snippets-button
+                  innerValue:@"<span class=""icon-folder-open""></span>"
+                  title:Load snippet - Alt+L
+                  events
+
+                    /*
+                     * Helper event to programatically open load snippet window.
+                     */
+                    hypereval.widgets.eval.show-load-window
+
+                      /*
+                       * To make it simple, we simply "click" button programmatically.
+                       */
+                      p5.web.widgets.ajax-events.raise:x:/../*/_event?value
+                        onclick
+
+                    /*
+                     * Helper event to programatically close load snippet window.
+                     */
+                    hypereval.widgets.eval.close-load-window
+
+                      /*
+                       * Closing modal window, if it exists.
+                       */
+                      if
+                        fetch:x:/0/0?value
+                          widget-exists:hypereval-manage-snippets
+                        delete-widget:hypereval-manage-snippets
+
+                  onclick
+
+                    /*
+                     * Shows a modal widget with each snippet from database, allowing
+                     * the user to either mark it as a "startup snippet" or as a "page".
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-manage-snippets
+                        widgets
+                          h3
+                            innerValue:Your snippets
+                          micro.widgets.grid:hypereval-snippets-grid
+                            class:hover striped
+                            events
+
+                              /*
+                               * Databinds snippets grid.
+                               */
+                              hypereval.snippets.databind
+
+                                /*
+                                 * Connecting to database, selecting all snippets, 
+                                 * and creating one grid item for each record.
+                                 */
+                                p5.mysql.connect:[hypereval]
+                                  p5.mysql.select:@"select * from snippets order by id desc"
+
+                                  /*
+                                   * Necessary to find the relative URL of module.
+                                   */
+                                  p5.io.unroll-path:@HYPEREVAL/
+                                  split:x:/@p5.io.unroll-path?value
+                                    =:/
+
+                                  /*
+                                   * Looping through each snippet, creating one datagrid item
+                                   * for each.
+                                   */
+                                  for-each:x:/@p5.mysql.select/*
+                                    p5.html.url-encode:x:/@_dp/#/*/name?value
+
+                                    /*
+                                     * Adding "name" cell.
+                                     */
+                                    if:x:/@_dp/#/*/type?value
+
+                                      /*
+                                       * Snippet has a type declaration (either a "page" or a "startup" type of snippet).
+                                       */
+                                      eval-x:x:/+/*/*/*
+                                      add:x:/../*/micro.widgets.grid.databind
+                                        src
+                                          item
+                                            name:{0} ({1})
+                                              :x:/@_dp/#/*/name?value
+                                              :x:/@_dp/#/*/type?value
+
+                                    else
+
+                                      /*
+                                       * Plain snippet.
+                                       */
+                                      eval-x:x:/+/*/*/*
+                                      add:x:/../*/micro.widgets.grid.databind
+                                        src
+                                          item
+                                            name:x:/@_dp/#/*/name?value
+
+                                    /*
+                                     * Adding commonalities for row.
+                                     */
+                                    eval-x:x:/+/**/.name
+                                    add:x:/../*/micro.widgets.grid.databind/0/-
+                                      src
+                                        .row
+                                          onclick:@"p5.$(event.target.parentNode.id).raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});return false;"
+                                          .onclick
+
+                                            /*
+                                             * Forward evaluated above.
+                                             */
+                                            .name:x:/@_dp/#/*/name?value
+                                            p5.mysql.connect:[hypereval]
+                                              p5.mysql.select:@"select content, name from snippets where name = @name"
+                                                @name:x:/@.name?value
+                                              p5.web.return-response-object:code
+                                                src:x:/@p5.mysql.select/*/*/content?value
+                                              p5.web.session.set:hypereval.snippet-name
+                                                src:x:/@p5.mysql.select/*/*/name?value
+
+                                            /*
+                                             * Closing modal window.
+                                             */
+                                            delete-widget:hypereval-manage-snippets
+
+                                            /*
+                                             * Making sure our Hypereval remembers that this is our
+                                             * "current code".
+                                             */
+                                            p5.web.session.set:hypereval.code
+                                              src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
+
+                                            /*
+                                             * Signaling that current snippet was changed.
+                                             */
+                                            hypereval.snippet.changed
+
+                                            /*
+                                             * Enabling delete snippet button.
+                                             */
+                                            delete-widget-property:hypereval-delete-button
+                                              disabled
+
+                                        name:x:/@_dp/#/*/name?value
+
+
+                                /*
+                                 * Databinds snippets.
+                                 */
+                                micro.widgets.grid.databind:hypereval-snippets-grid
+
+                            oninit
+
+                              /*
+                               * Initial databinding of snippets grid.
+                               */
+                              hypereval.snippets.databind
+                          div
+                            class:right
+                            widgets
+                              div
+                                class:strip
+                                style:"display:inline-block;"
+                                widgets
+                                  button
+                                    innerValue:@"<span class=""icon-cross""></span>"
+                                    style:"margin-bottom:0;"
+                                    title:Close window without loading  snippet
+                                    onclick
+
+                                      /*
+                                       * Simply deletes the modal widget.
+                                       */
+                                      delete-widget:hypereval-manage-snippets
+
+                /*
+                 * Save snippet button.
+                 */
+                button:hypereval-save-button
+                  innerValue:@"<span class=""icon-floppy-disk""></span>"
+                  title:Saves your current Hyperlambda to your snippets collection - Alt+S
+                  onclick
+
+                    /*
+                     * Checking if we should provide a default alternative value for "type" of snippet
+                     * radio buttons.
+                     */
+                    p5.web.session.get:hypereval.snippet-name
+                    if:x:/@p5.web.session.get/*?value
+                      p5.mysql.connect:[hypereval]
+                        p5.mysql.scalar:@"select type from snippets where name = @name"
+                          @name:x:/@p5.web.session.get/*?value
+                        if:x:/@p5.mysql.scalar?value
+                          add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/={0}
+                            :x:/@p5.mysql.scalar?value
+                            src:checked
+
+                    /*
+                     * Making sure we check of "Snippet" radio button, if no other radio buttons have been checked
+                     * by above logic.
+                     */
+                    if:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/checked
+                      not
+                      add:x:/../*/create-widgets/**/micro.widgets.wizard-form/*/radio-group/*/options/*/=snippet
+                        src:checked
+
+                    /*
+                     * Saving Hyperlambda to database, by allowing user to associate a name with snippet,
+                     * through a modal window, for then to save the code with the specified name.
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-save-modal
+                        widgets
+                          h3
+                            innerValue:Supply a name please
+                          p
+                            innerValue:And choose if you want to save your snippet as a page or a startup snippet. Notice, if you supply a name of a snippet that already exists, the old snippet will be overwritten.
+                          micro.widgets.wizard-form:hypereval-save-form
+                            text
+                              info:Name
+                              .data-field:name
+                              onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-save-modal-button').raise('onclick');return false;}"
+                              oninit
+
+                                /*
+                                 * Setting initial focus to "Name" textbox.
+                                 */
+                                micro.page.set-focus:x:/../*/_event?value
+
+                                /*
+                                 * Checking if we have a snippet name in session, and
+                                 * if so, we make sure we default our name to that value.
+                                 */
+                                p5.web.session.get:hypereval.snippet-name
+                                if:x:/-/*?value
+                                  set-widget-property:x:/../*/_event?value
+                                    value:x:/@p5.web.session.get/*?value
+
+                            radio-group
+                              .data-field:type
+                              options
+                                Snippet:snippet
+                                Page:page
+                                Startup:startup
+
+                            div
+                              class:right
+                              style:"margin-top:-1rem;"
+                              widgets
+                                div
+                                  class:strip
+                                  style:"display:inline-block;"
+                                  widgets
+                                    button:hypereval-save-modal-button
+                                      innerValue:@"<span class=""icon-checkmark""></span>"
+                                      title:Saves your snippet
+                                      style:"margin-bottom:0;padding-left:35px;padding-right:35px;"
+                                      onclick
+
+                                        /*
+                                         * Verfying there actually is any code.
+                                         */
+                                        get-widget-property:hypereval-input
+                                          innerValue
+                                        if
+                                          trim:x:/@get-widget-property/*/*?value
+                                          =:
+
+                                          /*
+                                           * No code.
+                                           */
+                                          micro.windows.info:There is no code to save
+                                            class:micro-windows-info warning
+                                          return
+
+                                        /*
+                                         * Serializing form, opening database connection,
+                                         * deleting snippets with similar name, and saving snippet
+                                         * into database.
+                                         */
+                                        micro.widgets.wizard-form.value:hypereval-save-form
+
+                                        /*
+                                         * Sanity checking name of snippet.
+                                         */
+                                        match:x:/@micro.widgets.wizard-form.value/*/name?value
+                                          src:regex:/^[-a-z0-9_ ]*$/i
+                                        if:x:/@match/*?name
+                                          not
+                                          micro.windows.info:Only use spaces, a-z, 0-9 and '-' in your name
+                                            class:micro-windows-info warning
+                                          return
+
+                                        /*
+                                         * Making sure we insert page as correct type.
+                                         */
+                                        _type
+                                        if:x:/@micro.widgets.wizard-form.value/*/type?value
+                                          !=:snippet
+                                          set:x:/@_type?value
+                                            src:x:/@micro.widgets.wizard-form.value/*/type?value
+
+                                        /*
+                                         * Inserting snippet into database.
+                                         */
+                                        p5.mysql.connect:[hypereval]
+                                          p5.mysql.delete:@"delete from snippets where name = @name"
+                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
+                                          p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
+                                            @name:x:/@micro.widgets.wizard-form.value/*/name?value
+                                            @content:x:/@get-widget-property/*/*?value
+                                            @type::x:/@_type?value
+
+                                        /*
+                                         * Closing modal window, and giving user some feedback.
+                                         */
+                                        delete-widget:hypereval-save-modal
+                                        micro.windows.info:Snippet was successfully saved
+                                          class:micro-windows-info success
+
+                                        /*
+                                         * Making sure we store name used into session, in case
+                                         * user wants to save the same snippet again.
+                                         */
+                                        p5.web.session.set:hypereval.snippet-name
+                                          src:x:/@micro.widgets.wizard-form.value/*/name?value
+
+                                        /*
+                                         * Storing code in session, to make it more easily available.
+                                         */
+                                        p5.web.session.set:hypereval.code
+                                          src:x:/../*/get-widget-property/*/*?value
+
+                                        /*
+                                         * Signaling that snippet was changed.
+                                         */
+                                        hypereval.snippet.changed
+
+                                        /*
+                                         * Making sure we disable delete snippet button, 
+                                         * since there are no active snippets now.
+                                         */
+                                        delete-widget-property:hypereval-delete-button
+                                          disabled
+
+                                    button
+                                      innerValue:@"<span class=""icon-cross""></span>"
+                                      title:Closes your save window without saving
+                                      style:"margin-bottom:0;"
+                                      onclick
+
+                                        /*
+                                         * Simply closing modal window.
+                                         */
+                                        delete-widget:hypereval-save-modal
+
+                /*
+                 * Delete snippet button.
+                 */
+                button:hypereval-delete-button
+                  innerValue:@"<span class=""icon-bin""></span>"
+                  title:Deletes your current snippet
+                  disabled
+                  oninit
+
+                    /*
+                     * Checking if we have a "current snippet", and if so, enabling our delete snippet button.
+                     */
+                    p5.web.session.get:hypereval.snippet-name
+                    if:x:/-/*?value
+
+                      /*
+                       * There's a "current snippet" loaded in our editor.
+                       */
+                      delete-widget-property:hypereval-delete-button
+                        disabled
+
+                  onclick
+
+                    /*
+                     * Asks user to confirm action.
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-confirm-snippet-deletion
+                        widgets
+                          h3
+                            innerValue:Confirm action
+                          p
+                            innerValue:Please confirm deletion of snippet. This action is permanent.
+                          div
+                            class:right
+                            widgets
+                              div
+                                class:strip
+                                style:"display:inline-block;"
+                                widgets
+                                  button:hypereval-confirm-deletion-btn
+                                    innerValue:@"<span class=""icon-bin""></span>"
+                                    style:"margin-bottom:0;padding-left:35px;padding-right:35px;"
+                                    title:Deletes snippet
+                                    oninit
+
+                                      /*
+                                       * Setting initial focus to "Yes" button.
+                                       */
+                                      micro.page.set-focus:x:/../*/_event?value
+
+                                    onclick:@"p5.$('hypereval-confirm-deletion-btn').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue('');}});return false;"
+                                    .onclick
+
+                                      /*
+                                       * Figuring out which snippet user wants to delete, if any.
+                                       */
+                                      p5.web.session.get:hypereval.snippet-name
+                                      create-widget
+                                        element:pre
+                                        innerValue:x:/..
+                                      if:x:/@p5.web.session.get/*?value
+                                        not
+                                        or:x:/@p5.web.session.get/*?value
+                                          =:
+
+                                        /*
+                                         * Snippet is probably not saved yet.
+                                         */
+                                        return
+
+                                      /*
+                                       * Opening database, and deleting snippet from snippet collection.
+                                       */
+                                      p5.mysql.connect:[hypereval]
+                                        p5.mysql.delete:@"delete from snippets where name = @name"
+                                          @name:x:/@p5.web.session.get/*?value
+
+                                      /*
+                                       * Cleaning out session variables.
+                                       */
+                                      p5.web.session.set:hypereval.snippet-name
+                                      p5.web.session.set:hypereval.code
+                                      p5.web.session.set:hypereval.file-type
+
+                                      /*
+                                       * Making sure we disable delete snippet button, 
+                                       * since there are no active snippets now.
+                                       */
+                                      set-widget-property:hypereval-delete-button
+                                        disabled
+
+                                      /*
+                                       * Deleting modal window.
+                                       */
+                                      delete-widget:hypereval-confirm-snippet-deletion
+
+                                  button
+                                    innerValue:@"<span class=""icon-cross""></span>"
+                                    title:Close window without deleting snippet
+                                    style:"margin-bottom:0;"
+                                    onclick
+
+                                      /*
+                                       * Simply deleting modal window.
+                                       */
+                                      delete-widget:hypereval-confirm-snippet-deletion
+
+            div
+              class:strip
+              style:"display:inline-block;margin-left:1rem;"
+              widgets
+
+                /*
                  * Download Hyperlambda button.
                  */
                 button:hypereval-download-button
@@ -753,6 +869,21 @@ p5.hypereval_input.setSize('100%', '600px');"
                               :x:/@p5.mysql.scalar?value
                     get-widget-property:hypereval-input
                       innerValue
+
+                    /*
+                     * Checking if there is any code at all in current view.
+                     */
+                    if
+                      trim:x:/@get-widget-property/*/*?value
+                      =:
+
+                      /*
+                       * No code in editor.
+                       */
+                      micro.windows.info:There is no code in your Hyperlambda editor
+                        class:micro-windows-info warning
+                      return
+
                     save-file:~/temp/hypereval-code.hl
                       src:x:/@get-widget-property/*/*?value
                     eval-x:x:/+/*/Content-Disposition
@@ -763,10 +894,18 @@ p5.hypereval_input.setSize('100%', '600px');"
                         :x:/@.defaults/*/type?value
 
                 /*
+                 * Upload Hyperlambda button.
+                 */
+                button
+                  innerValue:@"<span class=""icon-upload2""></span>"
+                  title:Uploads a Hyperlambda file from your client
+                  onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
+
+                /*
                  * Export all snippets button.
                  */
                 button
-                  innerValue:@"<span class=""icon-download2""></span>"
+                  innerValue:@"<span class=""icon-file-zip""></span>"
                   style:"margin-bottom:0;"
                   title:Exports all your snippets to a zip file
                   onclick
@@ -815,15 +954,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                     micro.download.file:~/temp/hypereval-export.zip
                       Content-Type:application/zip
                       Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
-
-                /*
-                 * Upload Hyperlambda button.
-                 */
-                button
-                  innerValue:@"<span class=""icon-upload2""></span>"
-                  title:Uploads a Hyperlambda file from your client
-                  onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
-
 
         div:hypereval-output-wrapper
           visible:false
