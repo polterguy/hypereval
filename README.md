@@ -17,15 +17,15 @@ for retrieving snippets, evaluating them, creating snippets, etc. See the list o
 below.
 
 * __[hypereval.snippets.create]__ - Creates a new snippet. Pass in [content] as Hyperlambda, and [_arg] as snippet name. Notice, will overwrite existing snippets with the same name.
-* __[hypereval.snippets.delete]__ - Deletes the given [_arg] snippet.
+* __[hypereval.snippets.delete]__ - Deletes the given [_arg] snippet. Pass in snippet's name as [_arg].
 * __[hypereval.snippets.evaluate]__ - Evaluates the given [_arg] snippet, with the given arguments, returning the results of the evaluation.
-* __[hypereval.snippets.get]__ - Returns the given [_arg] snippet.
+* __[hypereval.snippets.get]__ - Returns the given [_arg] snippet's Hyperlambda code.
 * __[hypereval.snippets.search]__ - Searches for snippets matching the given [_arg] value.
 
 In addition, Hypereval creates two extension widgets, which you can use in your own apps.
 
-* __[hypereval.widgets.eval]__ - The entire Hypereval module, more or less. Useful to inject on pages during debugging and similar sessions.
-* __[hypereval.widgets.hyperlambda-textarea]__ - A Hyperlambda _"textbox"_, using CodeMirror behind, to feature intellisense, autocomplete, etc.
+* __[hypereval.widgets.eval]__ - The entire Hypereval module as an extension widget, more or less. Useful to inject on pages during debugging sessions.
+* __[hypereval.widgets.hyperlambda-textarea]__ - A Hyperlambda _"textbox"_, using CodeMirror behind, to feature intellisense, autocomplete, etc. Highly useful for editing Hyperlambda.
 
-The Hyperlambda editor, or its _"code textarea"_ is based upon CodeMirror, giving you an extremely rich code editor, for editing Hyperlambda.
-Including for instance intellisense, autocomplete, etc, etc, etc.
+The Hyperlambda editor, or its _"code textarea"_ is based upon CodeMirror, giving you an extremely rich code editor, for editing Hyperlambda -
+Including for instance intellisense, autocomplete, syntax error feedback, etc, etc, etc.
