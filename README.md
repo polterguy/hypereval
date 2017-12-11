@@ -36,6 +36,8 @@ arguably being the _"DBMS"_ for p5.data.
 
 ![alt screenshot](media/hypereval-data-editor-snippet.png)
 
+## Import/export snippets
+
 You can also import snippets, either by dragging or dropping them directly unto the surface of your browser window, or by clicking the 
 upload snippet button. You can also export snippets. In addition, you can export all your snippets, and import a range of snippets, as a zip
 file, using the same logic. Below is a screenshot showing you the _"Load snippet window"_, which allows you to load a snippet from your snippet
