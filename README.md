@@ -3,9 +3,9 @@
 
 Hypereval allows you to evaluate Hyperlambda from within your browser, having it executed
 on the server. It also allows you to create Hyperlambda pages, and startup objects, arguably
-giving you an environment for creating your apps having its snippets become the Controllers and
-the Views. Pages would be the equivalent of a _"Views"_ and startup objects, and/or other snippets
-would become the equivalent of your _"Controllers"_.
+giving you an environment for creating your apps, having its Hypereval snippets becoming both 
+the Controllers and its Views. Pages would be the equivalent of a _"Views"_ and startup objects, 
+and/or other snippets would become the equivalent of your _"Controllers"_.
 
 In addition to the above, it also features an _"immediate mode"_, allowing you to evaluate your
 snippets immediately, optionally seeing the results of your evaluation in an _"output"_ window.
