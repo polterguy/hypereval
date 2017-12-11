@@ -1,4 +1,3 @@
-
 /*
  * Example of how to create a datagrid.
  * This little app will create a datagrid, simply displaying all "page snippets", 
@@ -70,11 +69,10 @@ create-widget:an-example-form-widget
                             widgets
                               a
                                 style:"display:block;"
-                                href:"{0}/hypereval?name={1}"
+                                href:"{0}hypereval/{1}"
                                   :x:/@p5.web.get-root-location?value
                                   :x:/@p5.html.url-encode?value
                                 innerValue:x:/@_dp?value
-                                target:_blank
 
                 /*
                  * Invokes the event that actually "databinds" our grid, now parametrised 
