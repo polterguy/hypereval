@@ -517,29 +517,42 @@ create-widget
                                             onclick
 
                                               /*
-                                               * Retrieving Hyperlambda from Code-Mirror editor, and inserting
-                                               * it into p5.data database.
+                                               * Making sure we wrap out insert into a try/catch block, in case of errors.
                                                */
-                                              micro.form.serialize:hypereval-data-editor-new-record-modal
-                                              hyper2lambda:x:/@micro.form.serialize/*/content?value
-                                              add:x:/../*/insert-data
-                                                src:x:/@hyper2lambda/*
-                                              insert-data
+                                              try
 
-                                              /*
-                                               * Deleting modal window.
-                                               */
-                                              delete-widget:hypereval-data-editor-new-record-modal
+                                                /*
+                                                 * Retrieving Hyperlambda from Code-Mirror editor, and inserting
+                                                 * it into p5.data database.
+                                                 */
+                                                micro.form.serialize:hypereval-data-editor-new-record-modal
+                                                hyper2lambda:x:/@micro.form.serialize/*/content?value
+                                                add:x:/../*/insert-data
+                                                  src:x:/@hyper2lambda/*
+                                                insert-data
 
-                                              /*
-                                               * Re-databinding grid.
-                                               */
-                                              p5.web.viewstate.get:hypereval.data-editor.filter
-                                              p5.web.viewstate.get:hypereval.data-editor.offset
-                                              eval-x:x:/+/*
-                                              hypereval._database-editor.databind
-                                                filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
-                                                offset:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+                                                /*
+                                                 * Deleting modal window.
+                                                 */
+                                                delete-widget:hypereval-data-editor-new-record-modal
+
+                                                /*
+                                                 * Re-databinding grid.
+                                                 */
+                                                p5.web.viewstate.get:hypereval.data-editor.filter
+                                                p5.web.viewstate.get:hypereval.data-editor.offset
+                                                eval-x:x:/+/*
+                                                hypereval._database-editor.databind
+                                                  filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                                  offset:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+
+                                              catch
+
+                                                /*
+                                                 * Displaying error to user.
+                                                 */
+                                                micro.windows.info:x:/@message?value
+                                                  class:micro-windows-info warning
 
                                           button
                                             innerValue:@"<span class=""icon-cross""></span>"
