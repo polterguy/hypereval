@@ -1,0 +1,616 @@
+/*
+ * Creates a form that allows the user to edit contents in p5.data database.
+ *
+ * Requires you to be logged in as "root", but will ask the user to login,
+ * if he is not already logged in.
+ */
+
+
+/*
+ * Including Micro, adding Awesome Fonts, and serious skin.
+ */
+p5.web.include-css-file:@MICRO/media/main.css
+p5.web.include-css-file:@MICRO/media/fonts.css
+p5.web.include-css-file:@MICRO/media/skins/serious.css
+
+
+/*
+ * Verifying user is logged in as root, and if not, forcing the user 
+ * to login before we proceed.
+ */
+whoami
+if:x:/@whoami/*/role?value
+  !=:root
+
+  /*
+   * User is not logged in as root.
+   */
+  p5.core.login
+    message:You'll need to login with a root account to edit your p5.data database.
+
+  /*
+   * Returning early to abort evaluating the rest of our file.
+   */
+  return
+
+
+/*
+ * Creating main wire frame.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Setting initial [offset] and [filter] for grid.
+     */
+    p5.web.viewstate.set:hypereval.data-editor.offset
+      src:int:0
+    p5.web.viewstate.set:hypereval.data-editor.filter
+      src:
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+
+            /*
+             * Descriptive header.
+             */
+            h1
+              class:center air-top
+              innerValue:p5.data records
+
+            /*
+             * Main content wrapper, creates some chrome wrapping entire app.
+             */
+            div:hypereval-data-editor-main-wrapper
+              class:bg air-inner shaded rounded
+              style:"overflow:auto;"
+              widgets
+
+                /*
+                 * Datagrid containing our p5.data records.
+                 */
+                micro.widgets.grid
+                  class:hover striped
+                  columns
+                    Name
+                      style:"width:50%;"
+                    ID
+                      style:"width:50%;"
+                  oninit
+
+                    /*
+                     * Initial databinding of grid.
+                     */
+                    hypereval._database-editor.databind
+
+                  events
+
+
+                    /*
+                     * Databinds grid of items from p5.data.
+                     *
+                     * Optionally pass in [offset] and [filter].
+                     */
+                    hypereval._database-editor.databind
+
+                      /*
+                       * Defaults, if no arguments are given.
+                       */
+                      .defaults
+                        offset:int:0
+
+                      /*
+                       * Sanity checking arguments.
+                       */
+                      micro.lambda.contract.optional:x:/..
+                        filter:string
+                        offset:int
+
+                      /*
+                       * Calculating slice to select.
+                       */
+                      +:x:(/../*/offset|/@.defaults/*/offset)/$?value.int
+                        _:int:10
+
+                      /*
+                       * Creating our (optional) filter condition.
+                       */
+                      _filter
+                      if:x:/../*/filter?value
+                        and:x:/@../*/filter?value
+                          !=:
+                        set:x:/@_filter?value
+                          src:@"(/""~{0}""|/""=~{0}""/*/""~{0}""/.|/*/""=~{0}""/.)"
+                            :x:/../*/filter?value
+
+                      /*
+                       * Querying database.
+                       */
+                      select-data:x:/*/*{0}/[{1},{2}]
+                        :x:/@_filter?value
+                        :x:(/../*/offset|/@.defaults/*/offset)/$?value.int
+                        :x:/@+?value
+
+                      /*
+                       * Looping through each result set from above, creating one item for our databind operation.
+                       */
+                      for-each:x:/@select-data/*
+                        eval-x:x:/+/*/*/*|/+/**/.id
+                        add:x:/../*/micro.widgets.grid.databind
+                          src
+                            item
+                              Name:x:/@_dp/#?name
+                              ID:x:/@_dp/#?value
+                              .row
+                                onclick
+
+                                  /*
+                                   * ID for item, forward evaluated above.
+                                   */
+                                  .id:x:/@_dp/#?value
+
+                                  /*
+                                   * Making sure we pass in correct type into [select-data].
+                                   */
+                                  p5.types.get-typename:x:/@.id?value
+                                  select-data:x:@"/*/*/""=:{0}:{1}"""
+                                    :x:/@p5.types.get-typename?value
+                                    :x:/@.id?value
+
+                                  /*
+                                   * Creating our editor widget.
+                                   */
+                                  lambda2hyper:x:/@select-data/*
+                                  p5.types.get-typename:x:/@select-data/*?value
+                                  create-widget
+                                    parent:hypereval-data-editor-main-wrapper
+                                    class:air-top
+                                    .editor:x:/@.id?value
+                                    widgets
+                                      hr
+                                      input
+                                        type:hidden
+                                        .type
+                                        value:"{0}:{1}:{2}"
+                                          :x:/@select-data/*?name
+                                          :x:/@p5.types.get-typename?value
+                                          :x:/@select-data/*?value
+                                      hypereval.widgets.hyperlambda-textarea
+                                        value:x:/@lambda2hyper?value
+                                      div
+                                        class:right
+                                        widgets
+                                          div
+                                            class:strip
+                                            style:"display:inline-block;"
+                                            widgets
+                                              button
+                                                innerValue:@"<span class=""icon-floppy-disk""></span>"
+                                                style:"padding-left:35px;padding-right:35px;margin-bottom:0;"
+                                                title:Saves your (updated) record
+                                                onclick
+
+                                                  /*
+                                                   * Making sure we're able to trap errors.
+                                                   */
+                                                  try
+
+                                                    /*
+                                                     * Finds our textarea widget, transforming its content to Hyperlambda,
+                                                     * and saves our record.
+                                                     *
+                                                     * First getting new lambda content for item.
+                                                     */
+                                                    p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+                                                      .editor
+                                                    p5.web.widgets.find:x:/-/*/*?value
+                                                      element:textarea
+                                                    get-widget-property:x:/-/*/*?value
+                                                      value
+                                                    hyper2lambda:x:/-/*/*?value
+
+                                                    /*
+                                                     * Then getting our type and the ID of our record.
+                                                     */
+                                                    p5.web.widgets.find:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                                      .type
+                                                    get-widget-property:x:/-/*/*?value
+                                                      value
+                                                    split:x:/-/*/*?value
+                                                      =:":"
+
+                                                    /*
+                                                     * Updating item, making sure we parametrise our [update-data] invocation.
+                                                     */
+                                                    add:x:/..try/*/update-data/*/src
+                                                      src:x:/@hyper2lambda/*
+                                                    update-data:x:@"/*/*/""=:{0}:{1}"""
+                                                      :x:/@split/1?name
+                                                      :x:/@split/2?name
+                                                      src
+
+                                                    /*
+                                                     * Giving user feedback about.
+                                                     */
+                                                    micro.windows.info:Record was successfully updated
+                                                      class:micro-windows-info success
+
+                                                  catch
+
+                                                    /*
+                                                     * Giving user feedback about error.
+                                                     */
+                                                    micro.windows.info:x:/@message?value
+                                                      class:micro-windows-info warning
+
+                                              button
+                                                innerValue:@"<span class=""icon-bin""></span>"
+                                                title:Delete this record
+                                                style:"margin-bottom:0;"
+                                                onclick
+
+                                                  /*
+                                                   * Asking user to confirm action.
+                                                   */
+                                                  create-widgets
+                                                    micro.widgets.modal:hypereval-data-editor-confirm-deletion
+                                                      widgets
+                                                        h3
+                                                          innerValue:Please confirm action
+                                                        p
+                                                          innerValue:Are you sure you want to delete this record? This action is permanent.
+                                                        div
+                                                          class:right
+                                                          widgets
+                                                            div
+                                                              class:strip
+                                                              style:"display:inline-block;"
+                                                              widgets
+                                                                button
+                                                                  innerValue:Yes
+                                                                  style:"margin-bottom:0;"
+                                                                  oninit
+
+                                                                    /*
+                                                                     * Setting initial focus to "Yes" button.
+                                                                     */
+                                                                    micro.page.set-focus:x:/../*/_event?value
+
+                                                                  onclick
+
+                                                                    /*
+                                                                     * Forward evaluated above.
+                                                                     */
+                                                                    .id:x:/@_dp/#?value
+
+                                                                    /*
+                                                                     * Deleting data record.
+                                                                     */
+                                                                    p5.types.get-typename:x:/@.id?value
+                                                                    delete-data:x:@"/*/*/""=:{0}:{1}"""
+                                                                      :x:/@p5.types.get-typename?value
+                                                                      :x:/@.id?value
+
+                                                                    /*
+                                                                     * Re-databinding grid.
+                                                                     */
+                                                                    p5.web.viewstate.get:hypereval.data-editor.filter
+                                                                    p5.web.viewstate.get:hypereval.data-editor.offset
+                                                                    eval-x:x:/+/*
+                                                                    hypereval._database-editor.databind
+                                                                      filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                                                      offset:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+
+                                                                    /*
+                                                                     * Finding our root editor widget, and simply deleting it, in addition
+                                                                     * to deleting our modal window.
+                                                                     */
+                                                                    p5.web.widgets.find
+                                                                      .editor:x:/@.id?value
+                                                                    delete-widget:x:/-/*/*?value
+                                                                    delete-widget:hypereval-data-editor-confirm-deletion
+
+                                                                button
+                                                                  innerValue:No
+                                                                  style:"margin-bottom:0;"
+                                                                  onclick
+
+                                                                    /*
+                                                                     * Deleting modal confirmation window.
+                                                                     */
+                                                                    delete-widget:hypereval-data-editor-confirm-deletion
+
+                                              button
+                                                innerValue:@"<span class=""icon-cross""></span>"
+                                                title:Close the editor for this record
+                                                style:"margin-bottom:0;"
+                                                onclick
+
+                                                  /*
+                                                   * Finding our root editor widget, and simply deleting it.
+                                                   */
+                                                  p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+                                                    .editor
+                                                  delete-widget:x:/-/*/*?value
+                                    
+
+                      /*
+                       * Actual databind operation.
+                       */
+                      micro.widgets.grid.databind:x:/../*/_event?value
+
+                      /*
+                       * Checking if there are (possibly) more records.
+                       */
+                      if:x:/@select-data/*?count
+                        =:int:10
+                        return:bool:true
+                      return:bool:false
+
+
+                div
+                  class:right
+                  widgets
+                    div
+                      class:strip
+                      style:"display:inline-block;"
+                      widgets
+                        input:hypereval-data-editor-search-filter
+                          type:text
+                          title:Filter, keyboard shortcut F
+                          style:"margin-bottom:0;"
+                          accesskey:F
+                          class:smaller
+                          onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-data-editor-search-btn').raise('onclick');return false;}"
+                          oninit
+
+                            /*
+                             * Setting initial focus to filter textbox.
+                             */
+                            micro.page.set-focus:x:/../*/_event?value
+                            select-data:x:/*/*?count
+                            set-widget-property:x:/../*/_event?value
+                              placeholder:{0} items ...
+                                :x:/@select-data?value
+
+                        button:hypereval-data-editor-search-btn
+                          style:"margin-bottom:0;"
+                          title:Search, keyboard shortcut S
+                          innerValue:@"<span class=""icon-search""></span>"
+                          accesskey:S
+                          onclick
+
+                            /*
+                             * Retrieving filter, storing it in ViewState, and re-databinding datagrid.
+                             */
+                            get-widget-property:hypereval-data-editor-search-filter
+                              value
+
+                            /*
+                             * Clearing our [offset] value.
+                             */
+                            p5.web.viewstate.set:hypereval.data-editor.offset
+                              src:int:0
+
+                            /*
+                             * Making sure we disable our "previous button".
+                             */
+                            set-widget-property:hypereval-data-editor-previous-btn
+                              disabled
+
+                            /*
+                             * Checking if filter is empty, and if so, making sure we remove the [filter] argument
+                             * to our databind invocation, disabling our "clear filter" button, and removing
+                             * our viewstate filter value.
+                             */
+                            if:x:/@get-widget-property/*/*?value
+                              =:
+
+                              /*
+                               * Filter is empty.
+                               */
+                              set-widget-property:hypereval-data-editor-clear-btn
+                                disabled
+                              p5.web.viewstate.set:hypereval.data-editor.filter
+                                src:
+
+                            else
+
+                              /*
+                               * Filter was not empty.
+                               */
+                              p5.web.viewstate.set:hypereval.data-editor.filter
+                                src:x:/@get-widget-property/*/*?value
+                              delete-widget-property:hypereval-data-editor-clear-btn
+                                disabled
+
+                            /*
+                             * Invoking our databind event.
+                             */
+                            eval-x:x:/+/*
+                            hypereval._database-editor.databind
+                              filter:x:/@get-widget-property/*/*?value
+                            if:x:/-?value
+                              =:bool:true
+                              delete-widget-property:hypereval-data-editor-next-btn
+                                disabled
+                            else
+                              set-widget-property:hypereval-data-editor-next-btn
+                                disabled
+                            micro.page.set-focus:hypereval-data-editor-search-filter
+
+                        button:hypereval-data-editor-clear-btn
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-cross""></span>"
+                          accesskey:X
+                          title:Clear filter, keyboard shortcut X
+                          disabled
+                          onclick
+
+                            /*
+                             * Clearing our viewstate offset value and filter condition, removing value
+                             * from filter textbox, and re-databinding grid.
+                             */
+                            p5.web.viewstate.set:hypereval.data-editor.offset
+                              src:int:0
+                            p5.web.viewstate.set:hypereval.data-editor.filter
+                              src:
+                            set-widget-property:hypereval-data-editor-search-filter
+                              value:
+                            hypereval._database-editor.databind
+                            if:x:/-?value
+                              =:bool:true
+                              delete-widget-property:hypereval-data-editor-next-btn
+                                disabled
+
+                            /*
+                             * Disabling clear filter button, and previus button, and setting
+                             * focus to filter textbox.
+                             */
+                            set-widget-property:hypereval-data-editor-clear-btn
+                              disabled
+                            set-widget-property:hypereval-data-editor-previous-btn
+                              disabled
+                            micro.page.set-focus:hypereval-data-editor-search-filter
+
+                    div
+                      class:strip
+                      style:"display:inline-block;"
+                      widgets
+                        button
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-plus""></span>"
+                          title:Create new record(s), keyboard shortcut C
+                          accesskey:C
+                          onclick
+
+                            /*
+                             * Showing a modal window, with a Hyperlambda editor, allowing
+                             * user to create a new item.
+                             */
+                            create-widgets
+                              micro.widgets.modal:hypereval-data-editor-new-record-modal
+                                widgets
+                                  h3
+                                    innerValue:New records(s)
+                                  p
+                                    innerValue:Supply me with data for your record(s).
+                                  hypereval.widgets.hyperlambda-textarea
+                                    .data-field:content
+                                  div
+                                    class:right
+                                    widgets
+                                      div
+                                        class:strip
+                                        style:"display:inline-block;"
+                                        widgets
+                                          button
+                                            innerValue:@"<span class=""icon-floppy-disk""></span>"
+                                            style:"margin-bottom:0;padding-left:35px;padding-right:35px;"
+                                            title:Creates your new record(s)
+                                            onclick
+
+                                              /*
+                                               * Retrieving Hyperlambda from Code-Mirror editor, and inserting
+                                               * it into p5.data database.
+                                               */
+                                              micro.form.serialize:hypereval-data-editor-new-record-modal
+                                              hyper2lambda:x:/@micro.form.serialize/*/content?value
+                                              add:x:/../*/insert-data
+                                                src:x:/@hyper2lambda/*
+                                              insert-data
+
+                                              /*
+                                               * Deleting modal window.
+                                               */
+                                              delete-widget:hypereval-data-editor-new-record-modal
+
+                                              /*
+                                               * Re-databinding grid.
+                                               */
+                                              p5.web.viewstate.get:hypereval.data-editor.filter
+                                              p5.web.viewstate.get:hypereval.data-editor.offset
+                                              eval-x:x:/+/*
+                                              hypereval._database-editor.databind
+                                                filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                                offset:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+
+                                          button
+                                            innerValue:@"<span class=""icon-cross""></span>"
+                                            style:"margin-bottom:0;"
+                                            title:Close window, without creating new record(s)
+                                            onclick
+
+                                              /*
+                                               * Deleting modal window.
+                                               */
+                                              delete-widget:hypereval-data-editor-new-record-modal
+
+                        button:hypereval-data-editor-previous-btn
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-arrow-left""></span>"
+                          accesskey:P
+                          title:Go to previous page, keyboard shortcut P
+                          disabled
+                          onclick
+
+                            /*
+                             * Retrieving current offset, decrementing it by 10, and re-databinding grid.
+                             */
+                            p5.web.viewstate.get:hypereval.data-editor.offset
+                            -:x:/@p5.web.viewstate.get/*?value.int
+                              _:10
+                            p5.web.viewstate.set:hypereval.data-editor.offset
+                              src:x:/@-?value
+                            p5.web.viewstate.get:hypereval.data-editor.filter
+                            eval-x:x:/+/*
+                            hypereval._database-editor.databind
+                              filter:x:/@p5.web.viewstate.get/*?value
+                              offset:x:/@-?value
+
+                            /*
+                             * Checking if we should disable previous button.
+                             */
+                            if:x:/@-?value.int
+                              =:int:0
+                              set-widget-property:hypereval-data-editor-previous-btn
+                                disabled
+                            delete-widget-property:hypereval-data-editor-next-btn
+                              disabled
+                            
+                        button:hypereval-data-editor-next-btn
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-arrow-right""></span>"
+                          accesskey:N
+                          title:Go to next page, keyboard shortcut N
+                          onclick
+
+                            /*
+                             * Retrieving current offset, incrementing it by 10, and re-databinding grid.
+                             */
+                            p5.web.viewstate.get:hypereval.data-editor.offset
+                            +:x:/@p5.web.viewstate.get/*?value.int
+                              _:10
+                            p5.web.viewstate.set:hypereval.data-editor.offset
+                              src:x:/@+?value
+                            p5.web.viewstate.get:hypereval.data-editor.filter
+                            eval-x:x:/+/*
+                            hypereval._database-editor.databind
+                              filter:x:/@p5.web.viewstate.get/*?value
+                              offset:x:/@+?value
+                            delete-widget-property:hypereval-data-editor-previous-btn
+                              disabled
+
+                            /*
+                             * Checking if we are at end of dataset.
+                             */
+                            if:x:/@hypereval._database-editor.databind?value
+                              not
+                              set-widget-property:hypereval-data-editor-next-btn
+                                disabled
