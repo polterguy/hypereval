@@ -135,6 +135,7 @@ create-event:hypereval.widgets.eval
     'Alt-V':function(cm) {{p5.$('hypereval-output-button').raise('onclick');}},
     'Alt-M':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
     'Alt-T':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}},
+    'Alt-N':function(cm) {{p5.$('hypereval-new-snippet').raise('onclick');}},
     'Alt-P':function(cm) {{p5.$('hypereval-preview-snippet').raise('onclick');}}
   }}
 }});
@@ -371,6 +372,70 @@ p5.hypereval_input.setSize('100%', '600px');"
               class:strip
               style:"display:inline-block;margin-left:1rem;"
               widgets
+
+                /*
+                 * New snippet button.
+                 */
+                button:hypereval-new-snippet
+                  innerValue:@"<span class=""icon-plus""></span>"
+                  title:New snippet - Alt+N
+                  onclick
+
+                    /*
+                     * Asking user to confirm action, since this will empty his current code.
+                     */
+                    create-widgets
+                      micro.widgets.modal:hypereval-confirm-new-snippet-modal
+                        widgets
+                          h3
+                            innerValue:Confirm action
+                          p
+                            innerValue:Are you sure you want to create a new snippet. This will empty your current Hyperlambda editor for its existing code.
+                          div
+                            class:right
+                            widgets
+                              div
+                                class:strip
+                                style:"display:inline-block;"
+                                widgets
+                                  button:hypereval-confirm-new-snippet
+                                    innerValue:Yes
+                                    style:"margin-bottom:0;"
+                                    onclick:@"p5.$('hypereval-confirm-new-snippet').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue(ret.code);}});return false;"
+                                    oninit
+
+                                      /*
+                                       * Setting initial focus to "Yes" button.
+                                       */
+                                      micro.page.set-focus:x:/../*/_event?value
+
+                                    .onclick
+
+                                      /*
+                                       * Clearing all relevant session variables, deleting modal widget, and
+                                       * making sure we disable our "delete snippet button".
+                                       */
+                                      set-widget-property:hypereval-delete-button
+                                        disabled
+                                      p5.web.session.set:hypereval.snippet-name
+                                      p5.web.session.set:hypereval.code
+                                      p5.web.session.set:hypereval.file-type
+                                      delete-widget:hypereval-confirm-new-snippet-modal
+                                      p5.web.return-response-object:code
+                                        src:@"/*
+ * Your code goes here ...
+ */
+"
+
+                                  button
+                                    innerValue:No
+                                    style:"margin-bottom:0;"
+                                    onclick
+
+                                      /*
+                                       * Simply deleting modal widget.
+                                       */
+                                      delete-widget:hypereval-confirm-new-snippet-modal
 
                 /*
                  * Load snippet button.
