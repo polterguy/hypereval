@@ -10,7 +10,7 @@ and/or other snippets, would become the equivalent of your _"Controllers"_.
 In addition to the above, it also features an _"immediate mode"_, allowing you to evaluate your
 snippets immediately, optionally seeing the results of your evaluation in an _"output"_ window.
 
-![alt screenshot](media/screenshot-hypereval.png)
+![alt screenshot](media/screenshot-hypereval-2.png)
 
 The snippets it creates are stored in a MySQL database, and Hypereval features a rich _"API"_
 for retrieving snippets, evaluating them, creating snippets, etc. See the list of Active Events
