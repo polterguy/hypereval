@@ -29,3 +29,10 @@ In addition, Hypereval creates two extension widgets, which you can use in your 
 
 The Hyperlambda editor, or its _"code textarea"_ is based upon CodeMirror, giving you an extremely rich code editor, for editing Hyperlambda -
 Including for instance intellisense, autocomplete, syntax error feedback, etc, etc, etc.
+
+Hypereval is extremely powerful, and arguably an entire IDE, which you can run through your browser. Below is a screenshot of one of its default
+snippets, which is created as you install Hypereval. The snippet below creates a _"page"_ object, which allows you to edit your p5.data records,
+arguably being the _"DBMS"_ for p5.data.
+
+![alt screenshot](media/hypereval-data-editor-snippet.png)
+
