@@ -7,14 +7,6 @@
 
 
 /*
- * Including Micro, adding Awesome Fonts, and serious skin.
- */
-p5.web.include-css-file:@MICRO/media/main.css
-p5.web.include-css-file:@MICRO/media/fonts.css
-p5.web.include-css-file:@MICRO/media/skins/serious.css
-
-
-/*
  * Verifying user is logged in as root, and if not, forcing the user 
  * to login before we proceed.
  */
@@ -40,6 +32,13 @@ if:x:/@whoami/*/role?value
 create-widget
   class:container
   oninit
+
+    /*
+     * Including Micro, adding Awesome Fonts, and serious skin.
+     */
+    p5.web.include-css-file:@MICRO/media/main.css
+    p5.web.include-css-file:@MICRO/media/fonts.css
+    p5.web.include-css-file:@MICRO/media/skins/serious.css
 
     /*
      * Setting initial [offset] and [filter] for grid.
