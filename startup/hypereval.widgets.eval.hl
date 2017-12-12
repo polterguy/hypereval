@@ -413,9 +413,11 @@ p5.hypereval_input.setSize('100%', '600px');"
 
                                       /*
                                        * Clearing all relevant session variables, deleting modal widget, and
-                                       * making sure we disable our "delete snippet button".
+                                       * making sure we disable our "delete snippet button" and "preview snippet" button.
                                        */
                                       set-widget-property:hypereval-delete-button
+                                        disabled
+                                      set-widget-property:hypereval-preview-snippet
                                         disabled
                                       p5.web.session.set:hypereval.snippet-name
                                       p5.web.session.set:hypereval.code
@@ -836,7 +838,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                 style:"display:inline-block;"
                                 widgets
                                   button:hypereval-confirm-deletion-btn
-                                    innerValue:@"<span class=""icon-bin""></span>"
+                                    innerValue:@"<span class=""icon-checkmark""></span>"
                                     style:"margin-bottom:0;padding-left:35px;padding-right:35px;"
                                     title:Deletes snippet
                                     oninit
@@ -888,6 +890,12 @@ p5.hypereval_input.setSize('100%', '600px');"
                                        * Deleting modal window.
                                        */
                                       delete-widget:hypereval-confirm-snippet-deletion
+
+                                      /*
+                                       * Disabling preview pagebutton.
+                                       */
+                                      set-widget-property:hypereval-preview-snippet
+                                        disabled
 
                                   button
                                     innerValue:@"<span class=""icon-cross""></span>"
@@ -983,8 +991,14 @@ p5.hypereval_input.setSize('100%', '600px');"
                         folder-exists:~/temp/hypereval/
                       not
                       create-folder:~/temp/hypereval/
+
+                    /*
+                     * Deleting all folders and files in our temporary folder.
+                     */
                     list-files:~/temp/hypereval/
                     delete-file:x:/-/*?name
+                    list-folders:~/temp/hypereval/
+                    delete-folder:x:/-/*?name
 
                     /*
                      * Then we select all snippets, and create on Hyperlambda file
