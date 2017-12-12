@@ -13,58 +13,72 @@ create-event:hypereval.widgets.hyperlambda-textarea
   .signal
 
   /*
+   * Figuring out font size to use for widget.
+   */
+  .defaults
+    font-size:9.25
+  select-data:x:/*/*/hypereval.settings
+
+  /*
    * Decorating widget with arguments.
    */
-  add:x:/../*/return/*/literal
-    src:x:/@.signal/--(!/_arg)
+  add:x:/../*/return/*/container
+    src:x:/@.signal/--(!/_arg!/value)
+  add:x:/../*/return/*/container/*/widgets/*/literal
+    src:x:/@.signal/--/value
 
   /*
    * Returning widget to caller.
    */
+  eval-x:x:/+/*/*/style
   return
-    literal
-      element:textarea
-      oninit
+    container
+      style:"font-size:{0}pt;"
+        :x:(/@select-data/*/*/font-size|/../*/.defaults/*/font-size)/$?value
+      widgets
+        literal
+          element:textarea
+          oninit
 
-        /*
-         * Including CodeMirror JavaScript.
-         */
-        p5.web.include-javascript-file
-          @HYPEREVAL/media/codemirror/lib/codemirror.js
-          @HYPEREVAL/media/codemirror/addon/selection/active-line.js
-          @HYPEREVAL/media/codemirror/addon/hint/show-hint.js
-          @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.js
+            /*
+             * Including CodeMirror JavaScript.
+             */
+            p5.web.include-javascript-file
+              @HYPEREVAL/media/codemirror/lib/codemirror.js
+              @HYPEREVAL/media/codemirror/addon/selection/active-line.js
+              @HYPEREVAL/media/codemirror/addon/hint/show-hint.js
+              @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.js
 
-        /*
-         * Making sure necessary Stylesheet files are included
-         */
-        p5.web.include-css-file
-          @HYPEREVAL/media/codemirror/lib/codemirror.css
-          @HYPEREVAL/media/codemirror/theme/hyperlambda.css
-          @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
+            /*
+             * Making sure necessary Stylesheet files are included
+             */
+            p5.web.include-css-file
+              @HYPEREVAL/media/codemirror/lib/codemirror.css
+              @HYPEREVAL/media/codemirror/theme/hyperlambda.css
+              @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
 
-        /*
-         * Including Active Events JSON on page, but only if it hasn't been include before.
-         */
-        p5.web.viewstate.get:hypereval.widgets.hyperlambda-textarea.keywords-included
-        if:x:/@p5.web.viewstate.get/*?value
-          not
+            /*
+             * Including Active Events JSON on page, but only if it hasn't been include before.
+             */
+            p5.web.viewstate.get:hypereval.widgets.hyperlambda-textarea.keywords-included
+            if:x:/@p5.web.viewstate.get/*?value
+              not
 
-          /*
-           * Keywords has not been previously included, make sure we include them.
-           */
-          vocabulary
-          join:x:/@vocabulary/*?value
-            sep:,
-            wrap:'
-          p5.web.include-javascript:@"CodeMirror._hyperlispKeywords = [{0}];"
-            :x:/@join?value
+              /*
+               * Keywords has not been previously included, make sure we include them.
+               */
+              vocabulary
+              join:x:/@vocabulary/*?value
+                sep:,
+                wrap:'
+              p5.web.include-javascript:@"CodeMirror._hyperlispKeywords = [{0}];"
+                :x:/@join?value
 
-          /*
-           * Transforming input textarea to CodeMirror instance.
-           */
-          p5.io.unroll-path:@HYPEREVAL/
-          p5.web.send-javascript:@"p5['{0}'] = CodeMirror.fromTextArea(p5.$('{0}').el, {{
+              /*
+               * Transforming input textarea to CodeMirror instance.
+               */
+              p5.io.unroll-path:@HYPEREVAL/
+              p5.web.send-javascript:@"p5['{0}'] = CodeMirror.fromTextArea(p5.$('{0}').el, {{
   mode:'hyperlambda',
   theme:'hyperlambda',
   lineNumbers:true,
@@ -83,5 +97,5 @@ p5['{0}'].on('change',function (cMirror) {{
   p5.$('{0}').el.value = cMirror.getValue();
 }});
 p5['{0}'].setSize('100%', '300px');"
-            :x:/../*/_event?value
-            :x:/@p5.io.unroll-path?value
+                :x:/../*/_event?value
+                :x:/@p5.io.unroll-path?value
