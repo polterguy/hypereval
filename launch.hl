@@ -115,6 +115,11 @@ if:x:/@split/0/-?name
    */
   p5.web.request.parse-mime
     attachment-folder:~/temp/
+
+  /*
+   * Checking what type of file this is.
+   * Candidates are .zip and .hl.
+   */
   split:x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
     =:.
   if:x:/@split/0/-?name
@@ -122,47 +127,106 @@ if:x:/@split/0/-?name
 
     /*
      * Zip file.
+     *
+     * Making sure we create our temporary folder, which will be tha destination
+     * for our unzip operation.
      */
     if
       fetch:x:/0/0?value
-        folder-exists:~/temp/hyperlambda/
+        folder-exists:~/temp/hypereval/
       not
-      create-folder:~/temp/hyperlambda/
-    list-files:~/temp/hyperlambda/
+      create-folder:~/temp/hypereval/
+
+    /*
+     * Deleting any previous files found in our temporary unzip folder.
+     */
+    list-files:~/temp/hypereval/
     delete-file:x:/-/*?name
+
+    /*
+     * Unzipping file.
+     */
     unzip:{0}{1}{2}
       :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/folder?value
       :x:/@p5.web.request.parse-mime/**/filename/[0,1]/*/prefix?value
       :x:/@p5.web.request.parse-mime/**/filename/[0,1]?value
-      dest:~/temp/hyperlambda/
+      dest:~/temp/hypereval/
+
+    /*
+     * Used to track how many files we are importing, to give feedback to client
+     * after import is done.
+     */
     _count:int:0
+
+    /*
+     * Connecing to database, and looping through each file, inserting content
+     * as a new snippet.
+     */
     p5.mysql.connect:[hypereval]
       for-each:x:/@unzip/*?name
+
+        /*
+         * Verifying currently iterated unzipped file is a Hyperlambda file.
+         */
         if
           ends-with:x:/@_dp?value
             src:.hl
           not
           continue
+
+        /*
+         * Incrementing file counter.
+         */
         set:x:/@_count?value
           +:x:/@_count?value
             _:1
+
+        /*
+         * Used to hold file type, candidates are "page", "startup" and nothing,
+         * which implies plain snippet.
+         */
         _type
+
+        /*
+         * Figuring out file type, first finding only filename, then its extension.
+         */
         split:x:/@_dp?value
           =:/
         split:x:/@split/0/-?name
           =:.
+
+        /*
+         * Checking if filename contains a snippet type ("page", "startup").
+         */
         if:x:/@split/*?count
           =:int:3
           set:x:/@_type?value
             src:x:/@split/0/-2?name
+
+        /*
+         * Loads file, without conversion, to make sure we keep comments.
+         */
         load-file:x:/@_dp?value
           convert:false
+
+        /*
+         * Deleting any old snippets with the same name.
+         */
         p5.mysql.delete:@"delete from snippets where name = @name"
-          @name:x:/@split/@split/@split/0/-2?name
+          @name:x:/@split/0?name
+
+        /*
+         * Inserting our new snippet.
+         */
         p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
           @name:x:/@split/0?name
           @content:x:/@load-file/*?value
           @type:x:/@_type?value
+
+    /*
+     * Storing our file count, such that we can later display it to user.
+     * In addition to file type.
+     */
     p5.web.session.set:hypereval.snippet-import-count
       src:x:/@_count?value
     p5.web.session.set:hypereval.file-type
