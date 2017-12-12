@@ -1,4 +1,4 @@
-.CodeMirror {margin-bottom:1rem;border-radius:var(--border-radius);}
+.CodeMirror {border-radius:var(--border-radius);}
 .CodeMirror-hints {z-index:2000 !important;}
 .cm-s-hyperlambda { background-color: #fefefe; border:solid 1px #e0e0e0;}
 .cm-s-hyperlambda .CodeMirror-code { color:#505050; }

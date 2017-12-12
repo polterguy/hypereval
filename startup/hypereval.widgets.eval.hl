@@ -10,6 +10,14 @@ create-event:hypereval.widgets.eval
   .signal
 
   /*
+   * Figuring out font size to use for widget.
+   */
+  .defaults
+    font-size:9.25
+    theme:hyperlambda
+  select-data:x:/*/*/hypereval.settings
+
+  /*
    * Decorating widget with arguments.
    */
   add:x:/../*/return/*/container
@@ -18,9 +26,11 @@ create-event:hypereval.widgets.eval
   /*
    * Returning widget to caller.
    */
+  eval-x:x:/+/**/.theme|/+/*/container/*/style
   return
     container
-      style:"margin-bottom:20px;"
+      style:"font-size:{0}pt !important;"
+        :x:(/@select-data/*/*/font-size|/../*/.defaults/*/font-size)/$?value
       events
 
         /*
@@ -87,11 +97,13 @@ create-event:hypereval.widgets.eval
         /*
          * Making sure necessary Stylesheet files are included
          */
+        .theme:x:(/@select-data/*/*/theme|/../*/.defaults/*/theme)/$?value
         p5.web.include-css-file
           @HYPEREVAL/media/codemirror/lib/codemirror.css
-          @HYPEREVAL/media/codemirror/theme/hyperlambda.css
           @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
           @HYPEREVAL/media/codemirror/addon/display/fullscreen.css
+        p5.web.include-css-file:@HYPEREVAL/media/codemirror/theme/{0}.css
+          :x:/@.theme?value
 
         /*
          * Including Active Events JSON on page.
@@ -109,7 +121,7 @@ create-event:hypereval.widgets.eval
         p5.io.unroll-path:@HYPEREVAL/
         p5.web.send-javascript:@"p5.hypereval_input = CodeMirror.fromTextArea(p5.$('hypereval-input').el, {{
   mode:'hyperlambda',
-  theme:'hyperlambda',
+  theme:'{1}',
   lineNumbers:true,
   styleActiveLine:true,
   path:'{0}/media/codemirror/',
@@ -143,6 +155,7 @@ p5.hypereval_input.on('change',function (cMirror) {{
 }});
 p5.hypereval_input.setSize('100%', '600px');"
           :x:/@p5.io.unroll-path?value
+          :x:/@.theme?value
 
       widgets
         literal:hypereval-input
@@ -192,7 +205,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                 innerValue:x:/@p5.web.session.get/*?value
 
         div
-          class:right
+          class:right air-top
           widgets
             div
               class:strip
