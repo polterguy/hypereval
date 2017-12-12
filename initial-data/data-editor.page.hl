@@ -676,11 +676,11 @@ create-widget
                   visible:false
                   widgets
                     label
-                      innerValue:Immediate mode, e.g. [delete-data] or [insert-data]
+                      innerValue:Immediate mode
                       style:"margin-bottom:0;"
                     hypereval.widgets.hyperlambda-textarea:hypereval-data-editor-advanced-code
                     div
-                      class:right
+                      class:right air-top
                       widgets
                         button
                           style:"padding-left:35px;padding-right:35px;"
