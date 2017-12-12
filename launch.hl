@@ -347,6 +347,22 @@ create-widget:hypereval-main-container
                                         element:option
                                         innerValue:x:/@split/0/-2?name
 
+                                checkbox
+                                  info:Line numbers
+                                  .data-field:line-numbers
+                                  oninit
+
+                                    /*
+                                     * Making sure we set checked value to whatever it already is, if anything.
+                                     */
+                                    .defaults
+                                      line-numbers:bool:true
+                                    select-data:x:/*/*/hypereval.settings
+                                    if:x:(/@select-data/*/*/line-numbers|/../*/.defaults/*/line-numbers)/$?value
+                                      =:bool:true
+                                      set-widget-property:x:/../*/_event?value
+                                        checked
+
                                 div
                                   class:right
                                   widgets

@@ -2,8 +2,11 @@
 /*
  * Responsible for creating the CodeMirror Hyperlambda textarea widget.
  *
- * All arguments passed in will be added to main root widget, which is a textarea
- * widget. To set its initial value, pass in [value] as its initial code value.
+ * All arguments passed in will be added to main root widget, except
+ * [auto-focus] and [value], which will be used to determine editor's 
+ * initial value, and whether or not it should automatically get focus.
+ *
+ * To set its initial value, pass in [value] as its initial code value.
  */
 create-event:hypereval.widgets.hyperlambda-textarea
 
@@ -13,11 +16,20 @@ create-event:hypereval.widgets.hyperlambda-textarea
   .signal
 
   /*
+   * Sanity check.
+   */
+  micro.lambda.contract.optional:x:/..
+    auto-focus:bool
+    value:string
+
+  /*
    * Figuring out font size to use for widget.
    */
   .defaults
     font-size:9.25
     theme:hyperlambda
+    line-numbers:bool:true
+    auto-focus:bool:false
   select-data:x:/*/*/hypereval.settings
 
   /*
@@ -31,7 +43,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
   /*
    * Returning widget to caller.
    */
-  eval-x:x:/+/*/*/style|/+/**/.theme
+  eval-x:x:/+/*/*/style|/+/**(/.theme|/.line-numbers|/.auto-focus)
   return
     container
       style:"font-size:{0}pt;"
@@ -77,17 +89,23 @@ create-event:hypereval.widgets.hyperlambda-textarea
               p5.web.include-javascript:@"CodeMirror._hyperlispKeywords = [{0}];"
                 :x:/@join?value
 
-              /*
-               * Transforming input textarea to CodeMirror instance.
-               */
-              p5.io.unroll-path:@HYPEREVAL/
-              p5.web.send-javascript:@"p5['{0}'] = CodeMirror.fromTextArea(p5.$('{0}').el, {{
+            /*
+             * Transforming input textarea to CodeMirror instance.
+             */
+            .line-numbers:x:(/@select-data/*/*/line-numbers|/../*/.defaults/*/line-numbers)/$?value
+            set:x:/-?value
+              to-lower:x:/./-?value.string
+            .auto-focus:x:(/../*/auto-focus|/../*/.defaults/*/auto-focus)/$?value
+            set:x:/-?value
+              to-lower:x:/./-?value.string
+            p5.io.unroll-path:@HYPEREVAL/
+            p5.web.send-javascript:@"p5['{0}'] = CodeMirror.fromTextArea(p5.$('{0}').el, {{
   mode:'hyperlambda',
   theme:'{2}',
-  lineNumbers:true,
+  lineNumbers:{3},
   styleActiveLine:true,
   path:'{1}/media/codemirror/',
-  autofocus:true,
+  autofocus:{4},
   tabSize:2,
   indentAuto:true,
   extraKeys: {{
@@ -100,6 +118,8 @@ p5['{0}'].on('change',function (cMirror) {{
   p5.$('{0}').el.value = cMirror.getValue();
 }});
 p5['{0}'].setSize('100%', '300px');"
-                :x:/../*/_event?value
-                :x:/@p5.io.unroll-path?value
-                :x:/@.theme?value
+              :x:/../*/_event?value
+              :x:/@p5.io.unroll-path?value
+              :x:/@.theme?value
+              :x:/@.line-numbers?value
+              :x:/@.auto-focus?value

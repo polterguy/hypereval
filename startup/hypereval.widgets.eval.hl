@@ -15,6 +15,7 @@ create-event:hypereval.widgets.eval
   .defaults
     font-size:9.25
     theme:hyperlambda
+    line-numbers:bool:true
   select-data:x:/*/*/hypereval.settings
 
   /*
@@ -26,7 +27,7 @@ create-event:hypereval.widgets.eval
   /*
    * Returning widget to caller.
    */
-  eval-x:x:/+/**/.theme|/+/*/container/*/style
+  eval-x:x:/+/**(/.theme|/.line-numbers)|/+/*/container/*/style
   return
     container
       style:"font-size:{0}pt !important;"
@@ -92,6 +93,13 @@ create-event:hypereval.widgets.eval
           @HYPEREVAL/media/codemirror/addon/selection/active-line.js
           @HYPEREVAL/media/codemirror/addon/display/fullscreen.js
           @HYPEREVAL/media/codemirror/addon/hint/show-hint.js
+          @HYPEREVAL/media/codemirror/addon/dialog/dialog.js
+          @HYPEREVAL/media/codemirror/addon/search/searchcursor.js
+          @HYPEREVAL/media/codemirror/addon/search/search.js
+          @HYPEREVAL/media/codemirror/addon/search/jump-to-line.js
+          @HYPEREVAL/media/codemirror/addon/edit/closebrackets.js
+          @HYPEREVAL/media/codemirror/addon/edit/trailingspace.js
+          @HYPEREVAL/media/codemirror/addon/display/placeholder.js
           @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.js
 
         /*
@@ -101,6 +109,8 @@ create-event:hypereval.widgets.eval
         p5.web.include-css-file
           @HYPEREVAL/media/codemirror/lib/codemirror.css
           @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
+          @HYPEREVAL/media/codemirror/addon/dialog/dialog.css
+          @HYPEREVAL/media/codemirror/addon/search/matchesonscrollbar.css
           @HYPEREVAL/media/codemirror/addon/display/fullscreen.css
         p5.web.include-css-file:@HYPEREVAL/media/codemirror/theme/{0}.css
           :x:/@.theme?value
@@ -118,21 +128,27 @@ create-event:hypereval.widgets.eval
         /*
          * Transforming input textarea to CodeMirror instance.
          */
+        .line-numbers:x:(/@select-data/*/*/line-numbers|/../*/.defaults/*/line-numbers)/$?value
+        set:x:/-?value
+          to-lower:x:/./-?value.string
         p5.io.unroll-path:@HYPEREVAL/
         p5.web.send-javascript:@"p5.hypereval_input = CodeMirror.fromTextArea(p5.$('hypereval-input').el, {{
   mode:'hyperlambda',
   theme:'{1}',
-  lineNumbers:true,
+  lineNumbers:{2},
   styleActiveLine:true,
   path:'{0}/media/codemirror/',
   autofocus:true,
   tabSize:2,
   indentAuto:true,
+  autoCloseBrackets:true,
+  showTrailingSpace:true,
   extraKeys: {{
     'Ctrl-Space':'autocomplete',
     'Shift-Tab':'indentLess',
+    'Alt-F': 'findPersistent',
     'Tab':'indentMore',
-    'Alt-F':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}},
+    'Alt-M':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}},
     'Alt-E':function(cm) {{
       p5.$('hypereval-evaluate-snippet').raise('.onclick', {{
         onsuccess:function(ret, evt) {{
@@ -156,10 +172,12 @@ p5.hypereval_input.on('change',function (cMirror) {{
 p5.hypereval_input.setSize('100%', '600px');"
           :x:/@p5.io.unroll-path?value
           :x:/@.theme?value
+          :x:/@.line-numbers?value
 
       widgets
         literal:hypereval-input
           element:textarea
+          placeholder:Hyperlambda ...
           class:fill
           rows:20
           events
