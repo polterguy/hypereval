@@ -526,7 +526,7 @@ create-widget
                                                  */
                                                 micro.form.serialize:hypereval-data-editor-new-record-modal
                                                 hyper2lambda:x:/@micro.form.serialize/*/content?value
-                                                add:x:/../*/insert-data
+                                                add:x:/..try/*/insert-data
                                                   src:x:/@hyper2lambda/*
                                                 insert-data
 
@@ -540,6 +540,16 @@ create-widget
                                                  */
                                                 p5.web.viewstate.get:hypereval.data-editor.filter
                                                 p5.web.viewstate.get:hypereval.data-editor.offset
+                                                if:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                                  not
+                                                  or:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                                    =:
+                                                  set:x:/..try/*/hypereval._database-editor.databind/*/filter
+                                                if:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+                                                  not
+                                                  or:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+                                                    =:
+                                                  set:x:/..try/*/hypereval._database-editor.databind/*/offset
                                                 eval-x:x:/+/*
                                                 hypereval._database-editor.databind
                                                   filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
@@ -563,6 +573,41 @@ create-widget
                                                * Deleting modal window.
                                                */
                                               delete-widget:hypereval-data-editor-new-record-modal
+                            
+                        button
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-eye""></span>"
+                          accesskey:A
+                          title:Advanced, keyboard shortcut A
+                          onclick
+                          
+                            /*
+                             * Toggling advanced editor parts.
+                             */
+                            get-widget-property:hypereval-data-editor-advanced
+                              visible
+                            if:x:/-/*/*?value
+                              =:bool:true
+
+                              /*
+                               * Hiding advanced widget.
+                               */
+                              set-widget-property:hypereval-data-editor-advanced
+                                visible:false
+
+                            else
+
+                              /*
+                               * Showing advanced widget.
+                               */
+                              set-widget-property:hypereval-data-editor-advanced
+                                visible:true
+
+                            /*
+                             * Toggling "toggled" CSS class for button.
+                             */
+                            micro.css.toggle:x:/../*/_event?value
+                              class:toggled
 
                         button:hypereval-data-editor-previous-btn
                           style:"margin-bottom:0;"
@@ -626,3 +671,38 @@ create-widget
                               not
                               set-widget-property:hypereval-data-editor-next-btn
                                 disabled
+
+                div:hypereval-data-editor-advanced
+                  visible:false
+                  widgets
+                    label
+                      innerValue:Immediate mode, e.g. [delete-data] or [insert-data]
+                      style:"margin-bottom:0;"
+                    hypereval.widgets.hyperlambda-textarea:hypereval-data-editor-advanced-code
+                    div
+                      class:right
+                      widgets
+                        button
+                          style:"padding-left:35px;padding-right:35px;"
+                          innerValue:@"<span class=""icon-flash""></span>"
+                          title:Evaluate your code
+                          onclick
+
+                            /*
+                             * Retrievines the code from our Hyperlambda editor, and evaluates it,
+                             * before re-databinding our grid (since it was probably insert, delete, 
+                             * or something, affecting our current result set).
+                             */
+                            get-widget-property:hypereval-data-editor-advanced-code
+                              innerValue
+                            eval:x:/-/*/*?value
+                            p5.web.viewstate.get:hypereval.data-editor.filter
+                            if:x:/@p5.web.viewstate.get/*?value
+                              not
+                              or:x:/@p5.web.viewstate.get/*?value
+                                =:
+                              set:x:/../*/hypereval._database-editor.databind/*/filter
+                            eval-x:x:/+/*
+                            hypereval._database-editor.databind
+                              filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+
