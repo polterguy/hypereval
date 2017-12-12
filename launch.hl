@@ -345,6 +345,124 @@ create-widget:hypereval-main-container
                                          */
                                         p5.web.reload-location
 
+                    /*
+                     * Download Hyperlambda button.
+                     */
+                    button:hypereval-download-button
+                      innerValue:@"<span class=""icon-download2""></span>"
+                      title:Downloads your current snippet, if any
+                      onclick
+
+                        /*
+                         * Creates a temporary file containing Hyperlambda, 
+                         * and allows user to download it to his client.
+                         */
+                        .defaults
+                          hypereval.snippet-name:hypereval
+                          type
+                        p5.web.session.get:hypereval.snippet-name
+                        if:x:/@p5.web.session.get/*?value
+                          p5.mysql.connect:[hypereval]
+                            p5.mysql.scalar:@"select type from snippets where name = @name"
+                              @name:x:/@p5.web.session.get/*?value
+                            if:x:/@p5.mysql.scalar?value
+                              set:x:/@.defaults/*/type?value
+                                src:.{0}
+                                  :x:/@p5.mysql.scalar?value
+                        get-widget-property:hypereval-input
+                          innerValue
+
+                        /*
+                         * Checking if there is any code at all in current view.
+                         */
+                        if
+                          trim:x:/@get-widget-property/*/*?value
+                          =:
+
+                          /*
+                           * No code in editor.
+                           */
+                          micro.windows.info:There is no code in your Hyperlambda editor
+                            class:micro-windows-info warning
+                          return
+
+                        save-file:~/temp/hypereval-code.hl
+                          src:x:/@get-widget-property/*/*?value
+                        eval-x:x:/+/*/Content-Disposition
+                        micro.download.file:~/temp/hypereval-code.hl
+                          Content-Type:x-application/hyperlambda
+                          Content-Disposition:@"attachment; filename=""{0}{1}.hl"""
+                            :x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
+                            :x:/@.defaults/*/type?value
+
+                    /*
+                     * Upload Hyperlambda button.
+                     */
+                    button
+                      innerValue:@"<span class=""icon-upload2""></span>"
+                      title:Uploads a Hyperlambda file from your client
+                      onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
+
+                    /*
+                     * Export all snippets button.
+                     */
+                    button
+                      innerValue:@"<span class=""icon-file-zip""></span>"
+                      style:"margin-bottom:0;"
+                      title:Exports all your snippets to a zip file
+                      onclick
+
+                        /*
+                         * Exports all snippets to a zip file.
+                         *
+                         * First we make sure our temp folder exists, and
+                         * if it does, we empty it for any previous files.
+                         */
+                        if
+                          fetch:x:/0/0?value
+                            folder-exists:~/temp/hypereval/
+                          not
+                          create-folder:~/temp/hypereval/
+
+                        /*
+                         * Deleting all folders and files in our temporary folder.
+                         */
+                        list-files:~/temp/hypereval/
+                        delete-file:x:/-/*?name
+                        list-folders:~/temp/hypereval/
+                        delete-folder:x:/-/*?name
+
+                        /*
+                         * Then we select all snippets, and create on Hyperlambda file
+                         * for each, and save to our temporary folder.
+                         */
+                        p5.mysql.connect:[hypereval]
+                          p5.mysql.select:@"select * from snippets"
+                          for-each:x:/@p5.mysql.select/*
+                            _type
+                            if:x:/@_dp/#/*/type?value
+                              set:x:/@_type?value
+                                src:.{0}
+                                  :x:/@_dp/#/*/type?value
+                            save-file:~/temp/hypereval/{0}{1}.hl
+                              :x:/@_dp/#/*/name?value
+                              :x:/@_type?value
+                              src:x:/@_dp/#/*/content?value
+
+                        /*
+                         * Creating a zip file of entire folder, and downloading
+                         * it to client.
+                         */
+                        if
+                          fetch:x:/0/0?value
+                            file-exists:~/temp/hypereval-export.zip
+                          delete-file:~/temp/hypereval-export.zip
+                        zip:~/temp/hypereval-export.zip
+                          src:~/temp/hypereval/
+                        micro.download.file:~/temp/hypereval-export.zip
+                          Content-Type:application/zip
+                          Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
+
                     button
                       innerValue:@"<span class=""icon-home3""></span>"
                       title:Close Hypereval

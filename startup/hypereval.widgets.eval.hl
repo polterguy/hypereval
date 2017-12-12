@@ -72,7 +72,7 @@ create-event:hypereval.widgets.eval
           multiple:false
           url:{0}/upload
             :x:/@split/0/-?name
-          .onfinish:@"function(){p5.$('hypereval-evaluate-button').raise('.onupload',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});}"
+          .onfinish:@"function(){p5.$('hypereval-evaluate-snippet').raise('.onupload',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});}"
 
         /*
          * Including CodeMirror JavaScript.
@@ -122,7 +122,7 @@ create-event:hypereval.widgets.eval
     'Tab':'indentMore',
     'Alt-F':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}},
     'Alt-E':function(cm) {{
-      p5.$('hypereval-evaluate-button').raise('.onclick', {{
+      p5.$('hypereval-evaluate-snippet').raise('.onclick', {{
         onsuccess:function(ret, evt) {{
           if (ret.code) {{
             p5.hypereval_output.getDoc().setValue(ret.code);
@@ -130,11 +130,10 @@ create-event:hypereval.widgets.eval
         }}
       }});
     }},
-    'Alt-S':function(cm) {{p5.$('hypereval-save-button').raise('onclick');}},
-    'Alt-L':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
-    'Alt-V':function(cm) {{p5.$('hypereval-output-button').raise('onclick');}},
-    'Alt-M':function(cm) {{p5.$('hypereval-manage-snippets-button').raise('onclick');}},
-    'Alt-T':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}},
+    'Alt-S':function(cm) {{p5.$('hypereval-save-snippet').raise('onclick');}},
+    'Alt-L':function(cm) {{p5.$('hypereval-load-snippet').raise('onclick');}},
+    'Alt-V':function(cm) {{p5.$('hypereval-view-output').raise('onclick');}},
+    'Alt-D':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}},
     'Alt-N':function(cm) {{p5.$('hypereval-new-snippet').raise('onclick');}},
     'Alt-P':function(cm) {{p5.$('hypereval-preview-snippet').raise('onclick');}}
   }}
@@ -203,11 +202,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                 /*
                  * Evaluate Hyperlambda button.
                  */
-                button:hypereval-evaluate-button
+                button:hypereval-evaluate-snippet
                   innerValue:@"<span class=""icon-flash""></span>"
                   title:Evaluates the Hyperlambda in your editor - Alt+E
                   style:"width:100px;"
-                  onclick:@"p5.$('hypereval-evaluate-button').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
+                  onclick:@"p5.$('hypereval-evaluate-snippet').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
                   .onupload
 
                     /*
@@ -338,7 +337,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                 /*
                  * View "Output" button.
                  */
-                button:hypereval-output-button
+                button:hypereval-view-output
                   innerValue:@"<span class=""icon-eye""></span>"
                   title:View the output code, which results from evaluating your code - Alt+V
                   onclick
@@ -415,13 +414,12 @@ p5.hypereval_input.setSize('100%', '600px');"
                                        * Clearing all relevant session variables, deleting modal widget, and
                                        * making sure we disable our "delete snippet button" and "preview snippet" button.
                                        */
-                                      set-widget-property:hypereval-delete-button
+                                      set-widget-property:hypereval-delete-snippet
                                         disabled
                                       set-widget-property:hypereval-preview-snippet
                                         disabled
                                       p5.web.session.set:hypereval.snippet-name
                                       p5.web.session.set:hypereval.code
-                                      p5.web.session.set:hypereval.file-type
                                       delete-widget:hypereval-confirm-new-snippet-modal
                                       p5.web.return-response-object:code
                                         src:@"/*
@@ -442,7 +440,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                 /*
                  * Load snippet button.
                  */
-                button:hypereval-manage-snippets-button
+                button:hypereval-load-snippet
                   innerValue:@"<span class=""icon-folder-open""></span>"
                   title:Load snippet - Alt+L
                   events
@@ -581,7 +579,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                             /*
                                              * Enabling delete snippet button.
                                              */
-                                            delete-widget-property:hypereval-delete-button
+                                            delete-widget-property:hypereval-delete-snippet
                                               disabled
 
                                         name:x:/@_dp/#/*/name?value
@@ -619,9 +617,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                 /*
                  * Save snippet button.
                  */
-                button:hypereval-save-button
+                button:hypereval-save-snippet
                   innerValue:@"<span class=""icon-floppy-disk""></span>"
-                  title:Saves your current Hyperlambda to your snippets collection - Alt+S
+                  title:Saves snippet - Alt+S
                   onclick
 
                     /*
@@ -783,7 +781,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                          * Making sure we disable delete snippet button, 
                                          * since there are no active snippets now.
                                          */
-                                        delete-widget-property:hypereval-delete-button
+                                        delete-widget-property:hypereval-delete-snippet
                                           disabled
 
                                     button
@@ -800,9 +798,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                 /*
                  * Delete snippet button.
                  */
-                button:hypereval-delete-button
+                button:hypereval-delete-snippet
                   innerValue:@"<span class=""icon-bin""></span>"
-                  title:Deletes your current snippet
+                  title:Deletes snippet - Alt+D
                   disabled
                   oninit
 
@@ -815,7 +813,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                       /*
                        * There's a "current snippet" loaded in our editor.
                        */
-                      delete-widget-property:hypereval-delete-button
+                      delete-widget-property:hypereval-delete-snippet
                         disabled
 
                   onclick
@@ -883,7 +881,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                        * Making sure we disable delete snippet button, 
                                        * since there are no active snippets now.
                                        */
-                                      set-widget-property:hypereval-delete-button
+                                      set-widget-property:hypereval-delete-snippet
                                         disabled
 
                                       /*
@@ -907,129 +905,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                                        * Simply deleting modal window.
                                        */
                                       delete-widget:hypereval-confirm-snippet-deletion
-
-            div
-              class:strip
-              style:"display:inline-block;margin-left:1rem;"
-              widgets
-
-                /*
-                 * Download Hyperlambda button.
-                 */
-                button:hypereval-download-button
-                  innerValue:@"<span class=""icon-download2""></span>"
-                  title:Downloads your current snippet, if any
-                  onclick
-
-                    /*
-                     * Creates a temporary file containing Hyperlambda, 
-                     * and allows user to download it to his client.
-                     */
-                    .defaults
-                      hypereval.snippet-name:hypereval
-                      type
-                    p5.web.session.get:hypereval.snippet-name
-                    if:x:/@p5.web.session.get/*?value
-                      p5.mysql.connect:[hypereval]
-                        p5.mysql.scalar:@"select type from snippets where name = @name"
-                          @name:x:/@p5.web.session.get/*?value
-                        if:x:/@p5.mysql.scalar?value
-                          set:x:/@.defaults/*/type?value
-                            src:.{0}
-                              :x:/@p5.mysql.scalar?value
-                    get-widget-property:hypereval-input
-                      innerValue
-
-                    /*
-                     * Checking if there is any code at all in current view.
-                     */
-                    if
-                      trim:x:/@get-widget-property/*/*?value
-                      =:
-
-                      /*
-                       * No code in editor.
-                       */
-                      micro.windows.info:There is no code in your Hyperlambda editor
-                        class:micro-windows-info warning
-                      return
-
-                    save-file:~/temp/hypereval-code.hl
-                      src:x:/@get-widget-property/*/*?value
-                    eval-x:x:/+/*/Content-Disposition
-                    micro.download.file:~/temp/hypereval-code.hl
-                      Content-Type:x-application/hyperlambda
-                      Content-Disposition:@"attachment; filename=""{0}{1}.hl"""
-                        :x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
-                        :x:/@.defaults/*/type?value
-
-                /*
-                 * Upload Hyperlambda button.
-                 */
-                button
-                  innerValue:@"<span class=""icon-upload2""></span>"
-                  title:Uploads a Hyperlambda file from your client
-                  onclick:@"p5.dropzone.browse();event.stopPropagation(true);return false;"
-
-                /*
-                 * Export all snippets button.
-                 */
-                button
-                  innerValue:@"<span class=""icon-file-zip""></span>"
-                  style:"margin-bottom:0;"
-                  title:Exports all your snippets to a zip file
-                  onclick
-
-                    /*
-                     * Exports all snippets to a zip file.
-                     *
-                     * First we make sure our temp folder exists, and
-                     * if it does, we empty it for any previous files.
-                     */
-                    if
-                      fetch:x:/0/0?value
-                        folder-exists:~/temp/hypereval/
-                      not
-                      create-folder:~/temp/hypereval/
-
-                    /*
-                     * Deleting all folders and files in our temporary folder.
-                     */
-                    list-files:~/temp/hypereval/
-                    delete-file:x:/-/*?name
-                    list-folders:~/temp/hypereval/
-                    delete-folder:x:/-/*?name
-
-                    /*
-                     * Then we select all snippets, and create on Hyperlambda file
-                     * for each, and save to our temporary folder.
-                     */
-                    p5.mysql.connect:[hypereval]
-                      p5.mysql.select:@"select * from snippets"
-                      for-each:x:/@p5.mysql.select/*
-                        _type
-                        if:x:/@_dp/#/*/type?value
-                          set:x:/@_type?value
-                            src:.{0}
-                              :x:/@_dp/#/*/type?value
-                        save-file:~/temp/hypereval/{0}{1}.hl
-                          :x:/@_dp/#/*/name?value
-                          :x:/@_type?value
-                          src:x:/@_dp/#/*/content?value
-
-                    /*
-                     * Creating a zip file of entire folder, and downloading
-                     * it to client.
-                     */
-                    if
-                      fetch:x:/0/0?value
-                        file-exists:~/temp/hypereval-export.zip
-                      delete-file:~/temp/hypereval-export.zip
-                    zip:~/temp/hypereval-export.zip
-                      src:~/temp/hypereval/
-                    micro.download.file:~/temp/hypereval-export.zip
-                      Content-Type:application/zip
-                      Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
 
         div:hypereval-output-wrapper
           visible:false
