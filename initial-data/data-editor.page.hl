@@ -183,7 +183,7 @@ create-widget
                                       hypereval.widgets.hyperlambda-textarea
                                         value:x:/@lambda2hyper?value
                                       div
-                                        class:right
+                                        class:right air-top
                                         widgets
                                           div
                                             class:strip
