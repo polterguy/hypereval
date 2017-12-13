@@ -89,29 +89,14 @@ create-event:hypereval.widgets.eval
          * Including CodeMirror JavaScript.
          */
         p5.web.include-javascript-file
-          @HYPEREVAL/media/codemirror/lib/codemirror.js
-          @HYPEREVAL/media/codemirror/addon/selection/active-line.js
-          @HYPEREVAL/media/codemirror/addon/display/fullscreen.js
-          @HYPEREVAL/media/codemirror/addon/hint/show-hint.js
-          @HYPEREVAL/media/codemirror/addon/dialog/dialog.js
-          @HYPEREVAL/media/codemirror/addon/search/searchcursor.js
-          @HYPEREVAL/media/codemirror/addon/search/search.js
-          @HYPEREVAL/media/codemirror/addon/search/jump-to-line.js
-          @HYPEREVAL/media/codemirror/addon/edit/closebrackets.js
-          @HYPEREVAL/media/codemirror/addon/edit/trailingspace.js
-          @HYPEREVAL/media/codemirror/addon/display/placeholder.js
-          @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.js
+          @HYPEREVAL/media/codemirror-all.min.js
+          @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.min.js
 
         /*
          * Making sure necessary Stylesheet files are included
          */
         .theme:x:(/@select-data/*/*/theme|/../*/.defaults/*/theme)/$?value
-        p5.web.include-css-file
-          @HYPEREVAL/media/codemirror/lib/codemirror.css
-          @HYPEREVAL/media/codemirror/addon/hint/show-hint.css
-          @HYPEREVAL/media/codemirror/addon/dialog/dialog.css
-          @HYPEREVAL/media/codemirror/addon/search/matchesonscrollbar.css
-          @HYPEREVAL/media/codemirror/addon/display/fullscreen.css
+        p5.web.include-css-file:@HYPEREVAL/media/codemirror-all.min.css
         p5.web.include-css-file:@HYPEREVAL/media/codemirror/theme/{0}.css
           :x:/@.theme?value
 
