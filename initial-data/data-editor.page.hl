@@ -7,7 +7,7 @@
 
 
 /*
- * Verifying user is logged in as root, and if not, forcing the user 
+ * Verifying user is logged in as root, and if not, forcing the user
  * to login before we proceed.
  */
 whoami
@@ -337,7 +337,7 @@ create-widget
                                                   p5.web.widgets.find-first-ancestor:x:/../*/_event?value
                                                     .editor
                                                   delete-widget:x:/-/*/*?value
-                                    
+
 
                       /*
                        * Actual databind operation.
@@ -573,14 +573,14 @@ create-widget
                                                * Deleting modal window.
                                                */
                                               delete-widget:hypereval-data-editor-new-record-modal
-                            
+
                         button
                           style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-eye""></span>"
                           accesskey:A
                           title:Advanced, keyboard shortcut A
                           onclick
-                          
+
                             /*
                              * Toggling advanced editor parts.
                              */
@@ -640,7 +640,7 @@ create-widget
                                 disabled
                             delete-widget-property:hypereval-data-editor-next-btn
                               disabled
-                            
+
                         button:hypereval-data-editor-next-btn
                           style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-arrow-right""></span>"
@@ -672,6 +672,91 @@ create-widget
                               set-widget-property:hypereval-data-editor-next-btn
                                 disabled
 
+                        button
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-download2""></span>"
+                          title:Download a backup of your database
+                          onclick
+
+                            /*
+                             * Loops through all database records, creating a backup zip file,
+                             * and downloading it to client.
+                             *
+                             * First making sure our temporary folder exists, and that it is empty.
+                             */
+                            if
+                              fetch:x:/0/0?value
+                                folder-exists:~/temp/p5-data-backup/
+                              not
+
+                              /*
+                               * Creating temp folder to hold zip file, and backup files.
+                               */
+                              create-folder:~/temp/p5-data-backup/
+
+                            else
+
+                              /*
+                               * Deleting temp folder for any existing files and folders.
+                               */
+                              list-files:~/temp/p5-data-backup/
+                              delete-file:x:/-/*?name
+                              list-folders:~/temp/p5-data-backup/
+                              delete-folder:x:/-/*?name
+
+                            /*
+                             * Looping through each database record, creating one Hyperlambda file, 
+                             * for every 50th record.
+                             */
+                            .offset:int:0
+                            .no:int:1
+                            while:bool:true
+                              +:x:/@.offset?value.int
+                                _:50
+                              select-data:x:/*/*/[{0},{1}]
+                                :x:/@.offset?value
+                                :x:/@+?value
+                              if:x:/@select-data/*
+                                not
+
+                                /*
+                                 * No more records.
+                                 */
+                                break
+
+                              /*
+                               * Transforming current result set to Hyperlambda, and stuffing it into a file,
+                               * in our temporary folder.
+                               */
+                              lambda2hyper:x:/@select-data/*
+                              save-file:"~/temp/p5-data-backup/db-{0:0000}.hl"
+                                :x:/@.no?value
+                                src:x:/@lambda2hyper?value
+                              set:x:/@.no?value
+                                +:x:/@.no?value
+                                  _:1
+                              set:x:/@.offset?value
+                                +:x:/@.offset?value
+                                  _:50
+
+                            /*
+                             * Zipping entire backup folder, and downloading to client.
+                             *
+                             * Making sure we delete any previously created backup zip files first.
+                             */
+                            if
+                              fetch:x:/0/0?value
+                                file-exists:~/temp/database-backup.zip
+                              delete-file:~/temp/database-backup.zip
+
+                            /*
+                             * Creating zip file containing all p5.data records, 
+                             * and downloading it to the client.
+                             */
+                            zip:~/temp/database-backup.zip
+                              src:~/temp/p5-data-backup/
+                            micro.download.file:~/temp/database-backup.zip
+
                 div:hypereval-data-editor-advanced
                   visible:false
                   widgets
@@ -690,7 +775,7 @@ create-widget
 
                             /*
                              * Retrievines the code from our Hyperlambda editor, and evaluates it,
-                             * before re-databinding our grid (since it was probably insert, delete, 
+                             * before re-databinding our grid (since it was probably insert, delete,
                              * or something, affecting our current result set).
                              */
                             get-widget-property:hypereval-data-editor-advanced-code
