@@ -1,0 +1,37 @@
+
+/*
+ * Creates a default page, with the default wiring.
+ */
+
+
+/*
+ * Creates a default page, with a header and a paragraph.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file, serious skin, and fonts.
+     *
+     * Notice, this is being done in [oninit] instead of at root of Hyperlambda file,
+     * since this would allow us to "controlify" the page later, as long as developer
+     * doesn't add any additional root events, beside the one that's already there 
+     * [create-widget] that is.
+     */
+    p5.web.include-css-file
+      @MICRO/media/main.css
+      @MICRO/media/skins/serious.css
+      @MICRO/media/fonts.css
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:Yo world!!
+            p
+              innerValue:Feel free to modify this as you wish

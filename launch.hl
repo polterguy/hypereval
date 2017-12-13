@@ -247,8 +247,9 @@ if:x:/@split/0/-?name
 
 
 /*
- * Creating main content container.
+ * Creating main content container, making sure we set the title of our page.
  */
+p5.web.page.set-title:Hypereval
 create-widget:hypereval-main-container
   class:container
   widgets
@@ -258,6 +259,25 @@ create-widget:hypereval-main-container
         div
           class:col-100
           widgets
+            h3
+              innerValue:Hypereval
+              style:"float:left;"
+              events
+
+                /*
+                 * Sets the header text of module.
+                 */
+                hypereval.set-header
+                  if:x:/../*/_arg?value
+                    and:x:/../*/_arg?value
+                      !=:
+                    set-widget-property:x:/../*/_event?value
+                      innerValue:Hypereval - {0}
+                        :x:/../*/_arg?value
+                  else
+                    set-widget-property:x:/../*/_event?value
+                      innerValue:Hypereval
+
             div
               class:right
               widgets

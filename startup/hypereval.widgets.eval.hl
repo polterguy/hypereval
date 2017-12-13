@@ -68,6 +68,11 @@ create-event:hypereval.widgets.eval
           p5.web.session.set:hypereval.code
             src:x:/@hypereval.snippets.get?value
 
+          /*
+           * Invoking event responsible for updating our header.
+           */
+          hypereval.set-header:x:/../*/_arg?value
+
       oninit
 
         /*
@@ -196,6 +201,12 @@ p5.hypereval_input.setSize('100%', '600px');"
             if:x:/@p5.web.session.get/*?value
               set-widget-property:hypereval-input
                 innerValue:x:/@p5.web.session.get/*?value
+
+              /*
+               * Invoking event responsible for updating our header.
+               */
+              p5.web.session.get:hypereval.snippet-name
+              hypereval.set-header:x:/@p5.web.session.get/*?value
 
         div
           class:right air-top
@@ -393,9 +404,53 @@ p5.hypereval_input.setSize('100%', '600px');"
                       micro.widgets.modal:hypereval-confirm-new-snippet-modal
                         widgets
                           h3
-                            innerValue:Confirm action
-                          p
-                            innerValue:Are you sure you want to create a new snippet. This will empty your current Hyperlambda editor for its existing code.
+                            innerValue:Choose template
+                          micro.widgets.grid:hypereval-new-snippet-templates
+                            class:hover striped
+                            oninit
+
+                              /*
+                               * Displaying all available templates for a new snippet.
+                               */
+                              list-files:@HYPEREVAL/templates/
+                                filter:.hl
+                              for-each:x:/@list-files/*?name
+                                split:x:/@_dp?value
+                                  =:/
+                                  =:.
+                                eval-x:x:/+/*/*/*|/+/**/.name
+                                add:x:/../*/micro.widgets.grid.databind
+                                  src
+                                    item
+                                      .row
+                                        onclick
+
+                                          /*
+                                           * Forward evaluated above.
+                                           */
+                                          .name:x:/@_dp?value
+
+                                          /*
+                                           * Loads template, returns JavaScript settings CodeMirror module, 
+                                           * and clicks the "Empty" button, which will take care of everything else.
+                                           */
+                                          load-file:x:/@.name?value
+                                            convert:false
+                                          p5.web.widgets.ajax-events.raise:hypereval-confirm-new-snippet
+                                            .onclick
+                                          replace:x:/@load-file/*?value
+                                            src:`
+                                            dest:\`
+                                          p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(`{0}`);"
+                                            :x:/@replace?value
+
+                                      name:x:/@split/0/-2?name
+
+                              /*
+                               * Databinds grid, now with actual items according to which templates exists in system.
+                               */
+                              micro.widgets.grid.databind:hypereval-new-snippet-templates
+
                           div
                             class:right
                             widgets
@@ -404,9 +459,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                                 style:"display:inline-block;"
                                 widgets
                                   button:hypereval-confirm-new-snippet
-                                    innerValue:Yes
+                                    innerValue:Empty
                                     style:"margin-bottom:0;"
-                                    onclick:@"p5.$('hypereval-confirm-new-snippet').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue(ret.code);}});return false;"
+                                    onclick:@"p5.$('hypereval-confirm-new-snippet').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue('');}});return false;"
                                     oninit
 
                                       /*
@@ -419,7 +474,10 @@ p5.hypereval_input.setSize('100%', '600px');"
                                       /*
                                        * Clearing all relevant session variables, deleting modal widget, and
                                        * making sure we disable our "delete snippet button" and "preview snippet" button.
+                                       *
+                                       * Also updating header of page.
                                        */
+                                      hypereval.set-header
                                       set-widget-property:hypereval-delete-snippet
                                         disabled
                                       set-widget-property:hypereval-preview-snippet
@@ -427,14 +485,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                                       p5.web.session.set:hypereval.snippet-name
                                       p5.web.session.set:hypereval.code
                                       delete-widget:hypereval-confirm-new-snippet-modal
-                                      p5.web.return-response-object:code
-                                        src:@"/*
- * Your code goes here ...
- */
-"
 
                                   button
-                                    innerValue:No
+                                    innerValue:Cancel
                                     style:"margin-bottom:0;"
                                     onclick
 
@@ -588,6 +641,11 @@ p5.hypereval_input.setSize('100%', '600px');"
                                             delete-widget-property:hypereval-delete-snippet
                                               disabled
 
+                                            /*
+                                             * Invoking event responsible for updating our header.
+                                             */
+                                            hypereval.set-header:x:/@.name?value
+
                                         name:x:/@_dp/#/*/name?value
 
 
@@ -610,9 +668,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                                 style:"display:inline-block;"
                                 widgets
                                   button
-                                    innerValue:@"<span class=""icon-cross""></span>"
+                                    innerValue:Close
                                     style:"margin-bottom:0;"
-                                    title:Close window without loading  snippet
+                                    title:Close window without loading snippet
                                     onclick
 
                                       /*
@@ -699,9 +757,9 @@ p5.hypereval_input.setSize('100%', '600px');"
                                   style:"display:inline-block;"
                                   widgets
                                     button:hypereval-save-modal-button
-                                      innerValue:@"<span class=""icon-checkmark""></span>"
+                                      innerValue:Save
                                       title:Saves your snippet
-                                      style:"margin-bottom:0;padding-left:35px;padding-right:35px;"
+                                      style:"margin-bottom:0;"
                                       onclick
 
                                         /*
@@ -790,8 +848,13 @@ p5.hypereval_input.setSize('100%', '600px');"
                                         delete-widget-property:hypereval-delete-snippet
                                           disabled
 
+                                        /*
+                                         * Invoking event responsible for updating our header.
+                                         */
+                                        hypereval.set-header:x:/@micro.widgets.wizard-form.value/*/name?value
+
                                     button
-                                      innerValue:@"<span class=""icon-cross""></span>"
+                                      innerValue:Cancel
                                       title:Closes your save window without saving
                                       style:"margin-bottom:0;"
                                       onclick
@@ -901,8 +964,13 @@ p5.hypereval_input.setSize('100%', '600px');"
                                       set-widget-property:hypereval-preview-snippet
                                         disabled
 
+                                      /*
+                                       * Setting header with empty value, changes it to its default value.
+                                       */
+                                      hypereval.set-header
+
                                   button
-                                    innerValue:@"<span class=""icon-cross""></span>"
+                                    innerValue:Close
                                     title:Close window without deleting snippet
                                     style:"margin-bottom:0;"
                                     onclick
