@@ -73,21 +73,9 @@ create-event:hypereval.widgets.hyperlambda-textarea
               :x:/@.theme?value
 
             /*
-             * Including Active Events JSON on page, but only if it hasn't been include before.
+             * Including AutoCompletion JSON.
              */
-            p5.web.viewstate.get:hypereval.widgets.hyperlambda-textarea.keywords-included
-            if:x:/@p5.web.viewstate.get/*?value
-              not
-
-              /*
-               * Keywords has not been previously included, make sure we include them.
-               */
-              vocabulary
-              join:x:/@vocabulary/*?value
-                sep:,
-                wrap:'
-              p5.web.include-javascript:@"CodeMirror._hyperlispKeywords = [{0}];"
-                :x:/@join?value
+            hypereval._internals.include-auto-complete
 
             /*
              * Transforming input textarea to CodeMirror instance.

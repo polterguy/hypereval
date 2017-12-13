@@ -771,7 +771,7 @@ CodeMirror.defineMode("hyperlambda", function() {
          * Default handling, simply checks if current name is either a
          * "variable" (starts with "_") or an Active Event invocation (contains ".")
          */
-        if (CodeMirror._hyperlispKeywords != null && CodeMirror._hyperlispKeywords.indexOf(word) != -1) {
+        if (CodeMirror._hyperlambdaKeywords != null && CodeMirror._hyperlambdaKeywords.indexOf(word) != -1) {
 
             /*
              * The name was found in our Active Events JSON declaration, and is either a "keyword" or an Active Event.
@@ -816,7 +816,7 @@ CodeMirror.registerHelper("hint", "hyperlambda", function(cm, options) {
   /*
    * Checking if there are any autocomplete keywords, and if not, returning early
    */
-  if (CodeMirror._hyperlispKeywords == null) {
+  if (CodeMirror._hyperlambdaKeywords == null) {
     return;
   }
 
@@ -835,14 +835,14 @@ CodeMirror.registerHelper("hint", "hyperlambda", function(cm, options) {
   /*
    * Then finding each word that matches from our Hyperlambda keywords list
    */
-  for (var idx = 0; idx < CodeMirror._hyperlispKeywords.length; idx++) {
-    if (CodeMirror._hyperlispKeywords[idx].indexOf (curWord) != -1) {
+  for (var idx = 0; idx < CodeMirror._hyperlambdaKeywords.length; idx++) {
+    if (CodeMirror._hyperlambdaKeywords[idx].indexOf (curWord) != -1) {
 
       /*
        * This keyword contains the text from current line in editor, hence
        * adding keyword back to caller
        */
-      list.push(CodeMirror._hyperlispKeywords[idx]);
+      list.push(CodeMirror._hyperlambdaKeywords[idx]);
     }
   }
   return {list: list, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)};

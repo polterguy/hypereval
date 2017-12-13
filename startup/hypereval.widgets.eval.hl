@@ -116,14 +116,9 @@ create-event:hypereval.widgets.eval
           :x:/@.theme?value
 
         /*
-         * Including Active Events JSON on page.
+         * Including AutoCompletion JSON.
          */
-        vocabulary
-        join:x:/@vocabulary/*?value
-          sep:,
-          wrap:'
-        p5.web.include-javascript:@"CodeMirror._hyperlispKeywords = [{0}];"
-          :x:/@join?value
+        hypereval._internals.include-auto-complete
 
         /*
          * Transforming input textarea to CodeMirror instance.
@@ -208,11 +203,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                 :x:/../*/_arg?value
 
           oninit
-
-            /*
-             * Setting focus initially to "input textarea".
-             */
-            micro.page.set-focus:x:/../*/_event?value
 
             /*
              * Checking if we have some code in our session.

@@ -28,3 +28,24 @@ create-event:p5.io.unroll-path.@HYPEREVAL
  * Evaluating all other startup files.
  */
 micro.evaluate.folder:@HYPEREVAL/startup/
+
+
+
+
+
+/*
+ * Deleting our JSON AutoCompleter cache folder, if it exists.
+ *
+ * This is done, to avoid having the server fill up with old AutoCompleter cache
+ * files, for vocabularies no longer relevant, due to new programs and modules, 
+ * with new Active Events having been installed.
+ */
+if
+  fetch:x:/0/0?value
+    folder-exists:/common/documents/public/hypereval-cache/
+
+  /*
+   * Deleting autocompleter cache folder.
+   */
+  delete-folder:/common/documents/public/hypereval-cache/
+
