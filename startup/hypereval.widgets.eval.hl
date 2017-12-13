@@ -547,15 +547,34 @@ p5.hypereval_input.setSize('100%', '600px');"
 
                               /*
                                * Databinds snippets grid.
+                               *
+                               * Optionally pass in [filter] and [offset].
                                */
                               hypereval.snippets.databind
+
+                                /*
+                                 * Defaults, if no arguments are given.
+                                 */
+                                .defaults
+                                  filter:
+                                  offset:long:0
 
                                 /*
                                  * Connecting to database, selecting all snippets, 
                                  * and creating one grid item for each record.
                                  */
                                 p5.mysql.connect:[hypereval]
-                                  p5.mysql.select:@"select * from snippets order by id desc"
+                                  p5.mysql.select:@"select * from snippets where name like @filter order by name limit 10 offset @offset"
+                                    @filter:%{0}%
+                                      :x:(/../*/filter|/@.defaults/*/filter)/$?value
+                                    @offset:x:(/../*/offset|/@.defaults/*/offset)/$?value
+
+                                  /*
+                                   * Verifying we actually have something.
+                                   */
+                                  if:x:/@p5.mysql.select/*?count
+                                    =:int:0
+                                    return:bool:false
 
                                   /*
                                    * Necessary to find the relative URL of module.
@@ -656,19 +675,227 @@ p5.hypereval_input.setSize('100%', '600px');"
                                  */
                                 micro.widgets.grid.databind:hypereval-snippets-grid
 
+                                /*
+                                 * Returning true if there are more items, otherwise false.
+                                 */
+                                if:x:/@p5.mysql.connect/*/p5.mysql.select/*?count.int
+                                  =:int:10
+                                  return:bool:true
+                                return:bool:false
+
                             oninit
 
                               /*
                                * Initial databinding of snippets grid.
                                */
                               hypereval.snippets.databind
-                          div
+
+                          div:hypereval-search-snippets-filter-pager-wrapper
                             class:right
                             widgets
                               div
                                 class:strip
                                 style:"display:inline-block;"
+                                .filter:
+                                .offset:0
                                 widgets
+                                  input:hypereval-search-snippets-filter
+                                    type:text
+                                    class:smaller
+                                    style:"margin-bottom:0;"
+                                    placeholder:Filter ...
+                                    onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-search-snippets-btn').raise('onclick');return false;}"
+                                    oninit
+
+                                      /*
+                                       * Setting initial focus to filter textbox.
+                                       */
+                                      micro.page.set-focus:x:/../*/_event?value
+
+                                  button:hypereval-search-snippets-btn
+                                    innerValue:@"<span class=""icon-search""></span>"
+                                    style:"margin-bottom:0;"
+                                    onclick
+
+                                      /*
+                                       * Retrieving filter, storing it, and re-databinding grid from offset 0.
+                                       *
+                                       * First retrieving new value for filter.
+                                       */
+                                      get-widget-property:hypereval-search-snippets-filter
+                                        value
+
+                                      /*
+                                       * Then finding ancestor widget that stores our filter and offset, and updating its value(s).
+                                       */
+                                      p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+                                        .offset
+                                      set-widget-property:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                        .offset:0
+                                        .filter:x:/@get-widget-property/*/*?value
+
+                                      /*
+                                       * Now (re-databinding) our snippets grid, with new offset and filter values.
+                                       */
+                                      eval-x:x:/+/*
+                                      hypereval.snippets.databind
+                                        filter:x:/@get-widget-property/*/*?value
+                                        offset:long:0
+
+                                      /*
+                                       * Checking if we should disabled or enable our "next page" button.
+                                       */
+                                      if:x:/@hypereval.snippets.databind?value
+
+                                        /*
+                                         * More pages (possibly), enabling next button.
+                                         */
+                                        delete-widget-property:hypereval-search-snippets-next
+                                          disabled
+                                      else
+
+                                        /*
+                                         * No more pages, disabling our next button.
+                                         */
+                                        set-widget-property:hypereval-search-snippets-next
+                                          disabled
+
+                                      /*
+                                       * Since we're definitely at page one now, we disabled our "previous" page button.
+                                       */
+                                      set-widget-property:hypereval-search-snippets-previous
+                                        disabled
+
+                                      /*
+                                       * Setting focus to filter button, to make it easier to apply another filter immediately.
+                                       */
+                                      micro.page.set-focus:hypereval-search-snippets-filter
+
+
+                                  button:hypereval-search-snippets-previous
+                                    innerValue:@"<span class=""icon-arrow-left""></span>"
+                                    style:"margin-bottom:0;"
+                                    disabled
+                                    onclick
+
+                                      /*
+                                       * Paging to previous page.
+                                       *
+                                       * First finding widget responsible for storing our filter and offset,
+                                       * and then retrieving its values.
+                                       */
+                                      p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+                                        .offset
+                                      get-widget-property:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                        .offset
+                                        .filter
+
+                                      /*
+                                       * Incrementing offset by 10, and storing the new value.
+                                       */
+                                      -:x:/@get-widget-property/*/*/.offset?value.long
+                                        _:10
+                                      set-widget-property:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                        .offset:x:/@-?value
+
+                                      /*
+                                       * Re-databinding our grid, now with a new offset value.
+                                       */
+                                      eval-x:x:/+/*
+                                      hypereval.snippets.databind
+                                        filter:x:/@get-widget-property/*/*/.filter?value
+                                        offset:x:/@-?value
+
+                                      /*
+                                       * Making sure we disable our "previous button" if we're at page 0.
+                                       */
+                                      if:x:/@-?value.long
+                                        =:long:0
+
+                                        /*
+                                         * Page 0, disabling "previous" button.
+                                         */
+                                        set-widget-property:hypereval-search-snippets-previous
+                                          disabled
+
+                                      /*
+                                       * Since we definitely have another page now, we make sure we
+                                       * enable our "next page" button.
+                                       */
+                                      delete-widget-property:hypereval-search-snippets-next
+                                        disabled
+
+                                  button:hypereval-search-snippets-next
+                                    innerValue:@"<span class=""icon-arrow-right""></span>"
+                                    style:"margin-bottom:0;"
+                                    onclick
+
+                                      /*
+                                       * Paging to next page.
+                                       *
+                                       * First finding widget responsible for storing our filter and offset,
+                                       * and then retrieving its values.
+                                       */
+                                      p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+                                        .offset
+                                      get-widget-property:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                        .offset
+                                        .filter
+
+                                      /*
+                                       * Incrementing offset by 10, and storing our new offset value.
+                                       */
+                                      +:x:/@get-widget-property/*/*/.offset?value.long
+                                        _:10
+                                      set-widget-property:x:/@p5.web.widgets.find-first-ancestor/*/*?value
+                                        .offset:x:/@+?value
+
+                                      /*
+                                       * Re-databinding our snippets grid.
+                                       */
+                                      eval-x:x:/+/*
+                                      hypereval.snippets.databind
+                                        filter:x:/@get-widget-property/*/*/.filter?value
+                                        offset:x:/@+?value
+
+                                      /*
+                                       * Our "previous page" button can now safely be enabled.
+                                       */
+                                      delete-widget-property:hypereval-search-snippets-previous
+                                        disabled
+
+                                      /*
+                                       * Checking if we (for sure) have no more pages, at which point
+                                       * we disable our "next page" button.
+                                       */
+                                      if:x:/@hypereval.snippets.databind?value
+                                        not
+
+                                        /*
+                                         * No more pages, disabling "next page" button.
+                                         */
+                                        set-widget-property:hypereval-search-snippets-next
+                                          disabled
+
+                                  button
+                                    innerValue:@"<span class=""icon-cross""></span>"
+                                    style:"margin-bottom:0;"
+                                    title:Remove filter
+                                    onclick
+
+                                      /*
+                                       * Simply removing filter value, and invoking search ajax event.
+                                       */
+                                      set-widget-property:hypereval-search-snippets-filter
+                                        value:
+                                      p5.web.widgets.ajax-events.raise:hypereval-search-snippets-btn
+                                        onclick
+
+                              div
+                                class:strip
+                                style:"display:inline-block;margin-left:1rem;"
+                                widgets
+
                                   button
                                     innerValue:Close
                                     style:"margin-bottom:0;"
