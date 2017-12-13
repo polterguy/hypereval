@@ -690,7 +690,7 @@ p5.hypereval_input.setSize('100%', '600px');"
                                */
                               hypereval.snippets.databind
 
-                          div:hypereval-search-snippets-filter-pager-wrapper
+                          div
                             class:right
                             widgets
                               div
@@ -771,6 +771,24 @@ p5.hypereval_input.setSize('100%', '600px');"
                                        */
                                       micro.page.set-focus:hypereval-search-snippets-filter
 
+                                  button
+                                    innerValue:@"<span class=""icon-cross""></span>"
+                                    style:"margin-bottom:0;"
+                                    title:Remove filter
+                                    onclick
+
+                                      /*
+                                       * Simply removing filter value, and invoking search ajax event.
+                                       */
+                                      set-widget-property:hypereval-search-snippets-filter
+                                        value:
+                                      p5.web.widgets.ajax-events.raise:hypereval-search-snippets-btn
+                                        onclick
+
+                              div
+                                class:strip
+                                style:"display:inline-block;margin-left:1rem;"
+                                widgets
 
                                   button:hypereval-search-snippets-previous
                                     innerValue:@"<span class=""icon-arrow-left""></span>"
@@ -876,20 +894,6 @@ p5.hypereval_input.setSize('100%', '600px');"
                                          */
                                         set-widget-property:hypereval-search-snippets-next
                                           disabled
-
-                                  button
-                                    innerValue:@"<span class=""icon-cross""></span>"
-                                    style:"margin-bottom:0;"
-                                    title:Remove filter
-                                    onclick
-
-                                      /*
-                                       * Simply removing filter value, and invoking search ajax event.
-                                       */
-                                      set-widget-property:hypereval-search-snippets-filter
-                                        value:
-                                      p5.web.widgets.ajax-events.raise:hypereval-search-snippets-btn
-                                        onclick
 
                               div
                                 class:strip
