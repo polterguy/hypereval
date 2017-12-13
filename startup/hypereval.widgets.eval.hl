@@ -438,6 +438,8 @@ p5.hypereval_input.setSize('100%', '600px');"
                                             convert:false
                                           p5.web.widgets.ajax-events.raise:hypereval-confirm-new-snippet
                                             .onclick
+                                          p5.web.session.set:hypereval.code
+                                            src:x:/@load-file/*?value
                                           replace:x:/@load-file/*?value
                                             src:`
                                             dest:\`

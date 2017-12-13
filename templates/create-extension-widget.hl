@@ -1,0 +1,15 @@
+
+/*
+ * Creates an extension widget.
+ *
+ * Notice, you'd probably want to save this as a "startup" snippet.
+ */
+
+
+/*
+ * Creates an extension widget, which you can consume in other places of your project.
+ */
+create-event:foo.widgets.bar
+  return
+    literal
+      innerValue:Hello World!!

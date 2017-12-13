@@ -1,0 +1,13 @@
+
+/*
+ * Creates an Active Event.
+ *
+ * Notice, you'd probably want to save this as a "startup" snippet.
+ */
+
+
+/*
+ * Creates an Active Event, returning 57.
+ */
+create-event:foo.bar
+  return:int:57
