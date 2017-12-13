@@ -18,7 +18,7 @@ create-widget
      *
      * Notice, this is being done in [oninit] instead of at root of Hyperlambda file,
      * since this would allow us to "controlify" the page later, as long as developer
-     * doesn't add any additional root events, beside the one that's already there 
+     * doesn't add any additional root nodes, beside the one that's already there -
      * [create-widget] that is.
      */
     p5.web.include-css-file
