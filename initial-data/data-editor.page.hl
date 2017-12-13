@@ -482,6 +482,74 @@ create-widget
                       class:strip
                       style:"display:inline-block;margin-left:1rem;"
                       widgets
+
+                        button:hypereval-data-editor-previous-btn
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-arrow-left""></span>"
+                          accesskey:P
+                          title:Go to previous page, keyboard shortcut P
+                          disabled
+                          onclick
+
+                            /*
+                             * Retrieving current offset, decrementing it by 10, and re-databinding grid.
+                             */
+                            p5.web.viewstate.get:hypereval.data-editor.offset
+                            -:x:/@p5.web.viewstate.get/*?value.int
+                              _:10
+                            p5.web.viewstate.set:hypereval.data-editor.offset
+                              src:x:/@-?value
+                            p5.web.viewstate.get:hypereval.data-editor.filter
+                            eval-x:x:/+/*
+                            hypereval._database-editor.databind
+                              filter:x:/@p5.web.viewstate.get/*?value
+                              offset:x:/@-?value
+
+                            /*
+                             * Checking if we should disable previous button.
+                             */
+                            if:x:/@-?value.int
+                              =:int:0
+                              set-widget-property:hypereval-data-editor-previous-btn
+                                disabled
+                            delete-widget-property:hypereval-data-editor-next-btn
+                              disabled
+
+                        button:hypereval-data-editor-next-btn
+                          style:"margin-bottom:0;"
+                          innerValue:@"<span class=""icon-arrow-right""></span>"
+                          accesskey:N
+                          title:Go to next page, keyboard shortcut N
+                          onclick
+
+                            /*
+                             * Retrieving current offset, incrementing it by 10, and re-databinding grid.
+                             */
+                            p5.web.viewstate.get:hypereval.data-editor.offset
+                            +:x:/@p5.web.viewstate.get/*?value.int
+                              _:10
+                            p5.web.viewstate.set:hypereval.data-editor.offset
+                              src:x:/@+?value
+                            p5.web.viewstate.get:hypereval.data-editor.filter
+                            eval-x:x:/+/*
+                            hypereval._database-editor.databind
+                              filter:x:/@p5.web.viewstate.get/*?value
+                              offset:x:/@+?value
+                            delete-widget-property:hypereval-data-editor-previous-btn
+                              disabled
+
+                            /*
+                             * Checking if we are at end of dataset.
+                             */
+                            if:x:/@hypereval._database-editor.databind?value
+                              not
+                              set-widget-property:hypereval-data-editor-next-btn
+                                disabled
+
+                    div
+                      class:strip
+                      style:"display:inline-block;margin-left:1rem;"
+                      widgets
                         button
                           style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-plus""></span>"
@@ -608,69 +676,6 @@ create-widget
                              */
                             micro.css.toggle:x:/../*/_event?value
                               class:toggled
-
-                        button:hypereval-data-editor-previous-btn
-                          style:"margin-bottom:0;"
-                          innerValue:@"<span class=""icon-arrow-left""></span>"
-                          accesskey:P
-                          title:Go to previous page, keyboard shortcut P
-                          disabled
-                          onclick
-
-                            /*
-                             * Retrieving current offset, decrementing it by 10, and re-databinding grid.
-                             */
-                            p5.web.viewstate.get:hypereval.data-editor.offset
-                            -:x:/@p5.web.viewstate.get/*?value.int
-                              _:10
-                            p5.web.viewstate.set:hypereval.data-editor.offset
-                              src:x:/@-?value
-                            p5.web.viewstate.get:hypereval.data-editor.filter
-                            eval-x:x:/+/*
-                            hypereval._database-editor.databind
-                              filter:x:/@p5.web.viewstate.get/*?value
-                              offset:x:/@-?value
-
-                            /*
-                             * Checking if we should disable previous button.
-                             */
-                            if:x:/@-?value.int
-                              =:int:0
-                              set-widget-property:hypereval-data-editor-previous-btn
-                                disabled
-                            delete-widget-property:hypereval-data-editor-next-btn
-                              disabled
-
-                        button:hypereval-data-editor-next-btn
-                          style:"margin-bottom:0;"
-                          innerValue:@"<span class=""icon-arrow-right""></span>"
-                          accesskey:N
-                          title:Go to next page, keyboard shortcut N
-                          onclick
-
-                            /*
-                             * Retrieving current offset, incrementing it by 10, and re-databinding grid.
-                             */
-                            p5.web.viewstate.get:hypereval.data-editor.offset
-                            +:x:/@p5.web.viewstate.get/*?value.int
-                              _:10
-                            p5.web.viewstate.set:hypereval.data-editor.offset
-                              src:x:/@+?value
-                            p5.web.viewstate.get:hypereval.data-editor.filter
-                            eval-x:x:/+/*
-                            hypereval._database-editor.databind
-                              filter:x:/@p5.web.viewstate.get/*?value
-                              offset:x:/@+?value
-                            delete-widget-property:hypereval-data-editor-previous-btn
-                              disabled
-
-                            /*
-                             * Checking if we are at end of dataset.
-                             */
-                            if:x:/@hypereval._database-editor.databind?value
-                              not
-                              set-widget-property:hypereval-data-editor-next-btn
-                                disabled
 
                         button
                           style:"margin-bottom:0;"
