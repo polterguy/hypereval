@@ -272,7 +272,7 @@ create-widget:hypereval-main-container
                     and:x:/../*/_arg?value
                       !=:
                     set-widget-property:x:/../*/_event?value
-                      innerValue:Hypereval - {0}
+                      innerValue:Hypereval <small>{{{0}}}</small>
                         :x:/../*/_arg?value
                   else
                     set-widget-property:x:/../*/_event?value
