@@ -3,8 +3,9 @@
  * Responsible for creating the CodeMirror Hyperlambda textarea widget.
  *
  * All arguments passed in will be added to main root widget, except
- * [auto-focus] and [value], which will be used to determine editor's 
- * initial value, and whether or not it should automatically get focus.
+ * [auto-focus], [height] and [value], which will be used to determine editor's 
+ * initial value, height, and whether or not it should automatically get focus or 
+ * not.
  *
  * To set its initial value, pass in [value] as its initial code value.
  */
@@ -21,15 +22,17 @@ create-event:hypereval.widgets.hyperlambda-textarea
   micro.lambda.contract.optional:x:/..
     auto-focus:bool
     value:string
+    height:string
 
   /*
-   * Figuring out font size to use for widget.
+   * Figuring out font size to use for widget, and other settings.
    */
   .defaults
     font-size:9.25
     theme:hyperlambda
     line-numbers:bool:true
     auto-focus:bool:false
+    height:300px
   select-data:x:/*/*/hypereval.settings
 
   /*
@@ -43,7 +46,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
   /*
    * Returning widget to caller.
    */
-  eval-x:x:/+/*/*/style|/+/**(/.theme|/.line-numbers|/.auto-focus)
+  eval-x:x:/+/*/*/style|/+/**(/.theme|/.line-numbers|/.auto-focus|/.height)
   return
     container
       style:"font-size:{0}pt;"
@@ -52,6 +55,11 @@ create-event:hypereval.widgets.hyperlambda-textarea
         literal
           element:textarea
           oninit
+
+            /*
+             * Forward evaluated above.
+             */
+            .height:x:(/@.signal/--/height|/@.defaults/*/height)/$?value
 
             /*
              * Including CodeMirror JavaScript.
@@ -101,9 +109,10 @@ create-event:hypereval.widgets.hyperlambda-textarea
 p5['{0}'].on('change',function (cMirror) {{
   p5.$('{0}').el.value = cMirror.getValue();
 }});
-p5['{0}'].setSize('100%', '300px');"
+p5['{0}'].setSize('100%', '{5}');"
               :x:/../*/_event?value
               :x:/@p5.io.unroll-path?value
               :x:/@.theme?value
               :x:/@.line-numbers?value
               :x:/@.auto-focus?value
+              :x:/@.height?value
