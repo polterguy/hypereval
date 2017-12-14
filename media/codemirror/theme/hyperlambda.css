@@ -26,5 +26,14 @@
 .cm-s-hyperlambda span.cm-error { color: #f00; }
 .cm-s-hyperlambda .CodeMirror-activeline-background { background: #d7d9cb; }
 .cm-s-hyperlambda .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
-.CodeMirror-hints { background: #e7e9db;color:#41323f; }
+
+/* AutoCompleter CSS */
+.CodeMirror-hints { background:#e7e9db;color:#41323f; }
 li.CodeMirror-hint-active { background: #c7c9bb;color:#41323f; }
+
+/* Dialog CSS (used in search for instance) */
+.CodeMirror-dialog { background: linear-gradient(#d7d9cb, #c7c9bb); }
+.CodeMirror-dialog-top { border-bottom: 1px solid #909090; top:0;}
+.CodeMirror-dialog-bottom { border-top: 1px solid #909090; bottom:0;}
+.CodeMirror-dialog input { border: none; outline:none; background:transparent; width: 20em; color: inherit; font-family: monospace; }
+.CodeMirror-dialog button { font-size: 70%; }
