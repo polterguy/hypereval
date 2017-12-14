@@ -131,8 +131,8 @@ create-event:hypereval.widgets.eval
   extraKeys: {{
     'Ctrl-Space':'autocomplete',
     'Shift-Tab':'indentLess',
-    'Alt-F': 'findPersistent',
     'Tab':'indentMore',
+    'Alt-F': 'findPersistent',
     'Alt-M':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}},
     'Alt-E':function(cm) {{
       p5.$('hypereval-evaluate-snippet').raise('.onclick', {{

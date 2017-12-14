@@ -100,10 +100,14 @@ create-event:hypereval.widgets.hyperlambda-textarea
   autofocus:{4},
   tabSize:2,
   indentAuto:true,
+  autoCloseBrackets:true,
+  showTrailingSpace:true,
   extraKeys: {{
     'Ctrl-Space':'autocomplete',
     'Shift-Tab':'indentLess',
-    'Tab':'indentMore'
+    'Tab':'indentMore',
+    'Alt-F': 'findPersistent',
+    'Alt-M':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}}
   }}
 }});
 p5['{0}'].on('change',function (cMirror) {{
