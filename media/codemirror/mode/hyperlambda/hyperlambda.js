@@ -804,7 +804,7 @@ CodeMirror.defineMode("hyperlambda", function() {
  * Not entirely sure where we'd need this, but possibly some plugins
  * created, that downloads code from JavaScript ...?
  */
-CodeMirror.defineMIME("text/x-hyperlambda", "hyperlambda");
+CodeMirror.defineMIME("application/x-hyperlambda", "hyperlambda");
 
 
 
