@@ -3,9 +3,9 @@
  * Responsible for creating the CodeMirror Hyperlambda textarea widget.
  *
  * All arguments passed in will be added to main root widget, except
- * [auto-focus], [height] and [value], which will be used to determine editor's 
- * initial value, height, and whether or not it should automatically get focus or 
- * not.
+ * [auto-focus], [height], [mode] and [value], which will be used to determine 
+ * editor's initial value, height, mode, and whether or not it should automatically 
+ * get focus or not.
  *
  * To set its initial value, pass in [value] as its initial code value.
  */
@@ -33,6 +33,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
     line-numbers:bool:true
     auto-focus:bool:false
     height:300px
+    mode:hyperlambda
   select-data:x:/*/*/hypereval.settings
 
   /*
@@ -46,7 +47,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
   /*
    * Returning widget to caller.
    */
-  eval-x:x:/+/*/*/style|/+/**(/.theme|/.line-numbers|/.auto-focus|/.height)
+  eval-x:x:/+/*/*/style|/+/**(/.theme|/.line-numbers|/.auto-focus|/.height|/.mode)
   return
     container
       style:"font-size:{0}pt;"
@@ -60,13 +61,83 @@ create-event:hypereval.widgets.hyperlambda-textarea
              * Forward evaluated above.
              */
             .height:x:(/@.signal/--/height|/@.defaults/*/height)/$?value
+            .mode:x:(/@.signal/--/mode|/@.defaults/*/mode)/$?value
 
             /*
              * Including CodeMirror JavaScript.
              */
             p5.web.include-javascript-file
               @HYPEREVAL/media/codemirror-all.min.js
-              @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.min.js
+
+            /*
+             * Checking if this is Hyperlambda mode.
+             */
+            if:x:/@.mode?value
+              =:hyperlambda
+
+              /*
+               * Including minified Hyperlambda JavaScript file.
+               */
+              p5.web.include-javascript-file:@HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.min.js
+
+              /*
+               * Including AutoCompletion JSON.
+               */
+              hypereval._internals.include-auto-complete
+
+            else-if:x:/@.mode?value
+              =:htmlmixed
+
+              /*
+               * Must include additional dependencies for HTML mode.
+               */
+              p5.web.include-javascript-file
+                @HYPEREVAL/media/codemirror/addon/hint/javascript-hint.js
+                @HYPEREVAL/media/codemirror/addon/hint/xml-hint.js
+                @HYPEREVAL/media/codemirror/addon/hint/html-hint.js
+                @HYPEREVAL/media/codemirror/addon/hint/css-hint.js
+                @HYPEREVAL/media/codemirror/mode/xml/xml.js
+                @HYPEREVAL/media/codemirror/mode/javascript/javascript.js
+                @HYPEREVAL/media/codemirror/mode/css/css.js
+                @HYPEREVAL/media/codemirror/mode/htmlmixed/htmlmixed.js
+
+            else-if:x:/@.mode?value
+              =:javascript
+
+              /*
+               * Must include additional dependencies for HTML mode.
+               */
+              p5.web.include-javascript-file
+                @HYPEREVAL/media/codemirror/addon/hint/javascript-hint.js
+                @HYPEREVAL/media/codemirror/mode/javascript/javascript.js
+
+            else-if:x:/@.mode?value
+              =:css
+
+              /*
+               * Must include additional dependencies for HTML mode.
+               */
+              p5.web.include-javascript-file
+                @HYPEREVAL/media/codemirror/addon/hint/css-hint.js
+                @HYPEREVAL/media/codemirror/mode/css/css.js
+
+            else-if:x:/@.mode?value
+              =:xml
+
+              /*
+               * Must include additional dependencies for HTML mode.
+               */
+              p5.web.include-javascript-file
+                @HYPEREVAL/media/codemirror/addon/hint/xml-hint.js
+                @HYPEREVAL/media/codemirror/mode/xml/xml.js
+
+            else
+
+              /*
+               * Including generic mode file, crossing our fingers it exists.
+               */
+              p5.web.include-javascript-file:@HYPEREVAL/media/codemirror/mode/{0}/{0}.js
+                :x:/@.mode?value
 
             /*
              * Making sure necessary Stylesheet files are included
@@ -75,11 +146,6 @@ create-event:hypereval.widgets.hyperlambda-textarea
             p5.web.include-css-file:@HYPEREVAL/media/codemirror-all.min.css
             p5.web.include-css-file:@HYPEREVAL/media/codemirror/theme/{0}.css
               :x:/@.theme?value
-
-            /*
-             * Including AutoCompletion JSON.
-             */
-            hypereval._internals.include-auto-complete
 
             /*
              * Transforming input textarea to CodeMirror instance.
@@ -92,7 +158,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
               to-lower:x:/./-?value.string
             p5.io.unroll-path:@HYPEREVAL/
             p5.web.send-javascript:@"p5['{0}'] = CodeMirror.fromTextArea(p5.$('{0}').el, {{
-  mode:'hyperlambda',
+  mode:'{6}',
   theme:'{2}',
   lineNumbers:{3},
   styleActiveLine:true,
@@ -120,3 +186,4 @@ p5['{0}'].setSize('100%', '{5}');"
               :x:/@.line-numbers?value
               :x:/@.auto-focus?value
               :x:/@.height?value
+              :x:/@.mode?value
