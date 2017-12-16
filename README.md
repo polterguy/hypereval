@@ -1,4 +1,4 @@
-
+﻿
 # Hypereval - An "IDE" module for Phosphorus Five
 
 Hypereval allows you to evaluate Hyperlambda from within your browser, having it executed
@@ -25,7 +25,7 @@ below.
 In addition, Hypereval creates two extension widgets, which you can use in your own apps.
 
 * __[hypereval.widgets.eval]__ - The entire Hypereval module as an extension widget, more or less. Useful to inject on pages during debugging sessions for instance.
-* __[hypereval.widgets.codemirror]__ - A Hyperlambda _"textbox"_, using CodeMirror behind to feature intellisense, autocomplete, etc. Highly useful for editing Hyperlambda.
+* __[micro.widgets.codemirror]__ - A Hyperlambda _"textbox"_, using CodeMirror behind to feature intellisense, autocomplete, etc. Highly useful for editing Hyperlambda.
 
 The Hyperlambda editor, or its _"code textarea"_ is based upon CodeMirror, giving you an extremely rich code editor for editing Hyperlambda -
 Including for instance intellisense, autocomplete, syntax error feedback, etc, etc, etc.

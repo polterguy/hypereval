@@ -180,7 +180,7 @@ create-widget
                                           :x:/@select-data/*?name
                                           :x:/@p5.types.get-typename?value
                                           :x:/@select-data/*?value
-                                      hypereval.widgets.codemirror
+                                      micro.widgets.codemirror
                                         value:x:/@lambda2hyper?value
                                       div
                                         class:right air-top
@@ -568,7 +568,7 @@ create-widget
                                     innerValue:New records(s)
                                   p
                                     innerValue:Supply me with data for your record(s).
-                                  hypereval.widgets.codemirror
+                                  micro.widgets.codemirror
                                     .data-field:content
                                   div
                                     class:right
@@ -768,7 +768,7 @@ create-widget
                     label
                       innerValue:Immediate mode
                       style:"margin-bottom:0;"
-                    hypereval.widgets.codemirror:hypereval-data-editor-advanced-code
+                    micro.widgets.codemirror:hypereval-data-editor-advanced-code
                     div
                       class:right air-top
                       widgets

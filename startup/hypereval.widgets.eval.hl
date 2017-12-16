@@ -1,3 +1,4 @@
+﻿
 /*
  * Responsible for creating the CodeMirror Hyperlambda evaluator widget.
  */
@@ -93,21 +94,21 @@ create-event:hypereval.widgets.eval
          * Including CodeMirror JavaScript.
          */
         p5.web.include-javascript-file
-          @HYPEREVAL/media/codemirror-all.min.js
-          @HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.min.js
+          @MICRO/media/codemirror-all.min.js
+          @MICRO/media/codemirror/mode/hyperlambda/hyperlambda.min.js
 
         /*
          * Making sure necessary Stylesheet files are included
          */
         .theme:x:(/@select-data/*/*/theme|/../*/.defaults/*/theme)/$?value
-        p5.web.include-css-file:@HYPEREVAL/media/codemirror-all.min.css
-        p5.web.include-css-file:@HYPEREVAL/media/codemirror/theme/{0}.css
+        p5.web.include-css-file:@MICRO/media/codemirror-all.min.css
+        p5.web.include-css-file:@MICRO/media/codemirror/theme/{0}.css
           :x:/@.theme?value
 
         /*
          * Including AutoCompletion JSON.
          */
-        hypereval._internals.include-auto-complete
+        micro.widgets.codemirror._include-auto-complete
 
         /*
          * Transforming input textarea to CodeMirror instance.
