@@ -1,4 +1,3 @@
-﻿
 /*
  * Responsible for creating the CodeMirror Hyperlambda evaluator widget.
  */
@@ -14,7 +13,7 @@ create-event:hypereval.widgets.eval
    */
   .defaults
     font-size:9.25
-    theme:hyperlambda
+    theme:phosphorus
     line-numbers:bool:true
   select-data:x:/*/*/hypereval.settings
 

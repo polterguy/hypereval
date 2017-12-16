@@ -1,11 +1,10 @@
-
 /*
  * Responsible for creating the CodeMirror Hyperlambda textarea widget.
  *
  * All arguments passed in will be added to main root widget, except
- * [auto-focus], [height], [mode] and [value], which will be used to determine 
+ * [auto-focus], [height], [mode], [keys] and [value], which will be used to determine 
  * editor's initial value, height, mode, and whether or not it should automatically 
- * get focus or not.
+ * get focus or not - In addition to an additional keyboard shortcut mapping.
  *
  * To set its initial value, pass in [value] as its initial code value.
  */
@@ -23,13 +22,15 @@ create-event:hypereval.widgets.hyperlambda-textarea
     auto-focus:bool
     value:string
     height:string
+    mode:string
+    keys
 
   /*
    * Figuring out font size to use for widget, and other settings.
    */
   .defaults
     font-size:9.25
-    theme:hyperlambda
+    theme:phosphorus
     line-numbers:bool:true
     auto-focus:bool:false
     height:300px
@@ -43,6 +44,12 @@ create-event:hypereval.widgets.hyperlambda-textarea
     src:x:/@.signal/--(!/_arg!/value)
   add:x:/../*/return/*/container/*/widgets/*/literal
     src:x:/@.signal/--/value
+
+  /*
+   * Passing in [keys], which are additional keyboard shortcuts.
+   */
+  add:x:/../*/return/*/container/*/widgets/*/literal/*/oninit/*/.keys
+    src:x:/../*/.keys/*
 
   /*
    * Returning widget to caller.
@@ -62,6 +69,20 @@ create-event:hypereval.widgets.hyperlambda-textarea
              */
             .height:x:(/@.signal/--/height|/@.defaults/*/height)/$?value
             .mode:x:(/@.signal/--/mode|/@.defaults/*/mode)/$?value
+            .keys
+
+            /*
+             * Building our additional keyboard shortcut mapping.
+             */
+            _keys
+            for-each:x:/@.keys/*
+              set:x:/@_keys?value
+                src:@"{0}'{1}':function(){{{2}}},"
+                  :x:/@_keys?value
+                  :x:/@_dp/#?name
+                  :x:/@_dp/#?value
+            set:x:/@_keys?value
+              trim-left:x:/@_keys?value
 
             /*
              * Including CodeMirror JavaScript.
@@ -173,6 +194,7 @@ create-event:hypereval.widgets.hyperlambda-textarea
     'Shift-Tab':'indentLess',
     'Tab':'indentMore',
     'Alt-F': 'findPersistent',
+    {7}
     'Alt-M':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}}
   }}
 }});
@@ -187,3 +209,4 @@ p5['{0}'].setSize('100%', '{5}');"
               :x:/@.auto-focus?value
               :x:/@.height?value
               :x:/@.mode?value
+              :x:/@_keys?value
