@@ -10,6 +10,17 @@
 
 
 /*
+ * Figuring out skin to use, and other settings.
+ */
+.defaults
+  skin:serious
+select-data:x:/*/*/hypereval.settings
+
+
+
+
+
+/*
  * Checking if this is a request for a specific page.
  */
 split:x:/../*/url?value
@@ -50,13 +61,14 @@ if:x:/@split/*?count
 
 
 /*
- * Including Micro, its "serious" skin, font CSS file, and main CSS file for Hypereval.
+ * Including Micro, selected skin, font CSS file, and main CSS file for Hypereval.
  */
 p5.web.include-css-file
   @MICRO/media/main.css
-  @MICRO/media/skins/serious.css
   @MICRO/media/fonts.css
-  @HYPEREVAL/media/main.css
+p5.web.include-css-file:@MICRO/media/skins/{0}.css
+  :x:(/@select-data/*/*/skin|/../*/.defaults/*/skin)/$?value
+p5.web.include-css-file:@HYPEREVAL/media/main.css
 
 
 
