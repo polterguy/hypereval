@@ -1,0 +1,39 @@
+.cm-s-phosphorus { background:#e7e9db;color:#41323f;border-radius:var(--border-radius); }
+.cm-s-phosphorus .CodeMirror-gutters { background: #e7e9db; border-right: none; }
+.cm-s-phosphorus .CodeMirror-guttermarker { color: black; }
+.cm-s-phosphorus .CodeMirror-guttermarker-subtle { color: #8d8687; }
+.cm-s-phosphorus .CodeMirror-hints {z-index:2000 !important;}
+.cm-s-phosphorus .CodeMirror-code { color:#707070; }
+.cm-s-phosphorus span.cm-meta { color: #FF1717; }
+.cm-s-phosphorus span.cm-keyword { color: #d00050; }
+.cm-s-phosphorus span.cm-atom { color: #219; }
+.cm-s-phosphorus span.cm-number { color: #a00070; }
+.cm-s-phosphorus span.cm-def { color: #00a000; }
+.cm-s-phosphorus span.cm-variable { color: #505099; }
+.cm-s-phosphorus span.cm-variable-2 { color: #5050dd; }
+.cm-s-phosphorus span.cm-variable-3, .cm-s-phosphorus span.cm-type { color: #5050aa; }
+.cm-s-phosphorus span.cm-property { color: #a0a0a0; }
+.cm-s-phosphorus span.cm-operator { color: black; }
+.cm-s-phosphorus span.cm-comment { color: #b0b0b0; }
+.cm-s-phosphorus span.cm-string { color: #909090; }
+.cm-s-phosphorus span.cm-string-2 { color: #f50; }
+.cm-s-phosphorus span.cm-qualifier { color: #555; }
+.cm-s-phosphorus span.cm-builtin { color: #30a; }
+.cm-s-phosphorus span.cm-bracket { color: #f00; }
+.cm-s-phosphorus span.cm-tag { color: #170; }
+.cm-s-phosphorus span.cm-attribute { color: #00c; }
+.cm-s-phosphorus span.cm-link { color: #219; }
+.cm-s-phosphorus span.cm-error { color: #f00; }
+.cm-s-phosphorus .CodeMirror-activeline-background { background: #d7d9cb; }
+.cm-s-phosphorus .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
+
+/* AutoCompleter CSS */
+.CodeMirror-hints { background:#e7e9db;color:#41323f; }
+li.CodeMirror-hint-active { background: #c7c9bb;color:#41323f; }
+
+/* Dialog CSS (used in search for instance) */
+.CodeMirror-dialog { background: linear-gradient(#d7d9cb, #c7c9bb); }
+.CodeMirror-dialog-top { border-bottom: 1px solid #909090; top:0;}
+.CodeMirror-dialog-bottom { border-top: 1px solid #909090; bottom:0;}
+.CodeMirror-dialog input { border: none; outline:none; background:transparent; width: 20em; color: inherit; font-family: monospace; }
+.CodeMirror-dialog button { font-size: 70%; }
