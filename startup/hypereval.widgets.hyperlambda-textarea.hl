@@ -91,74 +91,71 @@ create-event:hypereval.widgets.hyperlambda-textarea
               @HYPEREVAL/media/codemirror-all.min.js
 
             /*
-             * Checking if this is Hyperlambda mode.
+             * Checking mode of editor.
              */
-            if:x:/@.mode?value
-              =:hyperlambda
+            switch:x:/@.mode?value
+              case:hyperlambda
 
-              /*
-               * Including minified Hyperlambda JavaScript file.
-               */
-              p5.web.include-javascript-file:@HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.min.js
+                /*
+                 * Including minified Hyperlambda JavaScript file.
+                 */
+                p5.web.include-javascript-file:@HYPEREVAL/media/codemirror/mode/hyperlambda/hyperlambda.min.js
 
-              /*
-               * Including AutoCompletion JSON.
-               */
-              hypereval._internals.include-auto-complete
+                /*
+                 * Including AutoCompletion JSON.
+                 */
+                hypereval._internals.include-auto-complete
 
-            else-if:x:/@.mode?value
-              =:htmlmixed
+              case:htmlmixed
 
-              /*
-               * Must include additional dependencies for HTML mode.
-               */
-              p5.web.include-javascript-file
-                @HYPEREVAL/media/codemirror/addon/hint/javascript-hint.js
-                @HYPEREVAL/media/codemirror/addon/hint/xml-hint.js
-                @HYPEREVAL/media/codemirror/addon/hint/html-hint.js
-                @HYPEREVAL/media/codemirror/addon/hint/css-hint.js
-                @HYPEREVAL/media/codemirror/mode/xml/xml.js
-                @HYPEREVAL/media/codemirror/mode/javascript/javascript.js
-                @HYPEREVAL/media/codemirror/mode/css/css.js
-                @HYPEREVAL/media/codemirror/mode/htmlmixed/htmlmixed.js
+                /*
+                 * Must include additional dependencies for HTML mode.
+                 */
+                p5.web.include-javascript-file
+                  @HYPEREVAL/media/codemirror/addon/hint/javascript-hint.js
+                  @HYPEREVAL/media/codemirror/addon/hint/xml-hint.js
+                  @HYPEREVAL/media/codemirror/addon/hint/html-hint.js
+                  @HYPEREVAL/media/codemirror/addon/hint/css-hint.js
+                  @HYPEREVAL/media/codemirror/mode/xml/xml.js
+                  @HYPEREVAL/media/codemirror/mode/javascript/javascript.js
+                  @HYPEREVAL/media/codemirror/mode/css/css.js
+                  @HYPEREVAL/media/codemirror/mode/htmlmixed/htmlmixed.js
 
-            else-if:x:/@.mode?value
-              =:javascript
+              case:javascript
 
-              /*
-               * Must include additional dependencies for HTML mode.
-               */
-              p5.web.include-javascript-file
-                @HYPEREVAL/media/codemirror/addon/hint/javascript-hint.js
-                @HYPEREVAL/media/codemirror/mode/javascript/javascript.js
+                /*
+                 * Must include additional dependencies for HTML mode.
+                 */
+                p5.web.include-javascript-file
+                  @HYPEREVAL/media/codemirror/addon/hint/javascript-hint.js
+                  @HYPEREVAL/media/codemirror/mode/javascript/javascript.js
 
-            else-if:x:/@.mode?value
-              =:css
+              case:css
 
-              /*
-               * Must include additional dependencies for HTML mode.
-               */
-              p5.web.include-javascript-file
-                @HYPEREVAL/media/codemirror/addon/hint/css-hint.js
-                @HYPEREVAL/media/codemirror/mode/css/css.js
+                /*
+                 * Must include additional dependencies for HTML mode.
+                 */
+                p5.web.include-javascript-file
+                  @HYPEREVAL/media/codemirror/addon/hint/css-hint.js
+                  @HYPEREVAL/media/codemirror/mode/css/css.js
 
-            else-if:x:/@.mode?value
-              =:xml
+              case:xml
 
-              /*
-               * Must include additional dependencies for HTML mode.
-               */
-              p5.web.include-javascript-file
-                @HYPEREVAL/media/codemirror/addon/hint/xml-hint.js
-                @HYPEREVAL/media/codemirror/mode/xml/xml.js
+                /*
+                 * Must include additional dependencies for HTML mode.
+                 */
+                p5.web.include-javascript-file
+                  @HYPEREVAL/media/codemirror/addon/hint/xml-hint.js
+                  @HYPEREVAL/media/codemirror/mode/xml/xml.js
 
-            else
+              default
 
-              /*
-               * Including generic mode file, crossing our fingers it exists.
-               */
-              p5.web.include-javascript-file:@HYPEREVAL/media/codemirror/mode/{0}/{0}.js
-                :x:/@.mode?value
+                /*
+                 * Including generic mode file, crossing our fingers it exists.
+                 */
+                p5.web.include-javascript-file:@HYPEREVAL/media/codemirror/mode/{0}/{0}.js
+                  :x:/@.mode?value
+                p5.web.include-javascript-file:@HYPEREVAL/media/codemirror/addon/hint/anyword-hint.js
 
             /*
              * Making sure necessary Stylesheet files are included
