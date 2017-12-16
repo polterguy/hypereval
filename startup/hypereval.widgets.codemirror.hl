@@ -144,7 +144,7 @@ create-event:hypereval.widgets.codemirror
               case:xml
 
                 /*
-                 * Must include additional dependencies for HTML mode.
+                 * Must include additional dependencies for XML mode.
                  */
                 p5.web.include-javascript-file
                   @HYPEREVAL/media/codemirror/addon/hint/xml-hint.js

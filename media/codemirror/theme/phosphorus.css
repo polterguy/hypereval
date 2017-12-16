@@ -54,13 +54,13 @@
 .cm-s-phosphorus .CodeMirror-hints {z-index:2000 !important;}
 .cm-s-phosphorus .CodeMirror-code { color:#707070; }
 .cm-s-phosphorus span.cm-meta { color: #FF1717; }
-.cm-s-phosphorus span.cm-keyword { color: #d00050; }
+.cm-s-phosphorus span.cm-keyword { color: #0000ff; }
 .cm-s-phosphorus span.cm-atom { color: #219; }
 .cm-s-phosphorus span.cm-number { color: #a00070; }
 .cm-s-phosphorus span.cm-def { color: #00a000; }
 .cm-s-phosphorus span.cm-variable { color: #505099; }
 .cm-s-phosphorus span.cm-variable-2 { color: #5050dd; }
-.cm-s-phosphorus span.cm-variable-3, .cm-s-phosphorus span.cm-type { color: #5050aa; }
+.cm-s-phosphorus span.cm-variable-3, .cm-s-phosphorus span.cm-type { color: #50aa50; }
 .cm-s-phosphorus span.cm-property { color: #a0a0a0; }
 .cm-s-phosphorus span.cm-operator { color: black; }
 .cm-s-phosphorus span.cm-comment { color: #b0b0b0; }
