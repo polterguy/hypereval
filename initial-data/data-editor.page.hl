@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Creates a form that allows the user to edit contents in p5.data database.
  *
  * Requires you to be logged in as "root", but will ask the user to login,
@@ -180,7 +180,7 @@ create-widget
                                           :x:/@select-data/*?name
                                           :x:/@p5.types.get-typename?value
                                           :x:/@select-data/*?value
-                                      hypereval.widgets.hyperlambda-textarea
+                                      hypereval.widgets.codemirror
                                         value:x:/@lambda2hyper?value
                                       div
                                         class:right air-top
@@ -568,7 +568,7 @@ create-widget
                                     innerValue:New records(s)
                                   p
                                     innerValue:Supply me with data for your record(s).
-                                  hypereval.widgets.hyperlambda-textarea
+                                  hypereval.widgets.codemirror
                                     .data-field:content
                                   div
                                     class:right
@@ -768,7 +768,7 @@ create-widget
                     label
                       innerValue:Immediate mode
                       style:"margin-bottom:0;"
-                    hypereval.widgets.hyperlambda-textarea:hypereval-data-editor-advanced-code
+                    hypereval.widgets.codemirror:hypereval-data-editor-advanced-code
                     div
                       class:right air-top
                       widgets
