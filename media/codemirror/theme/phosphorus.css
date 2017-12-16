@@ -72,7 +72,7 @@
 .cm-s-phosphorus span.cm-tag { color: #170; }
 .cm-s-phosphorus span.cm-attribute { color: #00c; }
 .cm-s-phosphorus span.cm-link { color: #219; }
-.cm-s-phosphorus span.cm-error { color: #f00; }
+.cm-s-phosphorus span.cm-error { color: #f00; background-color:#ffa0a0; }
 .cm-s-phosphorus .CodeMirror-activeline-background { background: #fafafa; }
 .cm-s-phosphorus .CodeMirror-matchingbracket { outline:1px solid grey; color:black !important; }
 
