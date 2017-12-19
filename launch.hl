@@ -14,7 +14,7 @@
  */
 .defaults
   skin:serious
-select-data:x:/*/*/hypereval.settings
+select-data:x:/*/*/micro.codemirror.settings
 
 
 

@@ -16,7 +16,7 @@ create-event:hypereval.widgets.eval
     font-size:8.25
     theme:phosphorus
     line-numbers:bool:true
-  select-data:x:/*/*/hypereval.settings
+  select-data:x:/*/*/micro.codemirror.settings
 
   /*
    * Decorating widget with arguments.
