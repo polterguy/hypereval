@@ -42,10 +42,10 @@ micro.evaluate.folder:@HYPEREVAL/startup/
  */
 if
   fetch:x:/0/0?value
-    folder-exists:/common/documents/public/hypereval-cache/
+    folder-exists:/common/documents/public/micro-codemirror-cache/
 
   /*
    * Deleting autocompleter cache folder.
    */
-  delete-folder:/common/documents/public/hypereval-cache/
+  delete-folder:/common/documents/public/micro-codemirror-cache/
 
