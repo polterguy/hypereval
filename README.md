@@ -1,5 +1,4 @@
-﻿
-# Hypereval - An "IDE" module for Phosphorus Five
+# Hypereval - Evaluate Hyperlambda snippets
 
 Hypereval allows you to evaluate Hyperlambda from within your browser, having it executed
 on the server. It also allows you to create Hyperlambda pages, and startup objects, arguably
@@ -50,3 +49,13 @@ as a bunch of loosely coupled snippets, being composed of extension widgets as s
 as your controllers. For instance, from the above screenshot, to access the _"page-viewer"_ page snippet, you'd access it through a URL
 such as `your-domain.com/hypereval/page-viewer`, while the data-viewer snippet can be found at `your-comain.som/hypereval/data-viewer`.
 
+## Installation
+
+The easiest way to install it, is to [install phosphorus five](https://github.com/polterguy/phosphorusfive),
+for then to visit _"The Bazar"_, and simply install it through the Bazar on your local machine/server.
+However, if you want a more manual installation path, you can download the latest release,
+unzip it, and move the unzipped root folder into your _"core/p5.webapp/modules"_ folder. If you
+choose this path, you should rename the folder, removing any version information, making sure
+your module folder is called exactly _"hypereval"_. Installation through the Bazar
+also requires you having some sort of GnuPG client on your machine/server. If you don't want
+to fiddle with installing GnuPG, you can resort to download the latest zip file release directly.
