@@ -63,12 +63,12 @@ if:x:/@split/*?count
 /*
  * Including Micro, selected skin, font CSS file, and main CSS file for Hypereval.
  */
-p5.web.include-css-file
+micro.page.minify-and-bundle-css-file
   @MICRO/media/main.css
   @MICRO/media/fonts.css
-p5.web.include-css-file:@MICRO/media/skins/{0}.css
+micro.page.minify-and-bundle-css-file:@MICRO/media/skins/{0}.css
   :x:(/@select-data/*/*/skin|/../*/.defaults/*/skin)/$?value
-p5.web.include-css-file:@HYPEREVAL/media/main.css
+micro.page.minify-and-bundle-css-file:@HYPEREVAL/media/main.css
 
 
 
