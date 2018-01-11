@@ -1,4 +1,3 @@
-﻿
 /*
  * Responsible for creating the CodeMirror Hyperlambda evaluator widget.
  */
@@ -23,6 +22,15 @@ create-event:hypereval.widgets.eval
    */
   add:x:/../*/return/*/container
     src:x:/@.signal/--(!/_arg)
+
+  /*
+   * Checking if this is a "chrome less" instantiation.
+   */
+  if:x:/../*/chrome?value
+    =:bool:false
+    set:x:/../*/return/*/container/**/widgets/=chrome/.
+    set:x:/../*/return/*/container/**/button/=hypereval-preview-snippet
+    set:x:/../*/return/*/container/**/oninit/*/micro.page.create-dropzone
 
   /*
    * Returning widget to caller.
@@ -387,7 +395,7 @@ p5.hypereval_input.setSize('100%', '600px');"
             div
               class:strip
               style:"display:inline-block;margin-left:1rem;"
-              widgets
+              widgets:chrome
 
                 /*
                  * New snippet button.
