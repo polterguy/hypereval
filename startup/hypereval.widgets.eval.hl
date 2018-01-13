@@ -162,7 +162,7 @@ create-event:hypereval.widgets.eval
 p5.hypereval_input.on('change',function (cMirror) {{
   p5.$('hypereval-input').el.value = cMirror.getValue();
 }});
-p5.hypereval_input.setSize('100%', '600px');"
+p5.hypereval_input.setSize('100%', '400px');"
           :x:/@p5.io.unroll-path?value
           :x:/@.theme?value
           :x:/@.line-numbers?value
