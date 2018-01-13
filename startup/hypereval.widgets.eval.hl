@@ -12,7 +12,7 @@ create-event:hypereval.widgets.eval
    * Figuring out font size to use for widget.
    */
   .defaults
-    font-size:8.25
+    font-size:9.25
     theme:phosphorus
     line-numbers:bool:true
   select-data:x:/*/*/micro.codemirror.settings

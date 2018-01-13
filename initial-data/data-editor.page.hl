@@ -191,7 +191,8 @@ create-widget
                                             widgets
                                               button
                                                 innerValue:@"<span class=""icon-floppy-disk""></span>"
-                                                style:"padding-left:35px;padding-right:35px;margin-bottom:0;"
+                                                class:larger
+                                                style:"margin-bottom:0;"
                                                 title:Saves your (updated) record
                                                 onclick
 
@@ -579,7 +580,8 @@ create-widget
                                         widgets
                                           button
                                             innerValue:@"<span class=""icon-floppy-disk""></span>"
-                                            style:"margin-bottom:0;padding-left:35px;padding-right:35px;"
+                                            style:"margin-bottom:0;"
+                                            class:larger
                                             title:Creates your new record(s)
                                             onclick
 
@@ -773,7 +775,7 @@ create-widget
                       class:right air-top
                       widgets
                         button
-                          style:"padding-left:35px;padding-right:35px;"
+                          class:larger
                           innerValue:@"<span class=""icon-flash""></span>"
                           title:Evaluate your code
                           onclick
