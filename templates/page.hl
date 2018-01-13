@@ -14,7 +14,7 @@ create-widget
   oninit
 
     /*
-     * Including Micro CSS file, off-white skin, and fonts.
+     * Including Micro CSS file, serious skin, and fonts.
      *
      * Notice, this is being done in [oninit] instead of at root of Hyperlambda file,
      * since this would allow us to "controlify" the page later, as long as developer
@@ -22,7 +22,7 @@ create-widget
      * [create-widget] that is.
      */
     micro.css.include
-      skin:off-white
+      skin:serious
 
   widgets
     div
