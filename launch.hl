@@ -252,8 +252,12 @@ if:x:/../*/chrome?value
 
 /*
  * Creating main content container, making sure we set the title of our page.
+ *
+ * Notice, we don't set the title if this is a "plugin load" of module.
  */
-p5.web.page.set-title:Hypereval
+if:x:/../*/chrome?value
+  !=:bool:false
+  p5.web.page.set-title:Hypereval
 create-widget:hypereval-main-container
   class:container
   widgets

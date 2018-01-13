@@ -35,7 +35,7 @@ create-event:hypereval.widgets.eval
   /*
    * Returning widget to caller.
    */
-  eval-x:x:/+/**(/.theme|/.line-numbers)|/+/*/container/*/style
+  eval-x:x:/+/**(/.theme|/.line-numbers|/.chrome)|/+/*/container/*/style
   return
     container
       style:"font-size:{0}pt !important;"
@@ -84,6 +84,11 @@ create-event:hypereval.widgets.eval
       oninit
 
         /*
+         * Forward evaluate above.
+         */
+        .chrome:x:/../*/chrome?value
+
+        /*
          * Making sure our page becomes a "dropzone" to allow user to upload 
          * a Hyperlambda file (which will populate the CodeMirror module with its code).
          */
@@ -119,6 +124,20 @@ create-event:hypereval.widgets.eval
         micro.widgets.codemirror._include-auto-complete
 
         /*
+         * If this is a "chrome plugin load", we don't apply extra keyboard shortcuts.
+         */
+        .extra-keys:@",
+    'Alt-S':function(cm) {{p5.$('hypereval-save-snippet').raise('onclick');}},
+    'Alt-L':function(cm) {{p5.$('hypereval-load-snippet').raise('onclick');}},
+    'Alt-D':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}},
+    'Alt-N':function(cm) {{p5.$('hypereval-new-snippet').raise('onclick');}},
+    'Alt-P':function(cm) {{p5.$('hypereval-preview-snippet').raise('onclick');}}
+"
+        if:x:/../*/.chrome?value
+          =:bool:false
+          set:x:/@.extra-keys?value
+
+        /*
          * Transforming input textarea to CodeMirror instance.
          */
         .line-numbers:x:(/@select-data/*/*/line-numbers|/../*/.defaults/*/line-numbers)/$?value
@@ -151,12 +170,7 @@ create-event:hypereval.widgets.eval
         }}
       }});
     }},
-    'Alt-S':function(cm) {{p5.$('hypereval-save-snippet').raise('onclick');}},
-    'Alt-L':function(cm) {{p5.$('hypereval-load-snippet').raise('onclick');}},
-    'Alt-V':function(cm) {{p5.$('hypereval-view-output').raise('onclick');}},
-    'Alt-D':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}},
-    'Alt-N':function(cm) {{p5.$('hypereval-new-snippet').raise('onclick');}},
-    'Alt-P':function(cm) {{p5.$('hypereval-preview-snippet').raise('onclick');}}
+    'Alt-V':function(cm) {{p5.$('hypereval-view-output').raise('onclick');}}{3}
   }}
 }});
 p5.hypereval_input.on('change',function (cMirror) {{
@@ -166,6 +180,7 @@ p5.hypereval_input.setSize('100%', '400px');"
           :x:/@p5.io.unroll-path?value
           :x:/@.theme?value
           :x:/@.line-numbers?value
+          :x:/@.extra-keys?value
 
       widgets
         literal:hypereval-input
