@@ -485,7 +485,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                                 widgets
                                   button:hypereval-confirm-new-snippet
                                     innerValue:Empty
-                                    style:"margin-bottom:0;"
                                     onclick:@"p5.$('hypereval-confirm-new-snippet').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue('');}});return false;"
                                     oninit
 
@@ -513,7 +512,6 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                                   button
                                     innerValue:Cancel
-                                    style:"margin-bottom:0;"
                                     onclick
 
                                       /*
@@ -725,7 +723,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                                   input:hypereval-search-snippets-filter
                                     type:text
                                     class:smaller
-                                    style:"margin-bottom:0;"
                                     placeholder:Filter ...
                                     onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-search-snippets-btn').raise('onclick');return false;}"
                                     oninit
@@ -737,7 +734,6 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                                   button:hypereval-search-snippets-btn
                                     innerValue:@"<span class=""icon-search""></span>"
-                                    style:"margin-bottom:0;"
                                     onclick
 
                                       /*
@@ -796,7 +792,6 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                                   button
                                     innerValue:@"<span class=""icon-cross""></span>"
-                                    style:"margin-bottom:0;"
                                     title:Remove filter
                                     onclick
 
@@ -815,7 +810,6 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                                   button:hypereval-search-snippets-previous
                                     innerValue:@"<span class=""icon-arrow-left""></span>"
-                                    style:"margin-bottom:0;"
                                     disabled
                                     onclick
 
@@ -868,7 +862,6 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                                   button:hypereval-search-snippets-next
                                     innerValue:@"<span class=""icon-arrow-right""></span>"
-                                    style:"margin-bottom:0;"
                                     onclick
 
                                       /*
@@ -925,7 +918,6 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                                   button
                                     innerValue:Close
-                                    style:"margin-bottom:0;"
                                     title:Close window without loading snippet
                                     onclick
 
@@ -1015,7 +1007,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                                     button:hypereval-save-modal-button
                                       innerValue:Save
                                       title:Saves your snippet
-                                      style:"margin-bottom:0;"
                                       onclick
 
                                         /*
@@ -1112,7 +1103,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                                     button
                                       innerValue:Cancel
                                       title:Closes your save window without saving
-                                      style:"margin-bottom:0;"
                                       onclick
 
                                         /*
@@ -1162,7 +1152,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                                 widgets
                                   button:hypereval-confirm-deletion-btn
                                     innerValue:Yes
-                                    style:"margin-bottom:0;"
                                     oninit
 
                                       /*
@@ -1226,7 +1215,6 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                                   button
                                     innerValue:No
-                                    style:"margin-bottom:0;"
                                     onclick
 
                                       /*

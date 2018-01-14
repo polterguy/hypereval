@@ -192,7 +192,6 @@ create-widget
                                               button
                                                 innerValue:@"<span class=""icon-floppy-disk""></span>"
                                                 class:larger
-                                                style:"margin-bottom:0;"
                                                 title:Saves your (updated) record
                                                 onclick
 
@@ -252,7 +251,6 @@ create-widget
                                               button
                                                 innerValue:@"<span class=""icon-bin""></span>"
                                                 title:Delete this record
-                                                style:"margin-bottom:0;"
                                                 onclick
 
                                                   /*
@@ -274,7 +272,6 @@ create-widget
                                                               widgets
                                                                 button
                                                                   innerValue:Yes
-                                                                  style:"margin-bottom:0;"
                                                                   oninit
 
                                                                     /*
@@ -318,7 +315,6 @@ create-widget
 
                                                                 button
                                                                   innerValue:No
-                                                                  style:"margin-bottom:0;"
                                                                   onclick
 
                                                                     /*
@@ -329,7 +325,6 @@ create-widget
                                               button
                                                 innerValue:@"<span class=""icon-cross""></span>"
                                                 title:Close the editor for this record
-                                                style:"margin-bottom:0;"
                                                 onclick
 
                                                   /*
@@ -364,7 +359,6 @@ create-widget
                         input:hypereval-data-editor-search-filter
                           type:text
                           title:Filter, keyboard shortcut F
-                          style:"margin-bottom:0;"
                           accesskey:F
                           class:smaller
                           onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-data-editor-search-btn').raise('onclick');return false;}"
@@ -380,7 +374,6 @@ create-widget
                                 :x:/@select-data?value
 
                         button:hypereval-data-editor-search-btn
-                          style:"margin-bottom:0;"
                           title:Search, keyboard shortcut S
                           innerValue:@"<span class=""icon-search""></span>"
                           accesskey:S
@@ -446,7 +439,6 @@ create-widget
                             micro.page.set-focus:hypereval-data-editor-search-filter
 
                         button:hypereval-data-editor-clear-btn
-                          style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-cross""></span>"
                           accesskey:X
                           title:Clear filter, keyboard shortcut X
@@ -485,7 +477,6 @@ create-widget
                       widgets
 
                         button:hypereval-data-editor-previous-btn
-                          style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-arrow-left""></span>"
                           accesskey:P
                           title:Go to previous page, keyboard shortcut P
@@ -517,7 +508,6 @@ create-widget
                               disabled
 
                         button:hypereval-data-editor-next-btn
-                          style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-arrow-right""></span>"
                           accesskey:N
                           title:Go to next page, keyboard shortcut N
@@ -552,7 +542,6 @@ create-widget
                       style:"display:inline-block;margin-left:1rem;"
                       widgets
                         button
-                          style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-plus""></span>"
                           title:Create new record(s), keyboard shortcut C
                           accesskey:C
@@ -580,7 +569,6 @@ create-widget
                                         widgets
                                           button
                                             innerValue:@"<span class=""icon-floppy-disk""></span>"
-                                            style:"margin-bottom:0;"
                                             class:larger
                                             title:Creates your new record(s)
                                             onclick
@@ -635,7 +623,6 @@ create-widget
 
                                           button
                                             innerValue:@"<span class=""icon-cross""></span>"
-                                            style:"margin-bottom:0;"
                                             title:Close window, without creating new record(s)
                                             onclick
 
@@ -645,7 +632,6 @@ create-widget
                                               delete-widget:hypereval-data-editor-new-record-modal
 
                         button
-                          style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-eye""></span>"
                           accesskey:A
                           title:Advanced, keyboard shortcut A
@@ -680,7 +666,6 @@ create-widget
                               class:toggled
 
                         button
-                          style:"margin-bottom:0;"
                           innerValue:@"<span class=""icon-download2""></span>"
                           title:Download a backup of your database
                           onclick
@@ -769,7 +754,6 @@ create-widget
                   widgets
                     label
                       innerValue:Immediate mode
-                      style:"margin-bottom:0;"
                     micro.widgets.codemirror:hypereval-data-editor-advanced-code
                     div
                       class:right air-top
