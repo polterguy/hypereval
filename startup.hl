@@ -1,51 +1,22 @@
-
 /*
- * File responsible for initializing Hypereval.
- */
-
-
-/*
- * Creates the "path" Active Event that points to our "/hypereval/" folder.
+ * Startup file.
  *
- * This is done in such a way that we can install "Hypereval" in any folder we wish inside of 
- * the "/modules/" folder.
+ * Creates "path" event and evaluates all files in "/startup/" folder for module.
  */
-split:x:/..?name
-  =:/
-set:x:/@split/0/-
-join:x:/@split/*?name
-  sep:/
+
+
+/*
+ * Creates our "path" Active Event for module.
+ */
+micro.path.get-folder:x:/..?name
+trim-right:x:/@micro.path.get-folder?value
+  chars:/
 eval-x:x:/+/*
 create-event:p5.io.unroll-path.@HYPEREVAL
-  return:/{0}
-    :x:/@join?value
-
-
-
+  return:x:/@trim-right?value
 
 
 /*
  * Evaluating all other startup files.
  */
 micro.evaluate.folder:@HYPEREVAL/startup/
-
-
-
-
-
-/*
- * Deleting our JSON AutoCompleter cache folder, if it exists.
- *
- * This is done, to avoid having the server fill up with old AutoCompleter cache
- * files, for vocabularies no longer relevant, due to new programs and modules, 
- * with new Active Events having been installed.
- */
-if
-  fetch:x:/0/0?value
-    folder-exists:/common/documents/public/micro-codemirror-cache/
-
-  /*
-   * Deleting autocompleter cache folder.
-   */
-  delete-folder:/common/documents/public/micro-codemirror-cache/
-
