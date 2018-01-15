@@ -3,15 +3,12 @@
  */
 container
   element:a
-  class:desktop-app shaded rounded air-inner
-  title:Hypereval is a 'terminal' type of app, allowing you to evaluate arbitrary Hyperlambda
+  class:desktop-app button shaded
+  title:Evaluate Hyperlambda in immediate mode
   widgets
+    literal
+      element:span
+      class:icon-terminal desktop-app-icon
     span
-      class:desktop-app-name
-      widgets
-        literal
-          element:span
-          class:icon-bolt desktop-app-icon
-        span
-          class:desktop-app-text
-          innerValue:Hypereval
+      class:desktop-app-text
+      innerValue:Hypereval
