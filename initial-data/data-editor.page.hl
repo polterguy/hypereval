@@ -36,7 +36,7 @@ create-widget
     /*
      * Including Micro, adding Awesome Fonts, and serious skin.
      */
-    p5.web.include-css-file:@MICRO/media/main.css
+    p5.web.include-css-file:@MICRO/media/micro.css
     p5.web.include-css-file:@MICRO/media/fonts.css
     p5.web.include-css-file:@MICRO/media/skins/serious.css
 
@@ -187,7 +187,6 @@ create-widget
                                         widgets
                                           div
                                             class:strip
-                                            style:"display:inline-block;"
                                             widgets
                                               button
                                                 innerValue:@"<span class=""icon-floppy-disk""></span>"
@@ -268,7 +267,6 @@ create-widget
                                                           widgets
                                                             div
                                                               class:strip
-                                                              style:"display:inline-block;"
                                                               widgets
                                                                 button
                                                                   innerValue:Yes
@@ -354,7 +352,6 @@ create-widget
                   widgets
                     div
                       class:strip
-                      style:"display:inline-block;"
                       widgets
                         input:hypereval-data-editor-search-filter
                           type:text
@@ -473,7 +470,7 @@ create-widget
 
                     div
                       class:strip
-                      style:"display:inline-block;margin-left:1rem;"
+                      style:"margin-left:1rem;"
                       widgets
 
                         button:hypereval-data-editor-previous-btn
@@ -539,7 +536,7 @@ create-widget
 
                     div
                       class:strip
-                      style:"display:inline-block;margin-left:1rem;"
+                      style:"margin-left:1rem;"
                       widgets
                         button
                           innerValue:@"<span class=""icon-plus""></span>"
@@ -565,7 +562,6 @@ create-widget
                                     widgets
                                       div
                                         class:strip
-                                        style:"display:inline-block;"
                                         widgets
                                           button
                                             innerValue:@"<span class=""icon-floppy-disk""></span>"

@@ -18,7 +18,7 @@ create-widget:hypereval-page-viewer
     /*
      * Including Micro CSS files.
      */
-    p5.web.include-css-file:@MICRO/media/main.css
+    p5.web.include-css-file:@MICRO/media/micro.css
     p5.web.include-css-file:@MICRO/media/skins/serious.css
 
   widgets

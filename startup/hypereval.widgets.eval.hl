@@ -236,7 +236,6 @@ p5.hypereval_input.setSize('100%', '400px');"
           widgets
             div
               class:strip
-              style:"display:inline-block;"
               widgets
 
                 /*
@@ -409,7 +408,7 @@ p5.hypereval_input.setSize('100%', '400px');"
 
             div
               class:strip
-              style:"display:inline-block;margin-left:1rem;"
+              style:"margin-right:1rem;"
               widgets:chrome
 
                 /*
@@ -481,7 +480,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                             widgets
                               div
                                 class:strip
-                                style:"display:inline-block;"
                                 widgets
                                   button:hypereval-confirm-new-snippet
                                     innerValue:Empty
@@ -716,7 +714,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                             widgets
                               div
                                 class:strip
-                                style:"display:inline-block;"
                                 .filter:
                                 .offset:0
                                 widgets
@@ -805,7 +802,7 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                               div
                                 class:strip
-                                style:"display:inline-block;margin-left:1rem;"
+                                style:"margin-left:1rem;"
                                 widgets
 
                                   button:hypereval-search-snippets-previous
@@ -913,7 +910,7 @@ p5.hypereval_input.setSize('100%', '400px');"
 
                               div
                                 class:strip
-                                style:"display:inline-block;margin-left:1rem;"
+                                style:"margin-left:1rem;"
                                 widgets
 
                                   button
@@ -1002,7 +999,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                               widgets
                                 div
                                   class:strip
-                                  style:"display:inline-block;"
                                   widgets
                                     button:hypereval-save-modal-button
                                       innerValue:Save
@@ -1148,7 +1144,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                             widgets
                               div
                                 class:strip
-                                style:"display:inline-block;"
                                 widgets
                                   button:hypereval-confirm-deletion-btn
                                     innerValue:Yes
