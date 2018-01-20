@@ -22,7 +22,6 @@ create-widget
      * [create-widget] that is.
      */
     micro.css.include
-      skin:serious
 
   widgets
     div

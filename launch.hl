@@ -64,7 +64,6 @@ if:x:/@split/*?count
  */
 eval-x:x:/+/*
 micro.css.include
-  skin:x:(/@select-data/*/*/skin|/../*/.defaults/*/skin)/$?value
 p5.web.include-css-file:@HYPEREVAL/media/main.css
 
 
@@ -267,7 +266,7 @@ create-widget:hypereval-main-container
         div
           class:col-100
           widgets
-            h3
+            h1
               innerValue:Hypereval
               style:"float:left;"
               events
