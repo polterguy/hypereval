@@ -800,11 +800,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                                       p5.web.widgets.ajax-events.raise:hypereval-search-snippets-btn
                                         onclick
 
-                              div
-                                class:strip
-                                style:"margin-left:1rem;"
-                                widgets
-
                                   button:hypereval-search-snippets-previous
                                     innerValue:@"<span class=""icon-arrow-left""></span>"
                                     disabled
@@ -907,11 +902,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                                          */
                                         set-widget-property:hypereval-search-snippets-next
                                           disabled
-
-                              div
-                                class:strip
-                                style:"margin-left:1rem;"
-                                widgets
 
                                   button
                                     innerValue:Close
@@ -1032,10 +1022,10 @@ p5.hypereval_input.setSize('100%', '400px');"
                                          * Sanity checking name of snippet.
                                          */
                                         match:x:/@micro.widgets.wizard-form.value/*/name?value
-                                          src:regex:/^[-a-z0-9_ ]*$/i
+                                          src:regex:/^[-a-z0-9_ ]{2,}$/i
                                         if:x:/@match/*?name
                                           not
-                                          micro.windows.info:Only use spaces, a-z, 0-9 and '-' in your name
+                                          micro.windows.info:Use at least 2 characters, only spaces, a-z, 0-9 and '-' in your name
                                             class:micro-windows-info warning
                                           return
 
