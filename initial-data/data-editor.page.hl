@@ -34,11 +34,9 @@ create-widget
   oninit
 
     /*
-     * Including Micro, adding Awesome Fonts, and serious skin.
+     * Including Micro CSS.
      */
-    p5.web.include-css-file:@MICRO/media/micro.css
-    p5.web.include-css-file:@MICRO/media/fonts.css
-    p5.web.include-css-file:@MICRO/media/skins/serious.css
+    micro.css.include
 
     /*
      * Setting initial [offset] and [filter] for grid.
