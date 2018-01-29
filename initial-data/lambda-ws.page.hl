@@ -1,0 +1,48 @@
+
+/*
+ * Creates a lambda Web Service endpoint.
+ */
+
+
+/*
+ * Sanity checking invocation.
+ */
+if
+  p5.web.request.get-method
+  !=:POST
+  p5.web.response.set-status-code:405
+  p5.web.response.set-status-description:405 Only POST method is allowed
+
+
+/*
+ * De-serialising request.
+ */
+p5.web.request.parse-mime
+
+
+/*
+ * Evaluating specified Hyperlambda in a "whitelist" invocation to [eval].
+ *
+ * Notice, whatever keywords you wish to allow your clients to be legally allowed to evaluate,
+ * must be declared in the [events] lambda below.
+ */
+hyper2lambda:x:/@p5.web.request.parse-mime/**/content?value
+eval-whitelist:x:/@hyper2lambda
+  events
+    set
+    add
+    insert-before
+    insert-after
+    src
+    +
+    -
+    /
+    *
+    for-each
+    return
+
+
+/*
+ * Yielding results of above evaluation back to client.
+ */
+p5.web.echo:x:/@eval-whitelist

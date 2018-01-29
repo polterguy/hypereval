@@ -1,0 +1,89 @@
+
+/*
+ * Creates an example page, which allows the caller to invoke a lambda web service,
+ * passing in his own Hyperlambda to be evaluated.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file, serious skin, and fonts.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            div:code
+              class:bg shaded rounded air-inner air-top
+              widgets
+                h1
+                  innerValue:Invoke lambda web service
+
+                /*
+                 * Hyperlambda editor, which allows user to supply his own Hyperlambda.
+                 */
+                micro.widgets.codemirror
+                  mode:hyperlambda
+                  class:air-bottom
+                  .data-field:hyperlambda
+
+                /*
+                 * "Save button" wrapper.
+                 */
+                div
+                  class:strip fill
+                  widgets
+
+                    /*
+                     * URL textbox, for where we should pass in the specified Hyperlambda.
+                     */
+                    input
+                      type:text
+                      .data-field:url
+                      placeholder:Web service endpoint URL ...
+
+                    /*
+                     * Wrapper for "invoke" button.
+                     */
+                    button
+                      innerValue:Invoke
+                      onclick
+
+                        /*
+                         * Serializes our form, and invokes the specified web service endpoint, passing
+                         * in the specified Hyperlambda.
+                         */
+                        micro.form.serialize:code
+
+                        /*
+                         * Parametrising our web service invocation.
+                         */
+                        p5.http.post:x:/@micro.form.serialize/*/url?value
+                          Content-Type:application/x-www-form-urlencoded
+                          content:x:/@micro.form.serialize/*/hyperlambda?value
+                        p5.html.html-encode:x:/-/**/content?value
+
+                        /*
+                         * Creating a modal widget, displaying the results of our invocation.
+                         */
+                        create-widgets
+                          micro.widgets.modal:modal-results
+                            widgets
+                              h3
+                                innerValue:Results
+                              pre
+                                innerValue:x:/@p5.html.html-encode?value
+                              div
+                                class:right
+                                widgets
+                                  button
+                                    innerValue:Close
+                                    onclick
+                                      delete-widget:modal-results
+

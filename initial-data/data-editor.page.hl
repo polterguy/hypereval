@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Creates a form that allows the user to edit contents in p5.data database.
  *
  * Requires you to be logged in as "root", but will ask the user to login,
