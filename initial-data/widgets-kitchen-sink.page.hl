@@ -1,0 +1,198 @@
+/*
+ * Creates a default page, with the default wiring.
+ *
+ * Notice, you'd probably want to save this as a "page" snippet.
+ */
+
+
+/*
+ * Creates a default page, with a header and a paragraph.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file, serious skin, and fonts.
+     *
+     * Notice, this is being done in [oninit] instead of at root of Hyperlambda file,
+     * since this would allow us to "controlify" the page later, as long as developer
+     * doesn't add any additional root nodes, beside the one that's already there -
+     * [create-widget] that is.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col-100
+          widgets
+            h1
+              class:center
+              innerValue:Header 1
+        div
+          class:col
+          widgets
+            div
+              class:bg shaded rounded air-inner
+              widgets
+                p
+                  innerValue:Some column with bg, shaded, rounded and air-inner
+                div
+                  class:strip fill
+                  widgets
+                    label
+                      innerValue:Strip label
+                    input
+                      type:text
+                      placeholder:Strip input ...
+                    button
+                      innerValue:Show modal window
+                      onclick
+
+                        /*
+                         * Creates a modal widget.
+                         */
+                        create-widgets
+                          micro.widgets.modal:modal-widget
+                            widgets
+                              h3
+                                innerValue:Header 3
+                              p
+                                innerValue:Some value
+                              div
+                                class:right
+                                widgets
+                                  button
+                                    innerValue:@"<span class=""icon-cross""></span>"
+                                    onclick
+                                      delete-widget:modal-widget
+        div
+          class:col
+          widgets
+            div
+              class:bg shaded rounded air-inner
+              widgets
+                p
+                  innerValue:Some column with shaded, rounded and air-inner
+                label
+                  widgets
+                    span
+                      innerValue:Checkbox
+                    input
+                      type:checkbox
+                      checked
+                      disabled
+                label
+                  widgets
+                    span
+                      innerValue:Another checkbox
+                    input
+                      type:checkbox
+                      checked
+                label
+                  widgets
+                    span
+                      innerValue:Radio 1
+                    input
+                      type:radio
+                      name:rdo1
+                      disabled
+                label
+                  widgets
+                    span
+                      innerValue:Radio 2
+                    input
+                      type:radio
+                      name:rdo1
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+
+            /*
+             * A Tab view widget.
+             */
+            micro.widgets.tab
+              view
+                name:Tab view 1
+                widgets
+                  h3
+                    innerValue:This is a tab view
+                  p
+                    innerValue:This is some paragraph inside the tab view
+              view
+                name:Tab view 2
+                widgets
+                  h3
+                    innerValue:This is ANOTHER tab view
+                  p
+                    innerValue:This is just another paragraph
+              view
+                name:Tab view 3
+                widgets
+
+                  /*
+                   * TreeView widget.
+                   */
+                  micro.widgets.tree
+                    items
+                      root:/
+                    .onexpand
+                      list-folders:x:/../*/_item-id?value
+                      for-each:x:/@list-folders/*?name
+                        list-folders:x:/@_dp?value
+                        split:x:/@_dp?value
+                          =:/
+                        add:x:/../*/return/*
+                          src:@"{0}:{1}"
+                            :x:/@split/0/-?name
+                            :x:/@_dp?value
+                        if:x:/@list-folders/*
+                          not
+                          add:x:/../*/return/*/items/0/-
+                            src
+                              class:tree-leaf
+                      return
+                        items
+
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+
+            /*
+             * DataGrid widget example.
+             */
+            micro.widgets.grid:my-grid
+              class:hover striped air-top
+              columns
+                Name
+                Phone
+                Address
+            button
+              innerValue:Databind grid
+              onclick
+
+                /*
+                 * Dynamically databinds the datagrid we created above.
+                 */
+                micro.widgets.grid.databind:my-grid
+                  item
+                    Name:Thomas Hansen
+                    Phone:90909090
+                    Address:Foo bar st. 57
+                  item
+                    Name:John Doe
+                    Phone:98989898
+                    Address:Foo bar st. 67
+                  item
+                    Name:Jane Doe
+                    Phone:37474747
+                    Address:Foo bar st. 77

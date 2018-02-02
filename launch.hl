@@ -9,17 +9,6 @@
 
 
 /*
- * Figuring out skin to use, and other settings.
- */
-.defaults
-  skin:serious
-select-data:x:/*/*/micro.codemirror.settings
-
-
-
-
-
-/*
  * Checking if this is a request for a specific page.
  */
 split:x:/../*/url?value

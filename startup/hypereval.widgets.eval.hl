@@ -15,7 +15,7 @@ create-event:hypereval.widgets.eval
     font-size:9.25
     theme:phosphorus
     line-numbers:bool:true
-  select-data:x:/*/*/micro.codemirror.settings
+  p5.auth.my-settings.get
 
   /*
    * Decorating widget with arguments.
@@ -39,7 +39,7 @@ create-event:hypereval.widgets.eval
   return
     container
       style:"font-size:{0}pt !important;"
-        :x:(/@select-data/*/*/font-size|/../*/.defaults/*/font-size)/$?value
+        :x:(/@p5.auth.my-settings.get/*/codemirror/*/font-size|/../*/.defaults/*/font-size)/$?value
       events
 
         /*
@@ -113,8 +113,12 @@ create-event:hypereval.widgets.eval
         /*
          * Making sure necessary Stylesheet files are included
          */
-        .theme:x:(/@select-data/*/*/theme|/../*/.defaults/*/theme)/$?value
-        p5.web.include-css-file:@MICRO/media/codemirror-all.min.css
+        .theme:x:(/@p5.auth.my-settings.get/*/codemirror/*/theme|/../*/.defaults/*/theme)/$?value
+        p5.web.include-css-file
+          @MICRO/media/codemirror/lib/codemirror.css
+          @MICRO/media/codemirror/addon/dialog/dialog.css
+          @MICRO/media/codemirror/addon/display/fullscreen.css
+          @MICRO/media/codemirror/addon/hint/show-hint.css
         p5.web.include-css-file:@MICRO/media/codemirror/theme/{0}.css
           :x:/@.theme?value
 
@@ -140,7 +144,7 @@ create-event:hypereval.widgets.eval
         /*
          * Transforming input textarea to CodeMirror instance.
          */
-        .line-numbers:x:(/@select-data/*/*/line-numbers|/../*/.defaults/*/line-numbers)/$?value
+        .line-numbers:x:(/@p5.auth.my-settings.get/*/codemirror/*/line-numbers|/../*/.defaults/*/line-numbers)/$?value
         set:x:/-?value
           to-lower:x:/./-?value.string
         p5.io.unroll-path:@HYPEREVAL/
