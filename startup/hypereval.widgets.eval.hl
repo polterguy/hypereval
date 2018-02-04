@@ -107,7 +107,18 @@ create-event:hypereval.widgets.eval
          * Including CodeMirror JavaScript.
          */
         p5.web.include-javascript-file
-          @MICRO/media/codemirror-all.min.js
+          @MICRO/media/codemirror/lib/codemirror.js
+          @MICRO/media/codemirror/addon/dialog/dialog.js
+          @MICRO/media/codemirror/addon/search/searchcursor.js
+          @MICRO/media/codemirror/addon/search/search.js
+          @MICRO/media/codemirror/addon/search/jump-to-line.js
+          @MICRO/media/codemirror/addon/edit/closebrackets.js
+          @MICRO/media/codemirror/addon/edit/trailingspace.js
+          @MICRO/media/codemirror/addon/hint/show-hint.js
+          @MICRO/media/codemirror/addon/search/match-highlighter.js
+          @MICRO/media/codemirror/addon/selection/mark-selection.js
+          @MICRO/media/codemirror/addon/selection/active-line.js
+          @MICRO/media/codemirror/addon/display/fullscreen.js
           @MICRO/media/codemirror/mode/hyperlambda/hyperlambda.min.js
 
         /*
@@ -1222,17 +1233,31 @@ p5.hypereval_input.setSize('100%', '400px');"
               oninit
 
                 /*
+                 *
+                 */
+                .defaults
+                  font-size:9.25
+                  theme:phosphorus
+                  line-numbers:bool:true
+                p5.auth.my-settings.get
+                .line-numbers:x:(/@p5.auth.my-settings.get/*/codemirror/*/line-numbers|/@.defaults/*/line-numbers)/$?value
+                set:x:/-?value
+                  to-lower:x:/./-?value.string
+
+                /*
                  * Transforming output textarea to CodeMirror instance.
                  */
-                p5.io.unroll-path:@HYPEREVAL/
+                p5.io.unroll-path:@MICRO/
                 p5.web.send-javascript:@"p5.hypereval_output = CodeMirror.fromTextArea(p5.$('hypereval-output').el, {{
 mode:'hyperlambda',
-theme:'hyperlambda',
-lineNumbers:true,
+theme:'{0}',
+lineNumbers:{1},
 styleActiveLine:true,
-path:'{0}/media/codemirror/',
+path:'{2}/media/codemirror/',
 tabSize:2,
 indentAuto:true,
 readOnly:true
 }});"
+                  :x:(/@p5.auth.my-settings.get/*/codemirror/*/theme|/../*/.defaults/*/theme)/$?value
+                  :x:/@.line-numbers?value
                   :x:/@p5.io.unroll-path?value
