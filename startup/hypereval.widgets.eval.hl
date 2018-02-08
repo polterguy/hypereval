@@ -30,7 +30,6 @@ create-event:hypereval.widgets.eval
     =:bool:false
     set:x:/../*/return/*/container/**/widgets/=chrome/.
     set:x:/../*/return/*/container/**/button/=hypereval-preview-snippet
-    set:x:/../*/return/*/container/**/oninit/*/micro.page.create-dropzone
 
   /*
    * Returning widget to caller.
@@ -87,21 +86,6 @@ create-event:hypereval.widgets.eval
          * Forward evaluate above.
          */
         .chrome:x:/../*/chrome?value
-
-        /*
-         * Making sure our page becomes a "dropzone" to allow user to upload 
-         * a Hyperlambda file (which will populate the CodeMirror module with its code).
-         */
-        p5.io.unroll-path:@HYPEREVAL/
-        split:x:/@p5.io.unroll-path?value
-          =:/
-        eval-x:x:/+/*/url
-        micro.page.create-dropzone
-          filter:hl|zip
-          multiple:false
-          url:{0}/upload
-            :x:/@split/0/-?name
-          .onfinish:@"function(){p5.$('hypereval-evaluate-snippet').raise('.onupload',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_input.getDoc().setValue(ret.code);}}});}"
 
         /*
          * Including CodeMirror JavaScript.
@@ -261,49 +245,6 @@ p5.hypereval_input.setSize('100%', '400px');"
                   title:Evaluates the Hyperlambda in your editor - Alt+E
                   style:"width:100px;"
                   onclick:@"p5.$('hypereval-evaluate-snippet').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
-                  .onupload
-
-                    /*
-                     * Invoked after uploading of file has occurred, at which point our 
-                     * session is supposed to contain the file's content.
-                     *
-                     * Hence, first we retrieve session value, before we return it to
-                     * client, which updates the value of our "input CodeMirror" widget.
-                     */
-                    p5.web.session.get:hypereval.uploaded-file
-                    p5.web.return-response-object:code
-                      src:x:/@p5.web.session.get/*?value
-
-                    /*
-                     * Deleting session object.
-                     */
-                    p5.web.session.set:hypereval.uploaded-file
-
-                    /*
-                     * Checking if this was a zip file, or a Hyperlambda file.
-                     * If zip file, we inform user that it was imported, otherwise
-                     * we give user feedback about that he'll have to evaluate or execute it.
-                     */
-                    p5.web.session.get:hypereval.file-type
-                    if:x:/-/*?value
-                      =:zip
-
-                      /*
-                       * Giving user some feedback.
-                       */
-                      p5.web.session.get:hypereval.snippet-import-count
-                      micro.windows.info:{0} snippets successfully imported
-                        :x:/@p5.web.session.get/*?value
-                        class:micro-windows-info success
-
-                    else
-
-                      /*
-                       * Giving user some feedback.
-                       */
-                      micro.windows.info:Notice, your snippet was not saved
-                        class:micro-windows-info success
-
                   .onclick
 
                     /*

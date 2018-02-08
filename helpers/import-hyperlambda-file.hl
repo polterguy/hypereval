@@ -1,0 +1,106 @@
+
+/*
+ * Imports a single Hyperlambda file into snippets database.
+ *
+ * Expects [file] being filname of Hyperlambda file to import.
+ */
+
+
+
+
+
+/*
+ * Sanity checking invocation.
+ */
+micro.lambda.contract.min:x:/..
+  file:string
+if
+  ends-with:x:/../*/file?value
+    src:.hl
+  not
+
+  /*
+   * Oops, not a Hyperlambda file.
+   */
+  throw:Unsupported file type
+
+
+
+
+
+/*
+ * Figuring out file type, first finding only filename, then its extension.
+ */
+_type
+split:x:/../*/file?value
+  =:/
+split:x:/@split/0/-?name
+  =:.
+
+
+
+
+
+/*
+ * Checking if filename ends with a snippet type ("page", "startup").
+ */
+if:x:/@split/*?count
+  >=:int:3
+  and:x:/@split/0/-2?name
+    =:page
+  or:x:/@split/0/-2?name
+    =:startup
+
+  /*
+   * "Type declaration" in filename.
+   */
+  set:x:/@_type?value
+    src:x:/@split/0/-2?name
+
+  /*
+   * Removing "type declaration" from filename, since it's also used for snippet's name.
+   */
+  set:x:/@split/0/-2
+
+
+
+
+
+/*
+ * Loads file, without conversion, to make sure we keep comments.
+ */
+load-file:x:/../*/file?value
+  convert:false
+
+
+
+
+
+/*
+ * In case filename contained an actual ".", we make sure we join it again here.
+ */
+set:x:/@split/0/-
+join:x:/@split/*
+  sep:.
+
+
+
+
+
+/*
+ * Deleting any old snippets with the same name.
+ */
+p5.mysql.delete:@"delete from snippets where name = @name"
+  @name:x:/@join?value
+
+
+
+
+
+/*
+ * Inserting our new snippet.
+ */
+p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
+  @name:x:/@join?value
+  @content:x:/@load-file/*?value
+  @type:x:/@_type?value

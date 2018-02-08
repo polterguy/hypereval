@@ -1,0 +1,124 @@
+
+/*
+ * Responsible for handling an upload request for either a zip file, or a Hyperlambda file,
+ * or any combination(s) of the above.
+ */
+
+
+
+
+
+/*
+ * Sanity checking invocation.
+ */
+micro.lambda.contract.min:x:/..
+  files
+
+
+
+
+
+/*
+ * Used to track how many snippets we are importing, to give feedback to client
+ * after import is done.
+ */
+_count:int:0
+
+
+
+
+
+/*
+ * Opening up a database connection, and associating a transaction with it.
+ */
+p5.mysql.connect:[hypereval]
+  p5.mysql.transaction.begin
+
+    /*
+     * Looping through each file supplied by caller.
+     */
+    for-each:x:/../*/files/*
+
+      /*
+       * Checking what type of file this is.
+       *
+       * Candidates are .zip and .hl.
+       */
+      split:x:/@_dp/#?value
+        =:.
+
+      /*
+       * Checking what file type currently iterated file is.
+       */
+      if:x:/@split/0/-?name
+        =:zip
+
+        /*
+         * Unzipping file.
+         */
+        unzip:x:/@_dp/#?value
+          dest:~/temp/
+
+        /*
+         * Mac OS X tends to create "funny additional" folders, which we simply remove.
+         */
+        set:x:/@unzip/*/~__MACOSX
+
+        /*
+         * Looping through each file inside of zip file, inserting content
+         * as a new snippet.
+         */
+        for-each:x:/@unzip/*?name
+
+          /*
+           * Verifying currently iterated unzipped file is a Hyperlambda file.
+           */
+          if
+            ends-with:x:/@_dp?value
+              src:.hl
+            not
+
+            /*
+             * Simply ignoring file, since it's not a Hyperlambda file.
+             *
+             * This allows us to provide README.md files, and similar additional "meta information files"
+             * in backup packages, etc ...
+             */
+            continue
+
+          /*
+           * Incrementing file counter.
+           */
+          set:x:/@_count?value
+            +:x:/@_count?value
+              _:1
+
+          /*
+           * Invoking file responsible for importing a single Hyperlambda file.
+           */
+          eval-x:x:/+/*
+          micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
+            file:x:/@_dp?value
+
+      else
+
+        /*
+         * Incrementing file counter.
+         */
+        set:x:/@_count?value
+          +:x:/@_count?value
+            _:1
+
+        /*
+         * Invoking file responsible for importing a single Hyperlambda file.
+         */
+        eval-x:x:/+/*
+        micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
+          file:x:/@_dp?value
+
+    /*
+     * Committing database transaction, and returning (total) file count to caller.
+     */
+    p5.mysql.transaction.commit
+    return:x:/@_count?value
+
