@@ -2,10 +2,6 @@
 /*
  * Retrieves the named snippet's Hyperlambda converted to a lambda object.
  * pass in [_arg] and (optionally) [type] to signal which snippet you wish to retrieve.
- *
- * Notice, will parametrize the snippet's first child with all other arguments before returning it to caller.
- * This allows you to for instance create extension widget, which are stored as snippet, and
- * parametrize these as you see fit during invocation.
  */
 create-event:hypereval.snippets.get-lambda
 
@@ -30,8 +26,6 @@ create-event:hypereval.snippets.get-lambda
     src:x:/@.signal/--/<-(/_arg|/type)
   hypereval.snippets.get
   hyper2lambda:x:/@hypereval.snippets.get?value
-  add:x:/+2
-    src:x:/@hyper2lambda/*
-  add:x:/+/0
+  add:x:/+
     src:x:/@.signal/--/<-(!/_arg!/type)
   return
