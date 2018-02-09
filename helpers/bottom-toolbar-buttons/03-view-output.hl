@@ -1,0 +1,33 @@
+
+/*
+ * View "Output" button.
+ */
+button:hypereval-view-output
+  innerValue:@"<span class=""icon-eye""></span>"
+  title:View the output code, which results from evaluating your code - Alt+V
+  onclick
+
+    /*
+     * Toggles visibility of output.
+     */
+    get-widget-property:hypereval-output-wrapper
+      visible
+    if:x:/@get-widget-property/*/*?value
+
+      /*
+       * Hiding "output" widget.
+       */
+      set-widget-property:hypereval-output-wrapper
+        visible:false
+      micro.css.delete:x:/../*/_event?value
+        class:toggled
+
+    else
+
+      /*
+       * Showing "output" widget.
+       */
+      set-widget-property:hypereval-output-wrapper
+        visible:true
+      micro.css.add:x:/../*/_event?value
+        class:toggled

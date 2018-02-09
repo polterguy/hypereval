@@ -1,0 +1,38 @@
+
+/*
+ * Evaluate Hyperlambda button.
+ */
+button:hypereval-evaluate-snippet
+  innerValue:@"<span class=""icon-flash""></span>"
+  title:Evaluates the Hyperlambda in your editor - Alt+E
+  style:"width:100px;"
+  onclick:@"p5.$('hypereval-evaluate-snippet').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
+  .onclick
+
+    /*
+     * Retrieving Hyperlambda and evaluating it.
+     */
+    .exe:node:"exe"
+    get-widget-property:hypereval-input
+      innerValue
+    hyper2lambda:x:/@get-widget-property/*/*?value
+    set:x:/@.exe/#/*
+    add:x:/@.exe/#
+      src:x:/@hyper2lambda/*
+    eval-mutable:x:/@.exe/#
+
+    /*
+     * Then converting lambda result to Hyperlambda, and returning back to client as JSON
+     */
+    lambda2hyper:x:/@.exe/#/*
+    get-widget-property:hypereval-output-wrapper
+      visible
+    if:x:/@get-widget-property/*/*?value
+      p5.web.return-response-object:code
+        src:x:/@lambda2hyper?value
+
+    /*
+     * Storing code in session, to make it more easily available.
+     */
+    p5.web.session.set:hypereval.code
+      src:x:/../*/get-widget-property/[0,1]/*/*?value

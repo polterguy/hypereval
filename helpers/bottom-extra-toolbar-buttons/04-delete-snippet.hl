@@ -1,0 +1,111 @@
+
+/*
+ * Delete snippet button.
+ */
+button:hypereval-delete-snippet
+  innerValue:@"<span class=""icon-bin""></span>"
+  title:Deletes snippet - Alt+D
+  disabled
+  oninit
+
+    /*
+     * Checking if we have a "current snippet", and if so, enabling our delete snippet button.
+     */
+    p5.web.session.get:hypereval.snippet-name
+    if:x:/-/*?value
+
+      /*
+       * There's a "current snippet" loaded in our editor.
+       */
+      delete-widget-property:hypereval-delete-snippet
+        disabled
+
+  onclick
+
+    /*
+     * Asks user to confirm action.
+     */
+    create-widgets
+      micro.widgets.modal:hypereval-confirm-snippet-deletion
+        widgets
+          h3
+            innerValue:Confirm deletion
+          p
+            innerValue:Are you sure you want to delete this snippet? This action is permanent.
+          div
+            class:right
+            widgets
+              div
+                class:strip
+                widgets
+                  button:hypereval-confirm-deletion-btn
+                    innerValue:Yes
+                    oninit
+
+                      /*
+                       * Setting initial focus to "Yes" button.
+                       */
+                      micro.page.set-focus:x:/../*/_event?value
+
+                    onclick:@"p5.$('hypereval-confirm-deletion-btn').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue('');}});return false;"
+                    .onclick
+
+                      /*
+                       * Figuring out which snippet user wants to delete, if any.
+                       */
+                      p5.web.session.get:hypereval.snippet-name
+                      if:x:/@p5.web.session.get/*?value
+                        not
+                        or:x:/@p5.web.session.get/*?value
+                          =:
+
+                        /*
+                         * Snippet is probably not saved yet.
+                         */
+                        return
+
+                      /*
+                       * Opening database, and deleting snippet from snippet collection.
+                       */
+                      p5.mysql.connect:[hypereval]
+                        p5.mysql.delete:@"delete from snippets where name = @name"
+                          @name:x:/@p5.web.session.get/*?value
+
+                      /*
+                       * Cleaning out session variables.
+                       */
+                      p5.web.session.set:hypereval.snippet-name
+                      p5.web.session.set:hypereval.code
+                      p5.web.session.set:hypereval.file-type
+
+                      /*
+                       * Making sure we disable delete snippet button, 
+                       * since there are no active snippets now.
+                       */
+                      set-widget-property:hypereval-delete-snippet
+                        disabled
+
+                      /*
+                       * Deleting modal window.
+                       */
+                      delete-widget:hypereval-confirm-snippet-deletion
+
+                      /*
+                       * Disabling preview pagebutton.
+                       */
+                      set-widget-property:hypereval-preview-snippet
+                        disabled
+
+                      /*
+                       * Setting header with empty value, changes it to its default value.
+                       */
+                      hypereval.set-header
+
+                  button
+                    innerValue:No
+                    onclick
+
+                      /*
+                       * Simply deleting modal window.
+                       */
+                      delete-widget:hypereval-confirm-snippet-deletion

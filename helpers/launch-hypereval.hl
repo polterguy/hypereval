@@ -15,7 +15,7 @@
  * Checking if Hypereval is already running, and if so, throwing an exception.
  */
 if
-  hypereval.is-running
+  hypereval.widgets.eval.is-running
   throw:Hypereval is already running
 
 
@@ -65,11 +65,73 @@ create-widget
           class:col-100
           events
 
+
             /*
              * Returns true if Hypereval is already running on page.
              */
-            hypereval.is-running
+            hypereval.widgets.eval.is-running
               return:bool:true
+
+
+            /*
+             * Helper method to programmatically load the named snippet.
+             *
+             * Expects [_arg] to have snippet's name.
+             */
+            hypereval.widgets.eval.load
+
+              /*
+               * Using API method to make it simple.
+               */
+              hypereval.snippets.get:x:/../*/_arg?value
+
+              /*
+               * Modifying textarea's and CodeMirror's values.
+               */
+              set-widget-property:hypereval-input
+                innerValue:x:/@hypereval.snippets.get?value
+              p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(`{0}`);"
+                :x:/@hypereval.snippets.get?value
+
+              /*
+               * Storing into session the snippet's name, and its code.
+               */
+              p5.web.session.set:hypereval.snippet-name
+                src:x:/../*/_arg?value
+              p5.web.session.set:hypereval.code
+                src:x:/@hypereval.snippets.get?value
+
+              /*
+               * Invoking event responsible for updating our header.
+               */
+              hypereval.set-header:x:/../*/_arg?value
+
+
+            /*
+             * Returns the current code.
+             */
+            hypereval.widgets.eval.get-code
+
+              /*
+               * Retrieving textarea's content to caller.
+               */
+              get-widget-property:hypereval-input
+                innerValue
+              return:x:/@get-widget-property/*/*?value
+
+
+            /*
+             * Sets the current code to the given [_arg].
+             */
+            hypereval.widgets.eval.set-code
+
+              /*
+               * Retrieving textarea's content to caller.
+               */
+              set-widget-property:hypereval-input
+                innerValue:x:/../*/_arg?value
+              p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(`{0}`);"
+                :x:/../*/_arg?value
 
 
             /*
@@ -79,7 +141,7 @@ create-widget
              * Unless the snippet has been saved to the database, the [type] will
              * default to "snippet" and the [name] will default to "hypereval".
              */
-            hypereval.get-current-snippet
+            hypereval.widgets.eval.get-current-snippet
 
               /*
                * Retrieving Hyperlambda from CodeMirror editor.

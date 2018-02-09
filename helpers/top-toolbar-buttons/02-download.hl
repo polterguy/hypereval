@@ -10,14 +10,14 @@ button:hypereval-download-button
     /*
      * Retrieving snippet's Hyperlambda [content], [type] and [name].
      */
-    hypereval.get-current-snippet
+    hypereval.widgets.eval.get-current-snippet
 
     /*
      * Creating a temporary file which will contain the Hyperlambda
      * from our CodeMirror widget.
      */
     save-file:~/temp/hypereval-code.hl
-      src:x:/@hypereval.get-current-snippet/*/content?value
+      src:x:/@hypereval.widgets.eval.get-current-snippet/*/content?value
 
     /*
      * Making sure we get the "Content-Disposition" (filename) correct,
@@ -27,5 +27,5 @@ button:hypereval-download-button
     micro.download.file:~/temp/hypereval-code.hl
       Content-Type:x-application/hyperlambda
       Content-Disposition:@"attachment; filename=""{0}.{1}.hl"""
-        :x:/@hypereval.get-current-snippet/*/name?value
-        :x:/@hypereval.get-current-snippet/*/type?value
+        :x:/@hypereval.widgets.eval.get-current-snippet/*/name?value
+        :x:/@hypereval.widgets.eval.get-current-snippet/*/type?value

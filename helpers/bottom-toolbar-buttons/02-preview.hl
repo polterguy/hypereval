@@ -1,0 +1,54 @@
+
+/*
+ * Preview button.
+ */
+button:hypereval-preview-snippet
+  innerValue:@"<span class=""icon-play3""></span>"
+  title:Previews your page - Alt+P
+  disabled
+  oninit
+
+    /*
+     * Initially posting the "snippet changed" event, to make sure
+     * we can preview snippet, if possible.
+     */
+    hypereval.snippet.changed
+
+  events
+
+    /*
+     * Invoked when "current snippet" has been changed, either loaded
+     * from database, or saved to database.
+     */
+    hypereval.snippet.changed
+
+      /*
+       * Checking if this is a page, and if so, enabling button.
+       */
+      p5.web.session.get:hypereval.snippet-name
+      p5.mysql.connect:[hypereval]
+        p5.mysql.scalar:"select type from snippets where name = @name"
+          @name:x:/@p5.web.session.get/*?value
+        if:x:/@p5.mysql.scalar?value
+          =:page
+          delete-widget-property:x:/../*/_event?value
+            disabled
+        else
+          set-widget-property:x:/../*/_event?value
+            disabled
+
+  onclick
+
+    /*
+     * Previewing "current snippet" in a new window.
+     */
+    p5.web.session.get:hypereval.snippet-name
+    p5.mysql.connect:[hypereval]
+      p5.mysql.scalar:"select name from snippets where name = @name and type = 'page'"
+        @name:x:/@p5.web.session.get/*?value
+      if:x:/-?value
+        not
+        return
+      p5.html.url-encode:x:/@p5.mysql.scalar?value
+      p5.web.send-javascript:@"window.open('/hypereval/{0}');"
+        :x:/@p5.html.url-encode?value
