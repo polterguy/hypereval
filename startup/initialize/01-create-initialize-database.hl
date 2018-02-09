@@ -8,7 +8,7 @@ try
 create table if not exists `snippets` (
   `name` varchar(256) collate utf8mb4_unicode_ci not null,
   `content` longtext collate utf8mb4_unicode_ci not null,
-  `type` varchar(50) collate utf8mb4_unicode_ci null default 'snippet',
+  `type` varchar(50) collate utf8mb4_unicode_ci not null default 'snippet',
   primary key (`name`),
   unique key `name_UNIQUE` (`name`)
 ) engine=InnoDB auto_increment=0 default charset=utf8mb4 collate=utf8mb4_unicode_ci;"
@@ -18,7 +18,7 @@ create table if not exists `snippets` (
      * Checking if snippets table is empty, at which point we insert everything
      * we find in our "/initial-data/" folder.
      */
-    p5.mysql.scalar:"select count(*) from snippets"
+    p5.mysql.scalar:select count(*) from snippets
     if:x:/@p5.mysql.scalar?value.long
       =:long:0
 

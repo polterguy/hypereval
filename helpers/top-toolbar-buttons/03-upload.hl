@@ -1,0 +1,23 @@
+
+/*
+ * Upload Hyperlambda button.
+ */
+micro.widgets.upload-button
+  title:Upload snippet
+  multiple
+  accept:.zip,.hl
+  .onupload
+
+    /*
+     * Invoking file responsible for handling our upload request.
+     */
+    add:x:/../*/micro.evaluate.file
+      src:x:/../*/files
+    micro.evaluate.file:@HYPEREVAL/helpers/import-files.hl
+
+    /*
+     * Providing feedback to user.
+     */
+    micro.windows.info:{0} files successfully imported
+      :x:/@micro.evaluate.file?value
+      class:micro-windows-info success

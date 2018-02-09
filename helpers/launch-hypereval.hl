@@ -12,6 +12,17 @@
 
 
 /*
+ * Checking if Hypereval is already running, and if so, throwing an exception.
+ */
+if
+  hypereval.is-running
+  throw:Hypereval is already running
+
+
+
+
+
+/*
  * Including Micro, selected skin, and font CSS file.
  */
 micro.css.include
@@ -50,7 +61,79 @@ create-widget
     div
       class:row
       widgets
-        div:hypereval-codemirror-wrapper
+        div
           class:col-100
+          events
+
+            /*
+             * Returns true if Hypereval is already running on page.
+             */
+            hypereval.is-running
+              return:bool:true
+
+
+            /*
+             * Returns current snippet, if any.
+             *
+             * Will return [content], [type] and [name].
+             * Unless the snippet has been saved to the database, the [type] will
+             * default to "snippet" and the [name] will default to "hypereval".
+             */
+            hypereval.get-current-snippet
+
+              /*
+               * Retrieving Hyperlambda from CodeMirror editor.
+               */
+              get-widget-property:hypereval-input
+                innerValue
+
+              /*
+               * Checking to see if this is a saved snippet, at which point we
+               * also return its [type] and [name].
+               *
+               * The [type] and [name] values have the default values of "hypereval" and "snippet"
+               * if the snippet is not saved into our database.
+               */
+              .defaults
+                hypereval.snippet-name:hypereval
+                type:snippet
+
+              /*
+               * Checking if snippet has been saved to database.
+               */
+              p5.web.session.get:hypereval.snippet-name
+              if:x:/@p5.web.session.get/*?value
+
+                /*
+                 * This is a saved snippet, making sure we retrieve its [type].
+                 */
+                p5.mysql.connect:[hypereval]
+
+                  /*
+                   * Selecting type from snippets table.
+                   */
+                  p5.mysql.scalar:select type from snippets where name = @name
+                    @name:x:/@p5.web.session.get/*?value
+
+                  /*
+                   * Modifying above [.defaults]/[type] accordingly.
+                   */
+                  set:x:/@.defaults/*/type?value
+                    src:x:/@p5.mysql.scalar?value
+
+              /*
+               * Returning snippet to caller.
+               */
+              eval-x:x:/+/*
+              return
+                content:x:/@get-widget-property/*/*?value
+                name:x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
+                type:x:/@.defaults/*/type?value
+              
+
           widgets
+
+            /*
+             * Our actual CodeMirror wrapper widget.
+             */
             hypereval.widgets.eval

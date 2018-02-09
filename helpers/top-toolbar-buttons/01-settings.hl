@@ -1,0 +1,13 @@
+
+/*
+ * Settings button.
+ */
+button
+  innerValue:@"<span class=""icon-cog""></span>"
+  title:Settings
+  onclick
+
+    /*
+     * Showing settings for CodeMirror module to user.
+     */
+    micro.codemirror.settings

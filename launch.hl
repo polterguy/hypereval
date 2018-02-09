@@ -1,6 +1,10 @@
 
 /*
  * File responsible for starting "Hypereval".
+ *
+ * Notice, this file also seconds as a URL resolver for evaluating "page" Hyperlambda snippets.
+ * Basically, just add the name of your snippet as the second part of the URL when loading Hypereval,
+ * and it will load that snippet as a page, instead of loading Hypereval itself.
  */
 
 
@@ -55,6 +59,6 @@ else
    * This is not a request for a specific page, hence we load up main wireframe for
    * Hypereval.
    */
-  add:x:/./*/micro.evaluate.file
+  add:x:/+
     src:x:/@.signal/--/<-
   micro.evaluate.file:@HYPEREVAL/helpers/launch-hypereval.hl
