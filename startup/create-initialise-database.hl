@@ -29,38 +29,12 @@ create table if not exists `snippets` (
        */
       list-files:@HYPEREVAL/initial-data/
         filter:.hl
-
-      /*
-       * Looping through each file from above [list-files] invocation.
-       */
       for-each:x:/@list-files/*?name
-
-        /*
-         * Figuring out type of snippet, and its name.
-         */
-        _type
-        split:x:/@_dp?value
-          =:/
-        split:x:/@split/0/-?name
-          =:.
-        if:x:/@split/*?count
-          =:int:3
-
-          /*
-           * "Type declaration" found in filename.
-           */
-          set:x:/@_type?value
-            src:x:/@split/1?name
-
-        /*
-         * Loading snippet, and inserting it into our database.
-         */
-        load-file:x:/@_dp?value
-          convert:false
-        p5.mysql.insert:"insert into snippets (name, content, type) values (@name, @content, @type)"
-          @name:x:/@split/0?name
-          @content:x:/@load-file/*?value
-          @type:x:/@_type?value
+        eval-x:x:/+/*/*
+        add:x:/./*/micro.evaluate.file
+          src
+            file:x:/@_dp?value
+        micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
 
 catch
 

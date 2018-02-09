@@ -10,7 +10,7 @@
 
 
 /*
- * Sanity checking invocation.
+ * Sanity checking arguments.
  */
 micro.lambda.contract.min:x:/..
   file:string
@@ -42,25 +42,24 @@ split:x:/@split/0/-?name
 
 
 /*
- * Checking if filename ends with a snippet type ("page", "startup").
+ * Removing "type declaration" in filename, and making sure we get the "type"
+ * correct during insert operation.
  */
-if:x:/@split/*?count
-  >=:int:3
-  and:x:/@split/0/-2?name
-    =:page
-  or:x:/@split/0/-2?name
-    =:startup
+set:x:/@_type?value
+  src:x:/@split/0/-2?name
 
-  /*
-   * "Type declaration" in filename.
-   */
-  set:x:/@_type?value
-    src:x:/@split/0/-2?name
 
-  /*
-   * Removing "type declaration" from filename, since it's also used for snippet's name.
-   */
-  set:x:/@split/0/-2
+
+
+
+/*
+ * Removing "type declaration" from filename, since it's also used for snippet's name,
+ * and removing file extension - And in case filename contained an actual ".", 
+ * we make sure we join it again here.
+ */
+set:x:/@split/0(/-2|/-)
+join:x:/@split/*
+  sep:.
 
 
 
@@ -71,17 +70,6 @@ if:x:/@split/*?count
  */
 load-file:x:/../*/file?value
   convert:false
-
-
-
-
-
-/*
- * In case filename contained an actual ".", we make sure we join it again here.
- */
-set:x:/@split/0/-
-join:x:/@split/*
-  sep:.
 
 
 
