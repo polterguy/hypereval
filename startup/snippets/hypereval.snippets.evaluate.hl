@@ -1,0 +1,76 @@
+
+/*
+ * Creates evaluate snippet Active Event.
+ *
+ * This event will allow you to evaluate a snippet by name.
+ * Pass in the name of the snippet you want to evaluate as [_arg].
+ * Optionally pass in [type] being for instance "page" or "startup".
+ */
+create-event:hypereval.snippets.evaluate
+
+  /*
+   * Separating arguments from the rest of the lambda.
+   */
+  .signal
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+  micro.lambda.contract.optional:x:/..
+    type:string
+
+  /*
+   * Checking if caller supplied an (optional) [type] declaration.
+   */
+  _type-where
+  if:x:/@.signal/--/type
+
+    /*
+     * Caller supplied an optional [type] declaration.
+     *
+     * Making sure we further parametrize SQL with requested type.
+     */
+    set:x:/@_type-where?value
+      src:" and type = @type"
+    eval-x:x:/+/*/*
+    add:x:/../*/p5.mysql.connect/*/p5.mysql.scalar
+      src
+        @type:x:/@.signal/--/type?value
+
+  /*
+   * Opening up database connection.
+   */
+  p5.mysql.connect:[hypereval]
+
+    /*
+     * Selecting Hyperlambda content for specified snippet.
+     */
+    p5.mysql.scalar:@"select content from snippets where name = @name limit 1"
+      @name:x:/../*/_arg?value
+
+    /*
+     * Checking that snippet exists.
+     */
+    if:x:/@p5.mysql.scalar?value
+      not
+      throw:No such snippet
+
+    /*
+     * Converting snippet to Hyperlambda, passing in all arguments (except _arg and type),
+     * and evaluating snippet.
+     */
+    hyper2lambda:x:/@p5.mysql.scalar?value
+    add:x:/+
+      src:x:/@.signal/--(!/_arg!/type)
+    eval:x:/@hyper2lambda
+
+    /*
+     * Returning results back to caller.
+     */
+    set:x:/./*/return?value
+      src:x:/@eval?value
+    add:x:/./*/return
+      src:x:/@eval/*
+    return

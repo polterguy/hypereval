@@ -9,7 +9,7 @@ create table if not exists `snippets` (
   `id` int(10) unsigned not null auto_increment,
   `name` varchar(256) collate utf8mb4_unicode_ci not null,
   `content` longtext collate utf8mb4_unicode_ci not null,
-  `type` varchar(50) collate utf8mb4_unicode_ci null,
+  `type` varchar(50) collate utf8mb4_unicode_ci null default 'snippet',
   primary key (`id`),
   unique key `id_UNIQUE` (`id`),
   unique key `name_UNIQUE` (`name`)

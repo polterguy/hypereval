@@ -8,36 +8,43 @@
 
 
 /*
- * Checking if this is a request for a specific page.
+ * Signal node, to separate arguments from the rest of lambda.
  */
+.signal
+
+
+
+
+
+/*
+ * Checking if this is a request for a specific "page" snippet.
+ */
+split:x:/../*/url?value
+  =:?
 split:x:/@split/0?name
   =:/
 if:x:/@split/*?count
   >:int:1
-  p5.mysql.connect:[hypereval]
-    p5.mysql.select:@"select content from snippets where name = @name and type = 'page'"
-      @name:x:/@split/1?name
+
+  /*
+   * Evaluating snippet, making sure we wrap our evaluation in a try/catch block.
+   */
+  try
 
     /*
-     * Verifying page actually exists.
+     * Invoking event responsible for evaluating the requests page snippet.
      */
-    if:x:/@p5.mysql.select/*
-      not
+    hypereval.snippets.evaluate:x:/@split/1?name
+      type:page
 
-      /*
-       * No such page.
-       */
-      p5.web.response.set-status-code:404
-      p5.web.echo:This is where URLs goes to die ...
-      return
+  catch
 
     /*
-     * Transforming Hyperlambda into lambda and evaluating it, before we return early,
-     * to avoid evaluation of the rest of the file.
+     * No such snippet found.
      */
-    hyper2lambda:x:/@p5.mysql.select/*/*/content?value
-    eval:x:/@hyper2lambda
-    return
+    p5.web.response.set-status-code:404
+    p5.web.response.set-status-description:404 - No such snippet found
+    p5.web.echo:No such snippet found
 
 else
 
@@ -46,5 +53,5 @@ else
    * Hypereval.
    */
   add:x:/./*/micro.evaluate.file
-    src:x:/../*(/chrome|/url)
+    src:x:/@.signal/--/<-
   micro.evaluate.file:@HYPEREVAL/helpers/launch-hypereval.hl

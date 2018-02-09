@@ -238,14 +238,14 @@ create-widget:hypereval-main-container
                          * Storing each filename we create, such that we know what to zip later.
                          */
                         add:x:/@.snippets
-                          src:~/temp/{0}{1}.hl
+                          src:~/temp/{0}.{1}.hl
                             :x:/@_dp/#/*/name?value
                             :x:/@_dp/#/*/type?value
 
                         /*
                          * Saving snippet to "/temp/" folder.
                          */
-                        save-file:~/temp/{0}{1}.hl
+                        save-file:~/temp/{0}.{1}.hl
                           :x:/@_dp/#/*/name?value
                           :x:/@_dp/#/*/type?value
                           src:x:/@_dp/#/*/content?value
