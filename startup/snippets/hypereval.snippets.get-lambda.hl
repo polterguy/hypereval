@@ -26,6 +26,4 @@ create-event:hypereval.snippets.get-lambda
     src:x:/@.signal/--/<-(/_arg|/type)
   hypereval.snippets.get
   hyper2lambda:x:/@hypereval.snippets.get?value
-  add:x:/+
-    src:x:/@.signal/--/<-(!/_arg!/type)
   return
