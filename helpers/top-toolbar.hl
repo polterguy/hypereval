@@ -1,0 +1,220 @@
+
+/*
+ * Top toolbar for Hypereval.
+ *
+ * Dynamically loaded and insertet into Hypereval main app.
+ */
+div:hypereval-top-toolbar
+  class:row
+  widgets
+
+    /*
+     * Wrapper widget for both H1 (header) and toolbar widget.
+     */
+    div
+      class:col-100
+      widgets
+        h1
+          innerValue:Hypereval <small>{Hyperlambda snippets evaluator}</small>
+          style:"float:left;"
+          events
+
+            /*
+             * Sets the header text of module.
+             */
+            hypereval.set-header
+
+              /*
+               * Checking if caller provided an argument, or if he simply wants
+               * to "delete" existing header value.
+               */
+              if:x:/../*/_arg?value
+                and:x:/../*/_arg?value
+                  !=:
+
+                /*
+                 * Setting h1 element's value to whatever was provided as [_arg].
+                 */
+                set-widget-property:x:/../*/_event?value
+                  innerValue:Hypereval <small>{{{0}}}</small>
+                    :x:/../*/_arg?value
+
+              else
+
+                /*
+                 * No [_arg] given, setting H1 element's value to "default value".
+                 */
+                set-widget-property:x:/../*/_event?value
+                  innerValue:Hypereval <small>{Hyperlambda snippets evaluator}</small>
+
+        /*
+         * Toolbar wrapper widget.
+         */
+        div
+          class:strip right toolbar
+          widgets
+
+            button
+              innerValue:@"<span class=""icon-cog""></span>"
+              title:Settings
+              onclick
+
+                /*
+                 * Showing settings for CM to user.
+                 */
+                micro.codemirror.settings
+
+            /*
+             * Download Hyperlambda button.
+             */
+            button:hypereval-download-button
+              innerValue:@"<span class=""icon-download2""></span>"
+              title:Download snippet
+              onclick
+
+                /*
+                 * Retrieving Hyperlambda from CodeMirror editor.
+                 */
+                get-widget-property:hypereval-input
+                  innerValue
+
+                /*
+                 * Checking if there is any code at all in current view.
+                 */
+                if
+                  trim:x:/@get-widget-property/*/*?value
+                  =:
+
+                  /*
+                   * No code in editor.
+                   */
+                  micro.windows.info:There is no code in your Hyperlambda editor
+                    class:micro-windows-info warning
+                  return
+
+                /*
+                 * Creates a temporary file containing Hyperlambda, 
+                 * and allows user to download it to his client.
+                 */
+                .defaults
+                  hypereval.snippet-name:hypereval
+                  type:.snippet
+
+                /*
+                 * Checking if this is a saved snippet, at which point we make
+                 * sure we download it with the correct name and type.
+                 */
+                p5.web.session.get:hypereval.snippet-name
+                if:x:/@p5.web.session.get/*?value
+
+                  /*
+                   * This is a saved snippet, making sure we get the type
+                   * correct as we download it to client.
+                   */
+                  p5.mysql.connect:[hypereval]
+                    p5.mysql.scalar:@"select type from snippets where name = @name"
+                      @name:x:/@p5.web.session.get/*?value
+                    if:x:/@p5.mysql.scalar?value
+                      set:x:/@.defaults/*/type?value
+                        src:.{0}
+                          :x:/@p5.mysql.scalar?value
+
+                /*
+                 * Creating a temporary file which will contain the Hyperlambda
+                 * from our CodeMirror widget.
+                 */
+                save-file:~/temp/hypereval-code.hl
+                  src:x:/@get-widget-property/*/*?value
+
+                /*
+                 * Making sure we get the "Content-Disposition" (filename) correct,
+                 * before we download the actual file.
+                 */
+                eval-x:x:/+/*/Content-Disposition
+                micro.download.file:~/temp/hypereval-code.hl
+                  Content-Type:x-application/hyperlambda
+                  Content-Disposition:@"attachment; filename=""{0}{1}.hl"""
+                    :x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
+                    :x:/@.defaults/*/type?value
+
+            /*
+             * Upload Hyperlambda button.
+             */
+            micro.widgets.upload-button
+              title:Upload snippet
+              multiple
+              accept:.zip,.hl
+              .onupload
+
+                /*
+                 * Invoking file responsible for handling our upload request.
+                 */
+                add:x:/../*/micro.evaluate.file
+                  src:x:/../*/files
+                micro.evaluate.file:@HYPEREVAL/helpers/import-files.hl
+
+                /*
+                 * Providing feedback to user.
+                 */
+                micro.windows.info:{0} files successfully imported
+                  :x:/@micro.evaluate.file?value
+                  class:micro-windows-info success
+
+            /*
+             * Export all snippets button.
+             */
+            button
+              innerValue:@"<span class=""icon-file-zip""></span>"
+              title:Exports snippets
+              onclick
+
+                /*
+                 * Exports all snippets to a zip file.
+                 * First we select all snippets, and create one Hyperlambda file
+                 * for each, and save to our temporary folder.
+                 */
+                .snippets
+                p5.mysql.connect:[hypereval]
+
+                  /*
+                   * Looping through each snippet from above SQL select result.
+                   */
+                  p5.mysql.select:@"select * from snippets"
+                  for-each:x:/@p5.mysql.select/*
+
+                    /*
+                     * Storing each filename we create, such that we know what to zip later.
+                     */
+                    add:x:/@.snippets
+                      src:~/temp/{0}.{1}.hl
+                        :x:/@_dp/#/*/name?value
+                        :x:/@_dp/#/*/type?value
+
+                    /*
+                     * Saving snippet to "/temp/" folder.
+                     */
+                    save-file:~/temp/{0}.{1}.hl
+                      :x:/@_dp/#/*/name?value
+                      :x:/@_dp/#/*/type?value
+                      src:x:/@_dp/#/*/content?value
+
+                /*
+                 * Creating a zip file of each file, and downloading
+                 * it to client.
+                 */
+                zip:~/temp/hypereval-export.zip
+                  src:x:/@.snippets/*?name
+                micro.download.file:x:/@zip?value
+                  Content-Type:application/zip
+                  Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
+
+            button
+              innerValue:@"<span class=""icon-home3""></span>"
+              title:Close Hypereval
+              onclick
+
+                /*
+                 * Redirecting user to server's root URL.
+                 */
+                p5.web.get-root-location
+                p5.web.set-location:x:/-?value
