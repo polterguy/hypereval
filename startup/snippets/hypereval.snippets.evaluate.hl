@@ -5,6 +5,10 @@
  * This event will allow you to evaluate a snippet by name.
  * Pass in the name of the snippet you want to evaluate as [_arg].
  * Optionally pass in [type] being for instance "page" or "startup".
+ *
+ * Notice, this event allows for creating extension widgets that returns
+ * widgets to caller, allowing for the evaluation of a snippet, to create
+ * an extension widget.
  */
 create-event:hypereval.snippets.evaluate
 

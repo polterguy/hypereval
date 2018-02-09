@@ -38,7 +38,7 @@ button
           src:x:/@_dp/#/*/content?value
 
     /*
-     * Creating a zip file of each file, and downloading
+     * Creating a zip containing all snippets, and downloading
      * it to client.
      */
     zip:~/temp/hypereval-export.zip

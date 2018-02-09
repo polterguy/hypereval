@@ -53,7 +53,7 @@ create-event:hypereval.snippets.search
      *
      * Making sure we use a "like" SQL criteria.
      */
-    p5.mysql.select:@"select name from snippets where name like @name {0} limit @limit offset @offset"
+    p5.mysql.select:@"select name, type from snippets where name like @name {0} limit @limit offset @offset"
       :x:/@_where?value
       @name:%{0}%
         :x:/../*/_arg?value
@@ -61,8 +61,14 @@ create-event:hypereval.snippets.search
       @limit:x:(/../*/limit|/@.defaults/*/limit)/$?value
 
     /*
-     * Returning the full name of all snippets matching the specified criteria.
+     * Returning the full name and type of all snippets matching the specified criteria
+     * to caller.
      */
-    add:x:/+
-      src:x:/@p5.mysql.select/*/*/name
-    return
+    for-each:x:/@p5.mysql.select/*
+      set:x:/+2/*/*?name
+        src:x:/@_dp/#/*/name?value
+      eval-x:x:/+/*/*
+      add:x:/../*/return
+        src
+          foo:x:/@_dp/#/*/type?value
+  return

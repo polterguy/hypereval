@@ -4,6 +4,9 @@
  *
  * Expects [file] being filname of Hyperlambda file to import, in addition to
  * an open database connection.
+ *
+ * Notice, the filename has a convention, which is "snippet.name.foo.xxx.hl",
+ * where "xxx" is its "type".
  */
 
 
@@ -15,6 +18,14 @@
  */
 micro.lambda.contract.min:x:/..
   file:string
+
+
+
+
+
+/*
+ * Verify that caller is not trying to import something that's not a Hyperlambda file.
+ */
 if
   ends-with:x:/../*/file?value
     src:.hl
@@ -31,34 +42,18 @@ if
 
 
 /*
- * Figuring out file type, first finding only filename, then its extension.
+ * Figuring out file type and snippet's name.
+ *
+ * Notice, we do this by removing the file extension, and the snippet's type declaration,
+ * which are supposed to be a part of the snippet's filename by convention.
  */
 _type
 split:x:/../*/file?value
   =:/
 split:x:/@split/0/-?name
   =:.
-
-
-
-
-
-/*
- * Removing "type declaration" in filename, and making sure we get the "type"
- * correct during insert operation.
- */
 set:x:/@_type?value
   src:x:/@split/0/-2?name
-
-
-
-
-
-/*
- * Removing "type declaration" from filename, since it's also used for snippet's name,
- * and removing file extension - And in case filename contained an actual ".", 
- * we make sure we join it again here.
- */
 set:x:/@split/0(/-2|/-)
 join:x:/@split/*
   sep:.

@@ -4,8 +4,9 @@
  *
  * It expects the snippet's name to be given as [_arg], and its Hyperlambda to
  * be found in [content]. In addition, you can optionally pass in [type] being
- * the type of snippet, which must be either "page", "startup" or "snippet".
- *  The default [type] is "snippet".
+ * the type of snippet, which can be e.g. "page", "startup" or "snippet".
+ *
+ * The default [type] is "snippet".
  */
 create-event:hypereval.snippets.save
 

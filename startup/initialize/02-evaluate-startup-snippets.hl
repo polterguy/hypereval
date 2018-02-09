@@ -28,5 +28,5 @@ p5.mysql.connect:[hypereval]
     catch
 
       /*
-       * Do nothing, simply allow iteration to continue ...
+       * Do nothing, to simply allow iteration to continue ...
        */

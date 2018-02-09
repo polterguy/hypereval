@@ -28,11 +28,9 @@ create table if not exists `snippets` (
       list-files:@HYPEREVAL/initial-data/
         filter:.hl
       for-each:x:/@list-files/*?name
-        eval-x:x:/+/*/*
-        add:x:/./*/micro.evaluate.file
-          src
-            file:x:/@_dp?value
+        eval-x:x:/+/*
         micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
+          file:x:/@_dp?value
 
 catch
 

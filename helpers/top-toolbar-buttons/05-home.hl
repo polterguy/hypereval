@@ -2,13 +2,15 @@
 /*
  * Home button.
  */
-button
+a
+  class:button
   innerValue:@"<span class=""icon-home3""></span>"
   title:Close Hypereval
-  onclick
+  oninit
 
     /*
-     * Redirecting user to server's root URL.
+     * Retrieving root URL for Phosphorus Five, and setting the href attribute accordingly.
      */
     p5.web.get-root-location
-    p5.web.set-location:x:/-?value
+    set-widget-property:x:/../*/_event?value
+      href:x:/@p5.web.get-root-location?value
