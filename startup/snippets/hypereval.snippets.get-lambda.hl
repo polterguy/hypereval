@@ -1,0 +1,37 @@
+
+/*
+ * Retrieves the named snippet's Hyperlambda converted to a lambda object.
+ * pass in [_arg] and (optionally) [type] to signal which snippet you wish to retrieve.
+ *
+ * Notice, will parametrize the snippet's first child with all other arguments before returning it to caller.
+ * This allows you to for instance create extension widget, which are stored as snippet, and
+ * parametrize these as you see fit during invocation.
+ */
+create-event:hypereval.snippets.get-lambda
+
+  /*
+   * Separating arguments from the rest of the lambda.
+   */
+  .signal
+
+  /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+  micro.lambda.contract.optional:x:/..
+    type:string
+
+  /*
+   * Invoking [get] snippet event, transforming return value to lambda, and returning
+   * lambda to caller.
+   */
+  add:x:/+
+    src:x:/@.signal/--/<-(/_arg|/type)
+  hypereval.snippets.get
+  hyper2lambda:x:/@hypereval.snippets.get?value
+  add:x:/+2
+    src:x:/@hyper2lambda/*
+  add:x:/+/0
+    src:x:/@.signal/--/<-(!/_arg!/type)
+  return

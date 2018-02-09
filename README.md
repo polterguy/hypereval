@@ -15,7 +15,7 @@ The snippets it creates are stored in a MySQL database, and Hypereval features a
 for retrieving snippets, evaluating them, creating snippets, etc. See the list of Active Events
 below.
 
-* __[hypereval.snippets.create]__ - Creates a new snippet. Pass in [content] as Hyperlambda, and [_arg] as snippet name. Notice, will overwrite existing snippets with the same name.
+* __[hypereval.snippets.save]__ - Creates or updates a snippet. Pass in [content] as Hyperlambda, and [_arg] as snippet name.
 * __[hypereval.snippets.delete]__ - Deletes the given [_arg] snippet. Pass in snippet's name as [_arg].
 * __[hypereval.snippets.evaluate]__ - Evaluates the given [_arg] snippet, with the given arguments, returning the results of the evaluation.
 * __[hypereval.snippets.get]__ - Returns the given [_arg] snippet's Hyperlambda code.

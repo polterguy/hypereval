@@ -100,7 +100,8 @@ p5.mysql.connect:[hypereval]
           micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
             file:x:/@_dp?value
 
-      else
+      else-if:x:/@split/0/-?name
+        =:hl
 
         /*
          * Incrementing file counter.
@@ -115,6 +116,14 @@ p5.mysql.connect:[hypereval]
         eval-x:x:/+/*
         micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
           file:x:/@_dp?value
+
+      else
+
+        /*
+         * Unsupported file extension.
+         */
+        throw:'{0}' is an unsupported file type
+          :x:/@split/0/-?name
 
     /*
      * Committing database transaction, and returning (total) file count to caller.

@@ -7,7 +7,7 @@
  * the type of snippet, which must be either "page", "startup" or "snippet".
  *  The default [type] is "snippet".
  */
-create-event:hypereval.snippets.create
+create-event:hypereval.snippets.save
 
   /*
    * Sanity checking arguments.

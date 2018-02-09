@@ -203,7 +203,7 @@ create-widget:hypereval-main-container
                      */
                     add:x:/../*/micro.evaluate.file
                       src:x:/../*/files
-                    micro.evaluate.file:@HYPEREVAL/helpers/import-file.hl
+                    micro.evaluate.file:@HYPEREVAL/helpers/import-files.hl
 
                     /*
                      * Providing feedback to user.

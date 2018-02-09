@@ -2,7 +2,8 @@
 /*
  * Imports a single Hyperlambda file into snippets database.
  *
- * Expects [file] being filname of Hyperlambda file to import.
+ * Expects [file] being filname of Hyperlambda file to import, in addition to
+ * an open database connection.
  */
 
 
@@ -22,7 +23,8 @@ if
   /*
    * Oops, not a Hyperlambda file.
    */
-  throw:Unsupported file type
+  throw:'{0}' is an unsupported file type
+    :x:/../*/file?value
 
 
 
@@ -76,19 +78,9 @@ load-file:x:/../*/file?value
 
 
 /*
- * Deleting any old snippets with the same name.
- */
-p5.mysql.delete:@"delete from snippets where name = @name"
-  @name:x:/@join?value
-
-
-
-
-
-/*
  * Inserting our new snippet.
  */
-p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
+p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type) on duplicate key update content = @content, type = @type"
   @name:x:/@join?value
   @content:x:/@load-file/*?value
   @type:x:/@_type?value

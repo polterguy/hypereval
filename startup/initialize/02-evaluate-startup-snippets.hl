@@ -1,0 +1,32 @@
+
+/*
+ * Evaluating all "startup snippets".
+ *
+ * First connecting to database.
+ */
+p5.mysql.connect:[hypereval]
+
+  /*
+   * Selecting all "startup" snippets from database.
+   */
+  p5.mysql.select:@"select content from snippets where type = 'startup'"
+
+  /*
+   * Looping through each "startup" snippet, and evaluating it.
+   */
+  for-each:x:/@p5.mysql.select/*/*/content?value
+
+    /*
+     * Notice, in case there's an exception being thrown during evaluation of
+     * currently iterated "startup" snippet, we wrap our evaluation inside of
+     * a try/catch block, to avoid having this error prevent other snippets
+     * from being evaluated.
+     */
+    try
+      hyper2lambda:x:/@_dp?value
+      eval:x:/@hyper2lambda
+    catch
+
+      /*
+       * Do nothing, simply allow iteration to continue ...
+       */

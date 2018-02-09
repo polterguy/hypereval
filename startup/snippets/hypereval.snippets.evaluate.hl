@@ -14,6 +14,14 @@ create-event:hypereval.snippets.evaluate
   .signal
 
   /*
+   * Sanity checking arguments.
+   */
+  micro.lambda.contract.min:x:/..
+    _arg:string
+  micro.lambda.contract.optional:x:/..
+    type:string
+
+  /*
    * Retrieving snippet.
    */
   add:x:/+
