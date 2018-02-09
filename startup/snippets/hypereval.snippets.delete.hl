@@ -18,3 +18,10 @@ create-event:hypereval.snippets.delete
   p5.mysql.connect:[hypereval]
     p5.mysql.delete:@"delete from snippets where name = @name"
       @name:x:/../*/_arg?value
+
+    /*
+     * Verifying caller provided an actual existing snippet.
+     */
+    if:x:/@p5.mysql.delete?value
+      !=:int:1
+      throw:No such snippet

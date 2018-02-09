@@ -27,7 +27,10 @@ if:x:/@split/*?count
   >:int:1
 
   /*
-   * Evaluating snippet, making sure we wrap our evaluation in a try/catch block.
+   * This is a request for a "page snippet".
+   *
+   * Evaluating snippet, making sure we wrap our evaluation in a try/catch block,
+   * such that we can return intelligent error feedback to client if snippet doesn't exist.
    */
   try
 

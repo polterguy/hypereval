@@ -14,63 +14,26 @@ create-event:hypereval.snippets.evaluate
   .signal
 
   /*
-   * Sanity checking arguments.
+   * Retrieving snippet.
    */
-  micro.lambda.contract.min:x:/..
-    _arg:string
-  micro.lambda.contract.optional:x:/..
-    type:string
+  add:x:/+
+    src:x:/@.signal/--/<-(/type|/_arg)
+  hypereval.snippets.get
 
   /*
-   * Checking if caller supplied an (optional) [type] declaration.
+   * Converting snippet to Hyperlambda, passing in all arguments (except _arg and type),
+   * and evaluating snippet.
    */
-  _type-where
-  if:x:/@.signal/--/type
-
-    /*
-     * Caller supplied an optional [type] declaration.
-     *
-     * Making sure we further parametrize SQL with requested type.
-     */
-    set:x:/@_type-where?value
-      src:" and type = @type"
-    eval-x:x:/+/*/*
-    add:x:/../*/p5.mysql.connect/*/p5.mysql.scalar
-      src
-        @type:x:/@.signal/--/type?value
+  hyper2lambda:x:/@hypereval.snippets.get?value
+  add:x:/+
+    src:x:/@.signal/--(!/_arg!/type)
+  eval:x:/@hyper2lambda
 
   /*
-   * Opening up database connection.
+   * Returning results back to caller.
    */
-  p5.mysql.connect:[hypereval]
-
-    /*
-     * Selecting Hyperlambda content for specified snippet.
-     */
-    p5.mysql.scalar:@"select content from snippets where name = @name limit 1"
-      @name:x:/../*/_arg?value
-
-    /*
-     * Checking that snippet exists.
-     */
-    if:x:/@p5.mysql.scalar?value
-      not
-      throw:No such snippet
-
-    /*
-     * Converting snippet to Hyperlambda, passing in all arguments (except _arg and type),
-     * and evaluating snippet.
-     */
-    hyper2lambda:x:/@p5.mysql.scalar?value
-    add:x:/+
-      src:x:/@.signal/--(!/_arg!/type)
-    eval:x:/@hyper2lambda
-
-    /*
-     * Returning results back to caller.
-     */
-    set:x:/./*/return?value
-      src:x:/@eval?value
-    add:x:/./*/return
-      src:x:/@eval/*
-    return
+  set:x:/./*/return?value
+    src:x:/@eval?value
+  add:x:/./*/return
+    src:x:/@eval/*
+  return

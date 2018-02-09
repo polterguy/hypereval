@@ -2,7 +2,10 @@
 /*
  * Creates search for snippet Active Event.
  *
- * This event will allow you to search for a snippet matching the specified [_arg].
+ * This event will allow you to search for snippets containing the specified [_arg]
+ * in its name.
+ *
+ * Optionally pass in [type], [limit] and/or [offset] to further parametrize your query.
  */
 create-event:hypereval.snippets.search
 
@@ -12,31 +15,54 @@ create-event:hypereval.snippets.search
   micro.lambda.contract.min:x:/..
     _arg:string
   micro.lambda.contract.optional:x:/..
-    type
+    type:string
+    offset:long
+    limit:long
 
   /*
-   * Opening up database connection, selecting snippet, and evaluating it.
-   *
-   * Making sure we check if caller supplied a [type] argument, and accommodate 
+   * Default arguments.
+   */
+  .defaults
+    offset:long:0
+    limit:int:10
+
+  /*
+   * Making sure we check if caller supplied a [type] argument, and accommodating 
    * for it if it was supplied.
    */
   _where
-  if:x:/../*/type
-    if:x:/../*/type?value
-      not
-      set:x:/@_where?value
-        src:"and type is null"
-    else
-      set:x:/@_where?value
-        src:"and type = @type"
-      add:x:/../*/p5.mysql.connect/*/p5.mysql.select
-        src
-          @type:x:/../*/type?value
+  if:x:/../*/type?value
+
+    /*
+     * Caller provided a [type] argument, making sure we further parametrize SQL
+     * to accommodate for [type] criteria.
+     */
+    set:x:/@_where?value
+      src:"and type = @type"
+    add:x:/../*/p5.mysql.connect/*/p5.mysql.select
+      src
+        @type:x:/../*/type?value
+
+  /*
+   * Opening up database connection.
+   */
   p5.mysql.connect:[hypereval]
-    p5.mysql.select:@"select name from snippets where name like @name {0}"
+
+    /*
+     * Selecting all snippets matching the specified criteria.
+     *
+     * Making sure we use a "like" SQL criteria.
+     */
+    p5.mysql.select:@"select name from snippets where name like @name {0} limit @limit offset @offset"
       :x:/@_where?value
       @name:%{0}%
         :x:/../*/_arg?value
+      @offset:x:(/../*/offset|/@.defaults/*/offset)/$?value
+      @limit:x:(/../*/limit|/@.defaults/*/limit)/$?value
+
+    /*
+     * Returning the full name of all snippets matching the specified criteria.
+     */
     add:x:/+
       src:x:/@p5.mysql.select/*/*/name
     return

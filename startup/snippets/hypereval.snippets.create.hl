@@ -4,7 +4,8 @@
  *
  * It expects the snippet's name to be given as [_arg], and its Hyperlambda to
  * be found in [content]. In addition, you can optionally pass in [type] being
- * the type of snippet, which must be either "page" or "startup".
+ * the type of snippet, which must be either "page", "startup" or "snippet".
+ *  The default [type] is "snippet".
  */
 create-event:hypereval.snippets.create
 
@@ -16,27 +17,25 @@ create-event:hypereval.snippets.create
     content:string
   micro.lambda.contract.optional:x:/..
     type:string
-  if:x:/../*/type?value
-    switch:x:/../*/type?value
-      case:page
-      case:startup
-
-        /*
-         * Legal type.
-         */
-        .foo
-      default
-        throw:'{0}' is not a legal type
-          :x:/../*/type?value
 
   /*
-   * Opening up database connection, and inserting snippet, making sure we delete
-   * any old snippets with the same name.
+   * Making sure snippet is a valid piece of Hyperlambda.
+   *
+   * This event invocation will throw and exception, if snippet is not valid Hyperlambda.
+   */
+  hyper2lambda:x:/../*/content?value
+
+  /*
+   * Opening up database connection, and wrapping our insert operation in a
+   * database transaction, to avoid deletion of old snippet, without successful
+   * insert of new snippet.
    */
   p5.mysql.connect:[hypereval]
-    p5.mysql.delete:@"delete from snippets where name = @name"
-      @name:x:/../*/_arg?value
-    p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
+
+    /*
+     * Inserting new snippet.
+     */
+    p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type) on duplicate key update content = @content, type = @type"
       @name:x:/../*/_arg?value
       @content:x:/../*/content?value
       @type:x:/../*/type?value
