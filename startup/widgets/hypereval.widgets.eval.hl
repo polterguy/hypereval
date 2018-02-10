@@ -282,20 +282,6 @@ create-event:hypereval.widgets.eval
 
 
         /*
-         * Helper event to programatically close load snippet window.
-         */
-        hypereval.widgets.eval.close-load-window
-
-          /*
-           * Closing modal window, if it exists.
-           */
-          if
-            fetch:x:/0/0?value
-              widget-exists:hypereval-manage-snippets
-            delete-widget:hypereval-manage-snippets
-
-
-        /*
          * Helper event to download current code snippet.
          */
         hypereval.widgets.eval.download-current-snippet
