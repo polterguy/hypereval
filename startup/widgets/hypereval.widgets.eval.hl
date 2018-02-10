@@ -271,6 +271,17 @@ create-event:hypereval.widgets.eval
 
 
         /*
+         * Helper event to programmatically open save snippet window.
+         */
+        hypereval.widgets.eval.show-save-window
+
+          /*
+           * To make it simple, we simply "click" "load snippet button" programmatically.
+           */
+          micro.evaluate.file:@HYPEREVAL/helpers/save-snippet.hl
+
+
+        /*
          * Helper event to programatically close load snippet window.
          */
         hypereval.widgets.eval.close-load-window
