@@ -1,10 +1,5 @@
-
 /*
  * Starts main "Hypereval" app.
- *
- * Notice, pass in [chrome] and set its value to "false" if you wish to instantiate
- * app with minimum chrome, to allow for it to be functioning as a "plugin" for
- * other apps.
  */
 
 
@@ -32,21 +27,9 @@ micro.css.include
 
 
 /*
- * Checking if this is a "chrome less" instantiation.
- *
- * This allows us to support loading the entire module without its additional "chrome", to
- * have it function as a "user control".
+ * Setting title of page.
  */
-if:x:/../*/chrome?value
-  !=:bool:false
-
-  /*
-   * Setting title of page.
-   */
-  p5.web.page.set-title:Hypereval
-  load-file:@HYPEREVAL/helpers/top-toolbar.hl
-  insert-before:x:/../*/create-widget/*/widgets/*/div
-    src:x:/@load-file/*/*
+p5.web.page.set-title:Hypereval
 
 
 
@@ -61,247 +44,59 @@ create-widget
     div
       class:row
       widgets
+
+        /*
+         * Wrapper widget for both H1 (header) and toolbar widget.
+         */
         div
           class:col-100
-          events
-
-
-            /*
-             * Returns true if Hypereval is already running on page.
-             */
-            hypereval.widgets.eval.is-running
-
-              /*
-               * Simply returning true to caller, since (obviously) Hypereval
-               * is running.
-               */
-              return:bool:true
-
-
-            /*
-             * Helper method to programmatically load the named snippet.
-             *
-             * Expects [_arg] to have snippet's name.
-             */
-            hypereval.widgets.eval.load-snippet
-
-              /*
-               * Sanity checking arguments.
-               */
-              micro.lambda.contract.min:x:/..
-                _arg:string
-
-              /*
-               * Using API method to make it simple.
-               */
-              hypereval.snippets.load:x:/../*/_arg?value
-
-              /*
-               * Modifying textarea's and CodeMirror's values.
-               */
-              hypereval.widgets.eval.set-code:x:/@hypereval.snippets.load?value
-
-              /*
-               * Storing the snippet's name in our session.
-               */
-              p5.web.session.set:hypereval.snippet-name
-                src:x:/../*/_arg?value
-
-              /*
-               * Enabling delete snippet button.
-               */
-              delete-widget-property:hypereval-delete-snippet
-                disabled
-
-              /*
-               * Invoking event responsible for updating our header.
-               */
-              hypereval.set-header:x:/../*/_arg?value
-
-              /*
-               * Signaling that current snippet was changed.
-               */
-              hypereval.widgets.eval.active-snippet-changed
-
-
-            /*
-             * Helper method to programmatically save the current snippet.
-             *
-             * Expects [_arg] to have snippet's name and [type] being type of snippet.
-             */
-            hypereval.widgets.eval.save-snippet
-
-              /*
-               * Sanity checking arguments.
-               */
-              micro.lambda.contract.min:x:/..
-                _arg:string
-                type:string
-
-              /*
-               * Verifying there actually is any code.
-               */
-              get-widget-property:hypereval-input
-                innerValue
-
-              /*
-               * Inserting snippet into database.
-               */
-              eval-x:x:/+/*
-              hypereval.snippets.save:x:/../*/_arg?value
-                type:x:/../*/type?value
-                content:x:/@get-widget-property/*/*?value
-
-              /*
-               * Making sure we store name used is session, in case
-               * user wants to save the same snippet again.
-               */
-              p5.web.session.set:hypereval.snippet-name
-                src:x:/../*/_arg?value
-
-              /*
-               * Invoking event responsible for updating our header.
-               */
-              hypereval.set-header:x:/../*/_arg?value
-
-              /*
-               * Making sure we enable "delete snippet button",
-               * since there is an active snippet now.
-               */
-              delete-widget-property:hypereval-delete-snippet
-                disabled
-
-              /*
-               * Signaling that snippet was changed.
-               */
-              hypereval.widgets.eval.active-snippet-changed
-
-              /*
-               * Providing some feedback to user.
-               */
-              micro.windows.info:Snippet was successfully saved
-                class:micro-windows-info success
-
-
-            /*
-             * Returns the current code from CoreMirror editor.
-             */
-            hypereval.widgets.eval.get-code
-
-              /*
-               * Retrieving textarea's content to caller.
-               */
-              get-widget-property:hypereval-input
-                innerValue
-              return:x:/@get-widget-property/*/*?value
-
-
-            /*
-             * Sets the current current CodeMirror editor's code to the given [_arg].
-             */
-            hypereval.widgets.eval.set-code
-
-              /*
-               * Sanity checking code, to make sure it's actually a valid piece of Hyperlambda.
-               *
-               * Notice, this invocation will throw an exception if code is not valid Hyperlambda.
-               */
-              hyper2lambda:x:/../*/_arg?value
-
-              /*
-               * Retrieving textarea's content to caller.
-               */
-              set-widget-property:hypereval-input
-                innerValue:x:/../*/_arg?value
-              p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(p5.$('hypereval-input').el.value);"
-
-
-            /*
-             * Returns current snippet, if any.
-             *
-             * Will return [content], [type] and [name].
-             * Unless the snippet has been saved to the database, the [type] will
-             * default to "snippet" and the [name] will default to "hypereval".
-             */
-            hypereval.widgets.eval.get-current-snippet
-
-              /*
-               * Retrieving Hyperlambda from CodeMirror editor.
-               */
-              get-widget-property:hypereval-input
-                innerValue
-
-              /*
-               * Checking to see if this is a saved snippet, at which point we
-               * also return its [type] and [name].
-               *
-               * The [type] and [name] values have the default values of "hypereval" and "snippet"
-               * if the snippet is not saved into our database.
-               */
-              .defaults
-                hypereval.snippet-name:hypereval
-                type:snippet
-
-              /*
-               * Checking if snippet has been saved to database.
-               */
-              p5.web.session.get:hypereval.snippet-name
-              if:x:/@p5.web.session.get/*?value
+          widgets
+            h1
+              innerValue:Hypereval <small>{Hyperlambda snippets evaluator}</small>
+              style:"float:left;"
+              events
 
                 /*
-                 * This is a saved snippet, making sure we retrieve its [type].
+                 * Sets the header text of module.
                  */
-                p5.mysql.connect:[hypereval]
+                hypereval.set-header
 
                   /*
-                   * Selecting type from snippets table.
+                   * Checking if caller provided an argument, or if he simply wants
+                   * to "delete" existing header value.
                    */
-                  p5.mysql.scalar:select type from snippets where name = @name
-                    @name:x:/@p5.web.session.get/*?value
+                  if:x:/../*/_arg?value
+                    and:x:/../*/_arg?value
+                      !=:
 
-                  /*
-                   * Modifying above [.defaults]/[type] accordingly.
-                   */
-                  set:x:/@.defaults/*/type?value
-                    src:x:/@p5.mysql.scalar?value
+                    /*
+                     * Setting h1 element's value to whatever was provided as [_arg].
+                     */
+                    set-widget-property:x:/../*/_event?value
+                      innerValue:Hypereval <small>{{{0}}}</small>
+                        :x:/../*/_arg?value
 
+                  else
 
-              /*
-               * Returning snippet to caller.
-               */
-              eval-x:x:/+/*
-              return
-                content:x:/@get-widget-property/*/*?value
-                name:x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
-                type:x:/@.defaults/*/type?value
+                    /*
+                     * No [_arg] given, setting H1 element's value to "default value".
+                     */
+                    set-widget-property:x:/../*/_event?value
+                      innerValue:Hypereval <small>{Hyperlambda snippets evaluator}</small>
 
 
             /*
-             * Helper event to programmatically open load snippet window.
+             * Toolbar wrapper widget.
              */
-            hypereval.widgets.eval.show-load-window
+            micro.widgets.folder-plugin
+              class:strip right toolbar
+              folder:@HYPEREVAL/helpers/top-toolbar-buttons/
 
-              /*
-               * To make it simple, we simply "click" "load snippet button" programmatically.
-               */
-              p5.web.widgets.ajax-events.raise:hypereval-load-snippet
-                onclick
-
-
-            /*
-             * Helper event to programatically close load snippet window.
-             */
-            hypereval.widgets.eval.close-load-window
-
-              /*
-               * Closing modal window, if it exists.
-               */
-              if
-                fetch:x:/0/0?value
-                  widget-exists:hypereval-manage-snippets
-                delete-widget:hypereval-manage-snippets
-              
-
+    div
+      class:row
+      widgets
+        div
+          class:col-100
           widgets
 
             /*
