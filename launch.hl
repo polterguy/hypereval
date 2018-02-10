@@ -23,11 +23,8 @@
 /*
  * Checking if this is a request for a specific "page" snippet.
  */
-split:x:/../*/url?value
-  =:?
-split:x:/@split/0?name
-  =:/
-if:x:/@split/*?count
+micro.url.get-entities
+if:x:/@micro.url.get-entities/*?count
   >:int:1
 
   /*
@@ -41,7 +38,7 @@ if:x:/@split/*?count
     /*
      * Invoking event responsible for evaluating the requests page snippet.
      */
-    hypereval.snippets.evaluate:x:/@split/1?name
+    hypereval.snippets.evaluate:x:/@micro.url.get-entities/1?name
       type:page
 
   catch

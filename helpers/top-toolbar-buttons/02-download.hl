@@ -8,24 +8,6 @@ button:hypereval-download-button
   onclick
 
     /*
-     * Retrieving snippet's Hyperlambda [content], [type] and [name].
+     * Using API event to download snippet.
      */
-    hypereval.widgets.eval.get-current-snippet
-
-    /*
-     * Creating a temporary file which will contain the Hyperlambda
-     * from our CodeMirror widget.
-     */
-    save-file:~/temp/hypereval-code.hl
-      src:x:/@hypereval.widgets.eval.get-current-snippet/*/content?value
-
-    /*
-     * Making sure we get the "Content-Disposition" (filename) correct,
-     * before we download the actual file.
-     */
-    eval-x:x:/+/*/Content-Disposition
-    micro.download.file:~/temp/hypereval-code.hl
-      Content-Type:x-application/hyperlambda
-      Content-Disposition:@"attachment; filename=""{0}.{1}.hl"""
-        :x:/@hypereval.widgets.eval.get-current-snippet/*/name?value
-        :x:/@hypereval.widgets.eval.get-current-snippet/*/type?value
+    hypereval.widgets.eval.download-current-snippet

@@ -8,7 +8,9 @@ button:hypereval-view-output
   onclick
 
     /*
-     * Toggles visibility of output.
+     * Checking if output CodeMirror editor is already visible.
+     *
+     * Notice, this button will "toggle" the visibility of our CodeMirror output widget.
      */
     get-widget-property:hypereval-output-wrapper
       visible
@@ -19,6 +21,10 @@ button:hypereval-view-output
        */
       set-widget-property:hypereval-output-wrapper
         visible:false
+
+      /*
+       * Deleting "toggled" state of our button.
+       */
       micro.css.delete:x:/../*/_event?value
         class:toggled
 
@@ -29,5 +35,9 @@ button:hypereval-view-output
        */
       set-widget-property:hypereval-output-wrapper
         visible:true
+
+      /*
+       * Adding "toggled" state to our button.
+       */
       micro.css.add:x:/../*/_event?value
         class:toggled

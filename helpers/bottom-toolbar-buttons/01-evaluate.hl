@@ -64,6 +64,8 @@ button:hypereval-evaluate-snippet
           visible
 
       /*
+       * "Output" CodeMirror widget is visible.
+       *
        * Setting the results of our evaluation, and making sure we refetch the
        * code into CodeMirror editor on the client side of things.
        */

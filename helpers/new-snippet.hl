@@ -1,0 +1,150 @@
+
+/*
+ * Displays a modal window showing all templates for new snippets, allowing
+ * user to select a template, or create an empty snippet.
+ */
+create-widgets
+  micro.widgets.modal:hypereval-confirm-new-snippet-modal
+    widgets
+
+      /*
+       * Header for modal widget.
+       */
+      h3
+        innerValue:Choose template
+
+      /*
+       * Datagrid containing each template snippet from our "/templates/" folder.
+       */
+      micro.widgets.grid:hypereval-new-snippet-templates
+        class:hover striped
+        events
+
+
+          /*
+           * Common event invoked when a new snippet is created.
+           *
+           * Resets a couple of session values and closes modal widget.
+           */
+          hypereval.widgets.eval._new-snippet-created
+
+            /*
+             * Updating header of Hypereval to default value.
+             */
+            hypereval.set-header
+
+            /*
+             * disabling "delete snippet" button and "preview snippet" button.
+             */
+            set-widget-property:hypereval-delete-snippet
+              disabled
+            set-widget-property:hypereval-preview-snippet
+              disabled
+
+            /*
+             * Resetting session containing snippet's name.
+             */
+            p5.web.session.set:hypereval.snippet-name
+
+            /*
+             * Deleting modal window.
+             */
+            delete-widget:hypereval-confirm-new-snippet-modal
+
+
+        oninit
+
+          /*
+           * Displaying all available templates for a new snippet.
+           *
+           * First listing all template files.
+           */
+          list-files:@HYPEREVAL/templates/
+            filter:.hl
+
+          /*
+           * Then looping through each template file, making sure we create one
+           * datagrid item for each file.
+           */
+          for-each:x:/@list-files/*?name
+
+            /*
+             * Figuring out filename, which we use as "friendly name" for template.
+             */
+            split:x:/@_dp?value
+              =:/
+              =:.
+
+            /*
+             * Adding a datagrid item for currently iterated file to 
+             * databind invocation below.
+             */
+            eval-x:x:/+/*/*/*|/+/**/.name
+            add:x:/../*/micro.widgets.grid.databind
+              src
+                item
+                  .row
+                    onclick
+
+                      /*
+                       * Forward evaluated above.
+                       */
+                      .name:x:/@_dp?value
+
+                      /*
+                       * Loads template and sets the CodeMirror editor's code
+                       * to content from template snippet.
+                       */
+                      load-file:x:/@.name?value
+                        convert:false
+                      hypereval.widgets.eval.set-code:x:/@load-file/*?value
+
+                      /*
+                       * Invoking common event for resetting Hypereval settings, and closing
+                       * modal window, etc.
+                       */
+                      hypereval.widgets.eval._new-snippet-created
+
+                  name:x:/@split/0/-2?name
+
+          /*
+           * Databinds grid, now with actual items according to which templates exists in installation.
+           */
+          micro.widgets.grid.databind:hypereval-new-snippet-templates
+
+      /*
+       * Wrapper widget for "Empty" and "Cancel" buttons.
+       */
+      div
+        class:strip right
+        widgets
+          button:hypereval-confirm-new-snippet
+            innerValue:Empty
+            oninit
+
+              /*
+               * Setting initial focus to "Yes" button.
+               */
+              micro.page.set-focus:x:/../*/_event?value
+
+            onclick
+
+              /*
+               * Setting CodeMirror editor's content to "nothing".
+               */
+              hypereval.widgets.eval.set-code
+
+              /*
+               * Invoking common event for resetting Hypereval settings, and closing
+               * modal window, etc.
+               */
+              hypereval.widgets.eval._new-snippet-created
+
+          button
+            innerValue:Cancel
+            onclick
+
+              /*
+               * Simply deleting modal widget.
+               */
+              delete-widget:hypereval-confirm-new-snippet-modal

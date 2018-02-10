@@ -9,6 +9,13 @@ create-event:hypereval.widgets.eval
   .signal
 
   /*
+   * Checking if Hypereval is already running, and if so, throwing an exception.
+   */
+  if
+    hypereval.widgets.eval.is-running
+    throw:Hypereval is already running
+
+  /*
    * Figuring out font size to use for widget.
    */
   .defaults
@@ -29,6 +36,8 @@ create-event:hypereval.widgets.eval
   eval-x:x:/+/**(/.theme|/.line-numbers|/.chrome)|/+/*/container/*/style
   return
     container
+      style:"font-size:{0}pt !important;"
+        :x:(/@p5.auth.my-settings.get/*/codemirror/*/font-size|/../*/.defaults/*/font-size)/$?value
       events
 
 
@@ -168,11 +177,19 @@ create-event:hypereval.widgets.eval
         hypereval.widgets.eval.set-code
 
           /*
-           * Sanity checking code, to make sure it's actually a valid piece of Hyperlambda.
+           * Sanity checking arguments.
+           */
+          micro.lambda.contract.optional:x:/..
+            _arg:string
+
+          /*
+           * Sanity checking code, if there was any code given, to make sure 
+           * it's actually a valid piece of Hyperlambda.
            *
            * Notice, this invocation will throw an exception if code is not valid Hyperlambda.
            */
-          hyper2lambda:x:/../*/_arg?value
+          if:x:/../*/_arg?value
+            hyper2lambda:x:/../*/_arg?value
 
           /*
            * Retrieving textarea's content to caller.
@@ -250,8 +267,7 @@ create-event:hypereval.widgets.eval
           /*
            * To make it simple, we simply "click" "load snippet button" programmatically.
            */
-          p5.web.widgets.ajax-events.raise:hypereval-load-snippet
-            onclick
+          micro.evaluate.file:@HYPEREVAL/helpers/load-snippet.hl
 
 
         /*
@@ -268,8 +284,78 @@ create-event:hypereval.widgets.eval
             delete-widget:hypereval-manage-snippets
 
 
-      style:"font-size:{0}pt !important;"
-        :x:(/@p5.auth.my-settings.get/*/codemirror/*/font-size|/../*/.defaults/*/font-size)/$?value
+        /*
+         * Helper event to download current code snippet.
+         */
+        hypereval.widgets.eval.download-current-snippet
+
+          /*
+           * Retrieving snippet's Hyperlambda [content], [type] and [name].
+           */
+          hypereval.widgets.eval.get-current-snippet
+
+          /*
+           * Creating a temporary file which will contain the Hyperlambda
+           * from our CodeMirror widget.
+           */
+          save-file:~/temp/hypereval-code.hl
+            src:x:/@hypereval.widgets.eval.get-current-snippet/*/content?value
+
+          /*
+           * Making sure we get the "Content-Disposition" (filename) correct.
+           */
+          eval-x:x:/+/*/Content-Disposition
+
+          /*
+           * Downloading file to client.
+           */
+          micro.download.file:~/temp/hypereval-code.hl
+            Content-Type:x-application/hyperlambda
+            Content-Disposition:@"attachment; filename=""{0}.{1}.hl"""
+              :x:/@hypereval.widgets.eval.get-current-snippet/*/name?value
+              :x:/@hypereval.widgets.eval.get-current-snippet/*/type?value
+
+
+        /*
+         * Helper event to import a list of [files].
+         */
+        hypereval.widgets.eval.import-files
+
+          /*
+           * Sanity checking arguments.
+           */
+          micro.lambda.contract.min:x:/..
+            files
+
+          /*
+           * Invoking file responsible for handling our upload request.
+           */
+          add:x:/../*/micro.evaluate.file
+            src:x:/../*/files
+          micro.evaluate.file:@HYPEREVAL/helpers/import-files.hl
+
+          /*
+           * Providing feedback to user.
+           */
+          micro.windows.info:{0} files successfully imported
+            :x:/@micro.evaluate.file?value
+            class:micro-windows-info success
+
+
+        /*
+         * Helper event to allow user to create a new snippet.
+         *
+         * Will allow user to select a snippet template from the list of files existing
+         * in our "/template/" folder, or alternatively create an entirely empty snippet.
+         */
+        hypereval.widgets.eval.new-snippet
+
+          /*
+           * Allowing our "new snippet Hyperlambda file" do the heavy lifting.
+           */
+          micro.evaluate.file:@HYPEREVAL/helpers/new-snippet.hl
+
+
       oninit
 
         /*
@@ -391,7 +477,7 @@ p5.hypereval_input.setSize('100%', '400px');"
             /*
              * Extra toolbar buttons, for loading snippets, saving snippets, etc.
              */
-            micro.widgets.folder-plugin
+            micro.widgets.file
               folder:@HYPEREVAL/helpers/bottom-extra-toolbar-buttons/
               class:strip
               style:"margin-right:1rem;"
@@ -399,7 +485,7 @@ p5.hypereval_input.setSize('100%', '400px');"
             /*
              * Main toolbars, for evaluating Hyperlambda, etc.
              */
-            micro.widgets.folder-plugin
+            micro.widgets.file
               folder:@HYPEREVAL/helpers/bottom-toolbar-buttons/
               class:strip
 

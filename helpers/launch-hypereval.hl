@@ -1,17 +1,7 @@
+
 /*
  * Starts main "Hypereval" app.
  */
-
-
-
-
-
-/*
- * Checking if Hypereval is already running, and if so, throwing an exception.
- */
-if
-  hypereval.widgets.eval.is-running
-  throw:Hypereval is already running
 
 
 
@@ -46,7 +36,7 @@ create-widget
       widgets
 
         /*
-         * Wrapper widget for both H1 (header) and toolbar widget.
+         * Wrapper widget for both H1 (header) and top toolbar widgets.
          */
         div
           class:col-100
@@ -88,7 +78,7 @@ create-widget
             /*
              * Toolbar wrapper widget.
              */
-            micro.widgets.folder-plugin
+            micro.widgets.file
               class:strip right toolbar
               folder:@HYPEREVAL/helpers/top-toolbar-buttons/
 

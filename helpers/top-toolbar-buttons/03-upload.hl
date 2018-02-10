@@ -9,15 +9,8 @@ micro.widgets.upload-button
   .onupload
 
     /*
-     * Invoking file responsible for handling our upload request.
+     * Using API method to import files.
      */
-    add:x:/../*/micro.evaluate.file
+    add:x:/+
       src:x:/../*/files
-    micro.evaluate.file:@HYPEREVAL/helpers/import-files.hl
-
-    /*
-     * Providing feedback to user.
-     */
-    micro.windows.info:{0} files successfully imported
-      :x:/@micro.evaluate.file?value
-      class:micro-windows-info success
+    hypereval.widgets.eval.import-files
