@@ -82,86 +82,21 @@ button:hypereval-save-snippet
                       onclick
 
                         /*
-                         * Verfying there actually is any code.
-                         */
-                        get-widget-property:hypereval-input
-                          innerValue
-                        if
-                          trim:x:/@get-widget-property/*/*?value
-                          =:
-
-                          /*
-                           * No code.
-                           */
-                          micro.windows.info:There is no code to save
-                            class:micro-windows-info warning
-                          return
-
-                        /*
-                         * Serializing form, opening database connection,
-                         * deleting snippets with similar name, and saving snippet
-                         * into database.
+                         * Serializing form, and saving snippet.
                          */
                         micro.form.serialize:hypereval-save-form
 
                         /*
-                         * Sanity checking name of snippet.
+                         * Invoking event responsible for saving our snippet.
                          */
-                        match:x:/@micro.form.serialize/*/name?value
-                          src:regex:/^[-a-z0-9_ \.]{2,}$/i
-                        if:x:/@match/*?name
-                          not
-                          micro.windows.info:Use at least 2 characters, only spaces, a-z, 0-9 and '-' in your name
-                            class:micro-windows-info warning
-                          return
+                        eval-x:x:/+/*
+                        hypereval.widgets.eval.save-snippet:x:/@micro.form.serialize/*/name?value
+                          type:x:/@micro.form.serialize/*/type?value
 
                         /*
-                         * Inserting snippet into database.
-                         */
-                        p5.mysql.connect:[hypereval]
-                          p5.mysql.delete:@"delete from snippets where name = @name"
-                            @name:x:/@micro.form.serialize/*/name?value
-                          p5.mysql.insert:@"insert into snippets (name, content, type) values (@name, @content, @type)"
-                            @name:x:/@micro.form.serialize/*/name?value
-                            @content:x:/@get-widget-property/*/*?value
-                            @type:x:/@micro.form.serialize/*/type?value
-
-                        /*
-                         * Closing modal window, and giving user some feedback.
+                         * Closing modal window.
                          */
                         delete-widget:hypereval-save-modal
-                        micro.windows.info:Snippet was successfully saved
-                          class:micro-windows-info success
-
-                        /*
-                         * Making sure we store name used into session, in case
-                         * user wants to save the same snippet again.
-                         */
-                        p5.web.session.set:hypereval.snippet-name
-                          src:x:/@micro.form.serialize/*/name?value
-
-                        /*
-                         * Storing code in session, to make it more easily available.
-                         */
-                        p5.web.session.set:hypereval.code
-                          src:x:/../*/get-widget-property/*/*?value
-
-                        /*
-                         * Signaling that snippet was changed.
-                         */
-                        hypereval.snippet.changed
-
-                        /*
-                         * Making sure we disable delete snippet button, 
-                         * since there are no active snippets now.
-                         */
-                        delete-widget-property:hypereval-delete-snippet
-                          disabled
-
-                        /*
-                         * Invoking event responsible for updating our header.
-                         */
-                        hypereval.set-header:x:/@micro.form.serialize/*/name?value
 
                     button
                       innerValue:Cancel

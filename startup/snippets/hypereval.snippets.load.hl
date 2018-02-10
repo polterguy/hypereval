@@ -5,7 +5,7 @@
  * This event will return the Hyperlambda of the [_arg] snippet.
  * Optionally pass in [type] of snippet being e.g. "page" or "startup".
  */
-create-event:hypereval.snippets.get
+create-event:hypereval.snippets.load
 
   /*
    * Separating arguments from the rest of the lambda.

@@ -149,7 +149,7 @@ div
 
         /*
          * Shows a modal widget with each snippet from database, allowing
-         * the user to either mark it as a "startup snippet" or as a "page".
+         * the user to select which snippet to load.
          */
         create-widgets
           micro.widgets.modal:hypereval-manage-snippets
@@ -269,7 +269,7 @@ div
                                 /*
                                  * Signaling that current snippet was changed.
                                  */
-                                hypereval.snippet.changed
+                                hypereval.widgets.eval.active-snippet-changed
 
                                 /*
                                  * Enabling delete snippet button.
@@ -659,7 +659,7 @@ div
                             /*
                              * Signaling that snippet was changed.
                              */
-                            hypereval.snippet.changed
+                            hypereval.widgets.eval.active-snippet-changed
 
                             /*
                              * Making sure we disable delete snippet button, 
@@ -849,7 +849,7 @@ div
          * Initially posting the "snippet changed" event, to make sure
          * we can preview snippet, if possible.
          */
-        hypereval.snippet.changed
+        hypereval.widgets.eval.active-snippet-changed
 
       events
 
@@ -857,7 +857,7 @@ div
          * Invoked when "current snippet" has been changed, either loaded
          * from database, or saved to database.
          */
-        hypereval.snippet.changed
+        hypereval.widgets.eval.active-snippet-changed
 
           /*
            * Checking if this is a page, and if so, enabling button.

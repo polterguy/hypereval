@@ -6,49 +6,66 @@ button:hypereval-preview-snippet
   innerValue:@"<span class=""icon-play3""></span>"
   title:Previews your page - Alt+P
   disabled
-  oninit
-
-    /*
-     * Initially posting the "snippet changed" event, to make sure
-     * we can preview snippet, if possible.
-     */
-    hypereval.snippet.changed
-
   events
 
     /*
      * Invoked when "current snippet" has been changed, either loaded
      * from database, or saved to database.
+     *
+     * We handle this event here to check if we should enable or disable
+     * our preview button.
      */
-    hypereval.snippet.changed
+    hypereval.widgets.eval.active-snippet-changed
 
       /*
        * Checking if this is a page, and if so, enabling button.
        */
-      p5.web.session.get:hypereval.snippet-name
-      p5.mysql.connect:[hypereval]
-        p5.mysql.scalar:"select type from snippets where name = @name"
-          @name:x:/@p5.web.session.get/*?value
-        if:x:/@p5.mysql.scalar?value
-          =:page
-          delete-widget-property:x:/../*/_event?value
-            disabled
-        else
-          set-widget-property:x:/../*/_event?value
-            disabled
+      if
+        fetch:x:/0/*/type?value
+          hypereval.widgets.eval.get-current-snippet
+        =:page
+
+        /*
+         * Currently active snippet is a (saved) page.
+         * Hence, we enable the "preview button".
+         */
+        delete-widget-property:x:/../*/_event?value
+          disabled
+
+      else
+
+        /*
+         * Currently active snippet is not a page.
+         * Hence, we disable our "preview button".
+         */
+        set-widget-property:x:/../*/_event?value
+          disabled
 
   onclick
 
     /*
      * Previewing "current snippet" in a new window.
+     *
+     * First we need to retrieve the name of the currently active snippet.
      */
-    p5.web.session.get:hypereval.snippet-name
-    p5.mysql.connect:[hypereval]
-      p5.mysql.scalar:"select name from snippets where name = @name and type = 'page'"
-        @name:x:/@p5.web.session.get/*?value
-      if:x:/-?value
-        not
-        return
-      p5.html.url-encode:x:/@p5.mysql.scalar?value
-      p5.web.send-javascript:@"window.open('/hypereval/{0}');"
-        :x:/@p5.html.url-encode?value
+    hypereval.widgets.eval.get-current-snippet
+
+    /*
+     * Then we need to URL encode the snippet's name.
+     */
+    p5.html.url-encode:x:/@hypereval.widgets.eval.get-current-snippet/*/name?value
+
+    /*
+     * Figuring out root folder for Hypereval, to parametrize our
+     * JavaScript "window.open" invocation accordingly.
+     */
+    p5.io.unroll-path:@HYPEREVAL/
+    split:x:/@p5.io.unroll-path?value
+      =:/
+
+    /*
+     * Opening a window on the client side with the URL leading to our page snippet.
+     */
+    p5.web.send-javascript:@"window.open('/{0}/{1}');"
+      :x:/@split/0/-?name
+      :x:/@p5.html.url-encode?value

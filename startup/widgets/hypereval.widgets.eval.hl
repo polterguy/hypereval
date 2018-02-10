@@ -84,9 +84,6 @@ create-event:hypereval.widgets.eval
     'Alt-N':function(cm) {{p5.$('hypereval-new-snippet').raise('onclick');}},
     'Alt-P':function(cm) {{p5.$('hypereval-preview-snippet').raise('onclick');}}
 "
-        if:x:/../*/.chrome?value
-          =:bool:false
-          set:x:/@.extra-keys?value
 
         /*
          * Transforming input textarea to CodeMirror instance.
@@ -113,7 +110,7 @@ create-event:hypereval.widgets.eval
     'Alt-F': 'findPersistent',
     'Alt-M':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}},
     'Alt-E':function(cm) {{
-      p5.$('hypereval-evaluate-snippet').raise('.onclick', {{
+      p5.$('hypereval-evaluate-snippet').raise('onclick', {{
         onsuccess:function(ret, evt) {{
           if (ret.code) {{
             p5.hypereval_output.getDoc().setValue(ret.code);
@@ -144,16 +141,9 @@ p5.hypereval_input.setSize('100%', '400px');"
             /*
              * Checking if we have some code in our session.
              */
-            p5.web.session.get:hypereval.code
+            p5.web.session.get:hypereval.snippet-name
             if:x:/@p5.web.session.get/*?value
-              set-widget-property:hypereval-input
-                innerValue:x:/@p5.web.session.get/*?value
-
-              /*
-               * Invoking event responsible for updating our header.
-               */
-              p5.web.session.get:hypereval.snippet-name
-              hypereval.set-header:x:/@p5.web.session.get/*?value
+              hypereval.widgets.eval.load-snippet:x:/@p5.web.session.get/*?value
 
         div
           class:right air-top
@@ -187,12 +177,16 @@ p5.hypereval_input.setSize('100%', '400px');"
               oninit
 
                 /*
-                 *
+                 * Default values.
                  */
                 .defaults
                   font-size:9.25
                   theme:phosphorus
                   line-numbers:bool:true
+
+                /*
+                 * Retrieving settings for widget.
+                 */
                 p5.auth.my-settings.get
                 .line-numbers:x:(/@p5.auth.my-settings.get/*/codemirror/*/line-numbers|/@.defaults/*/line-numbers)/$?value
                 set:x:/-?value

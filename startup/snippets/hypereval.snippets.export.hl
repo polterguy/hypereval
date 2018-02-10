@@ -1,0 +1,75 @@
+
+/*
+ * Exports a zip file containing all snippets from database to client.
+ *
+ * Optionally pass in [filter] which will be used as a filter criteria to which
+ * snippets will actually be a part of the backup zip file.
+ * If a [filter] is supplied, it will only export snippets starting with the 
+ * specified [filter] condition.
+ */
+create-event:hypereval.snippets.export
+
+  /*
+   * Sanity echking arguments.
+   */
+  micro.lambda.contract.optional:x:/..
+    filter:string
+
+  /*
+   * Selecting all snippets from database
+   */
+  .snippets
+  p5.mysql.connect:[hypereval]
+
+    /*
+     * Checking if caller supplied a [filter] condition, at which point we further
+     * parametrize our SQL.
+     */
+    _filter
+    if:x:/../*/filter?value
+      set:x:/@_filter?value
+        src:"where name like @filter"
+      add:x:/..p5.mysql.connect/*/p5.mysql.select
+        src
+          @filter:{0}%
+            :x:/../*/filter?value
+
+    /*
+     * Selecting all snippets (optionally) matching specified [filter].
+     */
+    p5.mysql.select:@"select * from snippets {0}"
+      :x:/@_filter?value
+
+    /*
+     * Looping through each snippet from above SQL select result.
+     */
+    for-each:x:/@p5.mysql.select/*
+
+      /*
+       * Storing each filename we create, such that we know what to zip later.
+       */
+      add:x:/@.snippets
+        src:~/temp/{0}.{1}.hl
+          :x:/@_dp/#/*/name?value
+          :x:/@_dp/#/*/type?value
+
+      /*
+       * Saving snippet to "/temp/" folder.
+       */
+      save-file:~/temp/{0}.{1}.hl
+        :x:/@_dp/#/*/name?value
+        :x:/@_dp/#/*/type?value
+        src:x:/@_dp/#/*/content?value
+
+  /*
+   * Creating a zip containing all snippets.
+   */
+  zip:~/temp/hypereval-export.zip
+    src:x:/@.snippets/*?name
+
+  /*
+   * Downloading zip file to client.
+   */
+  micro.download.file:x:/@zip?value
+    Content-Type:application/zip
+    Content-Disposition:@"attachment; filename=""hypereval-export.zip"""

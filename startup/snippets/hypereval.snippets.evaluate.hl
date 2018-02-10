@@ -30,13 +30,13 @@ create-event:hypereval.snippets.evaluate
    */
   add:x:/+
     src:x:/@.signal/--/<-(/type|/_arg)
-  hypereval.snippets.get
+  hypereval.snippets.load
 
   /*
    * Converting snippet to Hyperlambda, passing in all arguments (except _arg and type),
    * and evaluating snippet.
    */
-  hyper2lambda:x:/@hypereval.snippets.get?value
+  hyper2lambda:x:/@hypereval.snippets.load?value
   add:x:/+
     src:x:/@.signal/--(!/_arg!/type)
   eval:x:/@hyper2lambda

@@ -20,6 +20,22 @@ create-event:hypereval.snippets.save
     type:string
 
   /*
+   * Sanity checking name of snippet.
+   */
+  match:x:/../*/_arg?value
+    src:regex:/^[-a-z0-9_ \.]{2,}$/i
+  if:x:/@match/*?name
+    not
+    throw:Use at least 2 characters, only spaces, a-z, 0-9, '.', '_' and '-' in your snippet's name
+
+  /*
+   * Sanity checking [content].
+   */
+  if:x:/../*/content?value
+    =:
+    throw:No [content] value provided
+
+  /*
    * Making sure snippet is a valid piece of Hyperlambda.
    *
    * This event invocation will throw and exception, if snippet is not valid Hyperlambda.

@@ -5,34 +5,68 @@
 button:hypereval-evaluate-snippet
   innerValue:@"<span class=""icon-flash""></span>"
   title:Evaluates the Hyperlambda in your editor - Alt+E
-  style:"width:100px;"
-  onclick:@"p5.$('hypereval-evaluate-snippet').raise('.onclick',{onsuccess:function(ret, evt){if (ret.code){p5.hypereval_output.getDoc().setValue(ret.code);}}});return false;"
-  .onclick
+  class:large
+  onclick
 
     /*
      * Retrieving Hyperlambda and evaluating it.
+     *
+     * Notice, we might want to show the results of evaluation in our output
+     * CodeMirror editor after evaluation. Hence, we'll need to use [eval-mutable],
+     * and apply some "eval trickery" here to be able to accomplish that.
+     *
+     * We do this by adding the lambda object into a reference node, which is
+     * necessary to be able to use [eval-mutable], and still have the main root
+     * node being the root node for our evaluation.
+     *
+     * First we retrieve code, and convert it to a lambda object.
      */
-    .exe:node:"exe"
     get-widget-property:hypereval-input
       innerValue
     hyper2lambda:x:/@get-widget-property/*/*?value
+
+    /*
+     * Then we append the lambda into a "reference node", which will allow us
+     * to retrieve the lambda as it is after evaluation, while still having
+     * our root node being the root node for our [eval-mutable] invocation.
+     *
+     * Notice, since reference nodes are shallow copies, we'll need to first
+     * delete the results of any previous invocations to it.
+     * Otherwise the operation will accumulate all nodes from any previous
+     * evaluations.
+     */
+    .exe:node:"exe"
     set:x:/@.exe/#/*
+
+    /*
+     * Adding above lambda into reference node above.
+     */
     add:x:/@.exe/#
       src:x:/@hyper2lambda/*
+
+    /*
+     * Evaluating reference node, now containing our lambda object.
+     */
     eval-mutable:x:/@.exe/#
 
     /*
      * Then converting lambda result to Hyperlambda, and returning back to client as JSON
      */
     lambda2hyper:x:/@.exe/#/*
-    get-widget-property:hypereval-output-wrapper
-      visible
-    if:x:/@get-widget-property/*/*?value
-      p5.web.return-response-object:code
-        src:x:/@lambda2hyper?value
 
     /*
-     * Storing code in session, to make it more easily available.
+     * Checking if output widget is visible, and if so, making sure we set the results
+     * of evaluation.
      */
-    p5.web.session.set:hypereval.code
-      src:x:/../*/get-widget-property/[0,1]/*/*?value
+    if
+      fetch:x:/0/0/0?value
+        get-widget-property:hypereval-output-wrapper
+          visible
+
+      /*
+       * Setting the results of our evaluation, and making sure we refetch the
+       * code into CodeMirror editor on the client side of things.
+       */
+      set-widget-property:hypereval-output
+        innerValue:x:/@lambda2hyper?value
+      p5.web.send-javascript:@"p5.hypereval_output.getDoc().setValue(p5.$('hypereval-output').el.value);"

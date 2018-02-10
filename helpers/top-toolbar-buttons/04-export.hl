@@ -8,41 +8,6 @@ button
   onclick
 
     /*
-     * Exports all snippets to a zip file.
-     * First we select all snippets, and create one Hyperlambda file
-     * for each, and save to our temporary folder.
+     * Invoking API event to do the heavy lifting.
      */
-    .snippets
-    p5.mysql.connect:[hypereval]
-
-      /*
-       * Looping through each snippet from above SQL select result.
-       */
-      p5.mysql.select:@"select * from snippets"
-      for-each:x:/@p5.mysql.select/*
-
-        /*
-         * Storing each filename we create, such that we know what to zip later.
-         */
-        add:x:/@.snippets
-          src:~/temp/{0}.{1}.hl
-            :x:/@_dp/#/*/name?value
-            :x:/@_dp/#/*/type?value
-
-        /*
-         * Saving snippet to "/temp/" folder.
-         */
-        save-file:~/temp/{0}.{1}.hl
-          :x:/@_dp/#/*/name?value
-          :x:/@_dp/#/*/type?value
-          src:x:/@_dp/#/*/content?value
-
-    /*
-     * Creating a zip containing all snippets, and downloading
-     * it to client.
-     */
-    zip:~/temp/hypereval-export.zip
-      src:x:/@.snippets/*?name
-    micro.download.file:x:/@zip?value
-      Content-Type:application/zip
-      Content-Disposition:@"attachment; filename=""hypereval-export.zip"""
+    hypereval.snippets.export

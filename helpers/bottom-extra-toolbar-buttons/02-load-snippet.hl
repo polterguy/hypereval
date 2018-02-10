@@ -5,32 +5,6 @@
 button:hypereval-load-snippet
   innerValue:@"<span class=""icon-folder-open""></span>"
   title:Load snippet - Alt+L
-  events
-
-    /*
-     * Helper event to programatically open load snippet window.
-     */
-    hypereval.widgets.eval.show-load-window
-
-      /*
-       * To make it simple, we simply "click" button programmatically.
-       */
-      p5.web.widgets.ajax-events.raise:x:/../*/_event?value
-        onclick
-
-    /*
-     * Helper event to programatically close load snippet window.
-     */
-    hypereval.widgets.eval.close-load-window
-
-      /*
-       * Closing modal window, if it exists.
-       */
-      if
-        fetch:x:/0/0?value
-          widget-exists:hypereval-manage-snippets
-        delete-widget:hypereval-manage-snippets
-
   onclick
 
     /*
@@ -42,6 +16,10 @@ button:hypereval-load-snippet
         widgets
           h3
             innerValue:Your snippets
+
+          /*
+           * Datagrid showing all available snippets
+           */
           micro.widgets.grid:hypereval-snippets-grid
             class:hover striped
             events
@@ -65,7 +43,7 @@ button:hypereval-load-snippet
                  * and creating one grid item for each record.
                  */
                 p5.mysql.connect:[hypereval]
-                  p5.mysql.select:@"select * from snippets where name like @filter order by name limit 10 offset @offset"
+                  p5.mysql.select:@"select name, type from snippets where name like @filter order by name limit 10 offset @offset"
                     @filter:%{0}%
                       :x:(/../*/filter|/@.defaults/*/filter)/$?value
                     @offset:x:(/../*/offset|/@.defaults/*/offset)/$?value
@@ -132,41 +110,12 @@ button:hypereval-load-snippet
                              * Forward evaluated above.
                              */
                             .name:x:/@_dp/#/*/name?value
-                            p5.mysql.connect:[hypereval]
-                              p5.mysql.select:@"select content, name from snippets where name = @name"
-                                @name:x:/@.name?value
-                              p5.web.return-response-object:code
-                                src:x:/@p5.mysql.select/*/*/content?value
-                              p5.web.session.set:hypereval.snippet-name
-                                src:x:/@p5.mysql.select/*/*/name?value
+                            hypereval.widgets.eval.load-snippet:x:/@.name?value
 
                             /*
                              * Closing modal window.
                              */
                             delete-widget:hypereval-manage-snippets
-
-                            /*
-                             * Making sure our Hypereval remembers that this is our
-                             * "current code".
-                             */
-                            p5.web.session.set:hypereval.code
-                              src:x:/@p5.mysql.connect/*/p5.mysql.select/*/*/content?value
-
-                            /*
-                             * Signaling that current snippet was changed.
-                             */
-                            hypereval.snippet.changed
-
-                            /*
-                             * Enabling delete snippet button.
-                             */
-                            delete-widget-property:hypereval-delete-snippet
-                              disabled
-
-                            /*
-                             * Invoking event responsible for updating our header.
-                             */
-                            hypereval.set-header:x:/@.name?value
 
                         name:x:/@_dp/#/*/name?value
 
