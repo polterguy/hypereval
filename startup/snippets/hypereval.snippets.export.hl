@@ -4,8 +4,10 @@
  *
  * Optionally pass in [filter] which will be used as a filter criteria to which
  * snippets will actually be a part of the backup zip file.
- * If a [filter] is supplied, it will only export snippets starting with the 
+ * If a [filter] is supplied, it will only export snippets mathing the 
  * specified [filter] condition.
+ * You can use wildcards in your [filter] by adding '%' characters being your wildcard
+ * characters.
  */
 create-event:hypereval.snippets.export
 
@@ -31,7 +33,7 @@ create-event:hypereval.snippets.export
         src:"where name like @filter"
       add:x:/..p5.mysql.connect/*/p5.mysql.select
         src
-          @filter:{0}%
+          @filter:{0}
             :x:/../*/filter?value
 
     /*

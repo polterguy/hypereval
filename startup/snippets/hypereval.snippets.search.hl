@@ -17,6 +17,9 @@
  * Notice, you don't have to provide neither an [_arg] criteria, nor
  * a [content] criteria, at which point the first 'n' snippets will be returned,
  * without any filtering occurring.
+ *
+ * Notice, you can also do a wildcard search by adding '%' as a wildcard and '_'
+ * as a single widlcard character substitution.
  */
 create-event:hypereval.snippets.search
 
@@ -52,8 +55,7 @@ create-event:hypereval.snippets.search
       src:name like @name
     add:x:/../*/p5.mysql.connect/*/p5.mysql.select
       src
-        @name:%{0}%
-          :x:/../*/_arg?value
+        @name::x:/../*/_arg?value
 
   /*
    * Checking if caller provided a [type] argument, at which point we
@@ -88,8 +90,7 @@ create-event:hypereval.snippets.search
       src:content like @content
     add:x:/../*/p5.mysql.connect/*/p5.mysql.select
       src
-        @content:%{0}%
-          :x:/../*/content?value
+        @content:x:/../*/content?value
 
   /*
    * Checking if one or more criteria were provided.
