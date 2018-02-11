@@ -1,13 +1,22 @@
 
 /*
- * Creates search for snippet Active Event.
+ * Creates our "search for snippet" Active Event.
  *
- * This event will allow you to search for snippets.
+ * This event will allow you to search your snippets.
  *
- * Optionally pass in [_arg], [type], [content], [limit] and/or [offset] to further parametrize your query.
+ * Optionally pass in [_arg], [type], [content], [limit] and/or [offset] to
+ * further parametrize your query.
  *
- * If you pass in [_arg] then the name of the snippet must contain your query.
- * If you pass in [content], then the snippet's content must contain your query.
+ * If you pass in [_arg] the name of the snippet must contain your query.
+ * If you pass in [content] the snippet's content must contain your query.
+ *
+ * This event will by default return the 10 first snippets matching your query,
+ * but this can be changed by providing an explicit [limit] and/or an [offset]
+ * criteria.
+ *
+ * Notice, you don't have to provide neither an [_arg] criteria, nor
+ * a [content] criteria, at which point the first 'n' snippets will be returned,
+ * without any filtering occurring.
  */
 create-event:hypereval.snippets.search
 
@@ -29,21 +38,74 @@ create-event:hypereval.snippets.search
     limit:int:10
 
   /*
-   * Making sure we check if caller supplied a [type] argument, and accommodating 
-   * for it if it was supplied.
+   * Checking if caller provided an [_arg] argument, at which point we
+   * further parametrize our SQL.
    */
-  _where
+  _where-name
+  if:x:/../*/_arg?value
+
+    /*
+     * Caller provided a [content] criteria.
+     * Making sure 
+     */
+    set:x:/@_where-name?value
+      src:name like @name
+    add:x:/../*/p5.mysql.connect/*/p5.mysql.select
+      src
+        @name:%{0}%
+          :x:/../*/_arg?value
+
+  /*
+   * Checking if caller provided a [type] argument, at which point we
+   * further parametrize our SQL.
+   */
+  _where-type
   if:x:/../*/type?value
 
     /*
-     * Caller provided a [type] argument, making sure we further parametrize SQL
+     * Caller provided a [type] argument. 
+     * Making sure we further parametrize SQL
      * to accommodate for [type] criteria.
      */
-    set:x:/@_where?value
-      src:"and type = @type"
+    set:x:/@_where-type?value
+      src:type = @type
     add:x:/../*/p5.mysql.connect/*/p5.mysql.select
       src
         @type:x:/../*/type?value
+
+  /*
+   * Checking if caller provided a [content] argument, at which point we
+   * further parametrize our SQL.
+   */
+  _where-content
+  if:x:/../*/content?value
+
+    /*
+     * Caller provided a [content] criteria.
+     * Making sure we further parametrize our SQL.
+     */
+    set:x:/@_where-content?value
+      src:content like @content
+    add:x:/../*/p5.mysql.connect/*/p5.mysql.select
+      src
+        @content:%{0}%
+          :x:/../*/content?value
+
+  /*
+   * Checking if one or more criteria were provided.
+   */
+  _where
+  for-each:x:/../*(/_where-name|/_where-type|/_where-content)?value
+    if:x:/@_dp?value
+      if:x:/@_where?value
+        set:x:/@_where?value
+          src:"{0} and {1}"
+            :x:/@_where?value
+            :x:/@_dp?value
+      else
+        set:x:/@_where?value
+          src:" where {0}"
+            :x:/@_dp?value
 
   /*
    * Opening up database connection.
@@ -51,16 +113,10 @@ create-event:hypereval.snippets.search
   p5.mysql.connect:[hypereval]
 
     /*
-     * Selecting all snippets matching the specified criteria.
-     *
-     * Making sure we use a "like" SQL criteria.
+     * Executing our SQL.
      */
-    p5.mysql.select:@"select name, type from snippets where name like @name and content like @content {0} limit @limit offset @offset"
+    p5.mysql.select:@"select name, type from snippets{0} limit @limit offset @offset"
       :x:/@_where?value
-      @name:%{0}%
-        :x:/../*/_arg?value
-      @content:%{0}%
-        :x:/../*/content?value
       @offset:x:(/../*/offset|/@.defaults/*/offset)/$?value.long
       @limit:x:(/../*/limit|/@.defaults/*/limit)/$?value.long
 

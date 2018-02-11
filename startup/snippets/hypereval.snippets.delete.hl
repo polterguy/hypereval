@@ -1,8 +1,8 @@
 
 /*
- * Deletes a new snippet.
+ * Deletes the specified snippet(s).
  *
- * It expects the snippet's name to be given as [_arg].
+ * It expects [_arg] being name of snippet(s) to delete.
  */
 create-event:hypereval.snippets.delete
 
@@ -13,15 +13,37 @@ create-event:hypereval.snippets.delete
     _arg:string
 
   /*
-   * Opening up database connection, and deleting snippet.
+   * Opening up database connection, and deleting snippet(s) specified by caller.
    */
   p5.mysql.connect:[hypereval]
-    p5.mysql.delete:@"delete from snippets where name = @name"
-      @name:x:/../*/_arg?value
 
     /*
-     * Verifying caller provided an actual existing snippet.
+     * Making sure we create a database transaction, to avoid partially deleted
+     * snippets, in case user provided multiple snippets he wanted to have deleted.
      */
-    if:x:/@p5.mysql.delete?value
-      !=:int:1
-      throw:No such snippet
+    p5.mysql.transaction.begin
+
+      /*
+       * In case caller supplied an expression leading to multiple snippets,
+       * we iterate through each [_arg] specified by caller.
+       */
+      for-each:x:/../*/_arg?value
+
+        /*
+         * Deleting currently iterated snippet.
+         */
+        p5.mysql.delete:delete from snippets where name = @name
+          @name:x:/@_dp?value
+
+        /*
+         * Verifying caller provided an actual existing snippet.
+         */
+        if:x:/@p5.mysql.delete?value
+          !=:int:1
+          throw:The snippet '{0}' doesn't exist
+            :x:/@_dp?value
+
+      /*
+       * Committing transaction.
+       */
+      p5.mysql.transaction.commit

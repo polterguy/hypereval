@@ -35,14 +35,15 @@ create-event:hypereval.snippets.save
     src:regex:/^[-a-z0-9_ \.]{2,}$/i
   if:x:/@match/*?name
     not
-    throw:Use at least 2 characters, only spaces, a-z, 0-9, '.', '_' and '-' in your snippet's name
+    throw:Illegal snippet name. Use at least 2 characters, only spaces, a-z, A-Z, 0-9, '.', '_', ' ' and '-' in your snippet's name
 
   /*
    * Sanity checking [content].
    */
   if:x:/../*/content?value
     =:
-    throw:No [content] value provided
+    throw:No [content] value provided while trying to save snippet '{0}'
+      :x:/../*/_arg?value
 
   /*
    * Checking if Hyperlambda was provided as value of [content].
@@ -66,9 +67,7 @@ create-event:hypereval.snippets.save
       src:x:/@lambda2hyper?value
 
   /*
-   * Opening up database connection, and wrapping our insert operation in a
-   * database transaction, to avoid deletion of old snippet, without successful
-   * insert of new snippet.
+   * Opening up database connection, and saving our snippet to the database.
    */
   p5.mysql.connect:[hypereval]
 

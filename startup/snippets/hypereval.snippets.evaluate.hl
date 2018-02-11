@@ -3,12 +3,8 @@
  * Creates evaluate snippet Active Event.
  *
  * This event will allow you to evaluate a snippet by name.
- * Pass in the name of the snippet you want to evaluate as [_arg].
+ * Pass in the name of the snippet(s) you want to evaluate as [_arg].
  * Optionally pass in [type] being for instance "page" or "startup".
- *
- * Notice, this event allows for creating extension widgets that returns
- * widgets to caller, allowing for the evaluation of a snippet, to create
- * an extension widget.
  */
 create-event:hypereval.snippets.evaluate
 
@@ -26,7 +22,7 @@ create-event:hypereval.snippets.evaluate
     type:string
 
   /*
-   * Retrieving snippet.
+   * Loading snippet(s).
    */
   add:x:/+
     src:x:/@.signal/--/<-(/type|/_arg)
@@ -34,16 +30,26 @@ create-event:hypereval.snippets.evaluate
 
   /*
    * Looping through each result, converting snippet to Hyperlambda,
-   * passing in all arguments (except _arg and type), and evaluating snippet.
+   * passing in all arguments (except [_arg] and [type]), and evaluating snippet.
    */
-  for-each:x:/@hypereval.snippets.load/*?value
+  for-each:x:/@hypereval.snippets.load/*/content?value
+
+    /*
+     * Converting currently iterated snippet Hyperlambda to a lambda object.
+     */
     hyper2lambda:x:/@_dp?value
+
+    /*
+     * Adding all arguments to snippet, except [_arg] and [type], which are
+     * criteria to the load snippet mechanism.
+     */
     add:x:/+
       src:x:/@.signal/--(!/_arg!/type)
     eval:x:/@hyper2lambda
 
     /*
-     * Making sure we return the results of evaluation back to caller.
+     * Making sure we return the results of evaluation back to caller of
+     * currently iterated snippet, if anything.
      */
     set:x:/../*/return?value
       src:x:/@eval?value
