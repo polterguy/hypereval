@@ -47,7 +47,7 @@ create-event:hypereval.snippets.load
      * Looping through each [_arg] specified by caller, and concatenating into
      * [_result].
      */
-    for-each:x:/@.signal/--/_arg/<-?value
+    for-each:x:/../*/_arg?value
 
       /*
        * Selecting currently iterated snippet.

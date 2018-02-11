@@ -47,8 +47,8 @@ if:x:/@micro.url.get-entities/*?count
      * No such snippet found.
      */
     p5.web.response.set-status-code:404
-    p5.web.response.set-status-description:404 - No such snippet found
-    p5.web.echo:No such snippet found
+    p5.web.response.set-status-description:404 - No such functioning snippet found
+    p5.web.echo:x:/@message?value
 
 else
 
