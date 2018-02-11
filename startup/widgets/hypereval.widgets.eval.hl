@@ -74,7 +74,7 @@ create-event:hypereval.widgets.eval
           /*
            * Modifying textarea's and CodeMirror's values.
            */
-          hypereval.widgets.eval.set-code:x:/@hypereval.snippets.load?value
+          hypereval.widgets.eval.set-code:x:/@hypereval.snippets.load/*?value
 
           /*
            * Storing the snippet's name in our session.

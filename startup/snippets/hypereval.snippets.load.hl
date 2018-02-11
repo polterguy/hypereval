@@ -1,8 +1,8 @@
 
 /*
- * Retrieves the named snippet's Hyperlambda.
+ * Retrieves the snippet(s) with the specified [_arg] Hyperlambda.
  *
- * This event will return the Hyperlambda of the [_arg] snippet.
+ * This event will return the Hyperlambda of all snippets matching the specified [_arg].
  * Optionally pass in [type] of snippet being e.g. "page" or "startup".
  */
 create-event:hypereval.snippets.load
@@ -33,7 +33,7 @@ create-event:hypereval.snippets.load
      */
     set:x:/@_type-where?value
       src:"and type = @type"
-    add:x:/../*/p5.mysql.connect/*/p5.mysql.scalar
+    add:x:/../*/p5.mysql.connect/*/for-each/*/p5.mysql.scalar
       src
         @type:x:/@.signal/--/type?value
 
@@ -42,18 +42,36 @@ create-event:hypereval.snippets.load
    * to caller.
    */
   p5.mysql.connect:[hypereval]
-    p5.mysql.scalar:@"select content from snippets where name = @name {0}"
-      :x:/@_type-where?value
-      @name:x:/../*/_arg?value
 
     /*
-     * Making sure that snippet actually exists.
+     * Looping through each [_arg] specified by caller, and concatenating into
+     * [_result].
      */
-    if:x:/@p5.mysql.scalar?value
-      not
-      throw:No such snippet
+    for-each:x:/@.signal/--/_arg/<-?value
 
-    /*
-     * Returning snippet to caller.
-     */
-    return:x:/@p5.mysql.scalar?value
+      /*
+       * Selecting currently iterated snippet.
+       */
+      p5.mysql.scalar:@"select content from snippets where name = @name {0}"
+        :x:/@_type-where?value
+        @name:x:/@_dp?value
+
+      /*
+       * Making sure that snippet actually exists.
+       */
+      if:x:/@p5.mysql.scalar?value
+        not
+        throw:No such snippet
+
+      /*
+       * Concatenating snippet's Hyperlambda into [_result].
+       */
+      eval-x:x:/+/*/*
+      add:x:/../*/return
+        src
+          content:x:/@p5.mysql.scalar?value
+
+  /*
+   * Returning snippet to caller.
+   */
+  return

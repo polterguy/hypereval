@@ -33,19 +33,24 @@ create-event:hypereval.snippets.evaluate
   hypereval.snippets.load
 
   /*
-   * Converting snippet to Hyperlambda, passing in all arguments (except _arg and type),
-   * and evaluating snippet.
+   * Looping through each result, converting snippet to Hyperlambda,
+   * passing in all arguments (except _arg and type), and evaluating snippet.
    */
-  hyper2lambda:x:/@hypereval.snippets.load?value
-  add:x:/+
-    src:x:/@.signal/--(!/_arg!/type)
-  eval:x:/@hyper2lambda
+  for-each:x:/@hypereval.snippets.load/*?value
+    hyper2lambda:x:/@_dp?value
+    add:x:/+
+      src:x:/@.signal/--(!/_arg!/type)
+    eval:x:/@hyper2lambda
+
+    /*
+     * Making sure we return the results of evaluation back to caller.
+     */
+    set:x:/../*/return?value
+      src:x:/@eval?value
+    add:x:/../*/return
+      src:x:/@eval/*
 
   /*
-   * Returning results back to caller.
+   * Returning results to caller.
    */
-  set:x:/./*/return?value
-    src:x:/@eval?value
-  add:x:/./*/return
-    src:x:/@eval/*
   return

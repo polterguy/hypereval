@@ -2,19 +2,21 @@
 /*
  * Creates search for snippet Active Event.
  *
- * This event will allow you to search for snippets containing the specified [_arg]
- * in its name.
+ * This event will allow you to search for snippets.
  *
- * Optionally pass in [type], [limit] and/or [offset] to further parametrize your query.
+ * Optionally pass in [_arg], [type], [content], [limit] and/or [offset] to further parametrize your query.
+ *
+ * If you pass in [_arg] then the name of the snippet must contain your query.
+ * If you pass in [content], then the snippet's content must contain your query.
  */
 create-event:hypereval.snippets.search
 
   /*
    * Sanity checking arguments.
    */
-  micro.lambda.contract.min:x:/..
-    _arg:string
   micro.lambda.contract.optional:x:/..
+    _arg:string
+    content:string
     type:string
     offset:long
     limit:long
@@ -53,12 +55,14 @@ create-event:hypereval.snippets.search
      *
      * Making sure we use a "like" SQL criteria.
      */
-    p5.mysql.select:@"select name, type from snippets where name like @name {0} limit @limit offset @offset"
+    p5.mysql.select:@"select name, type from snippets where name like @name and content like @content {0} limit @limit offset @offset"
       :x:/@_where?value
       @name:%{0}%
         :x:/../*/_arg?value
-      @offset:x:(/../*/offset|/@.defaults/*/offset)/$?value
-      @limit:x:(/../*/limit|/@.defaults/*/limit)/$?value
+      @content:%{0}%
+        :x:/../*/content?value
+      @offset:x:(/../*/offset|/@.defaults/*/offset)/$?value.long
+      @limit:x:(/../*/limit|/@.defaults/*/limit)/$?value.long
 
     /*
      * Returning the full name and type of all snippets matching the specified criteria
