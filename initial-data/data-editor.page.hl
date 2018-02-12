@@ -346,402 +346,390 @@ create-widget
 
 
                 div
-                  class:right
+                  class:strip right
                   widgets
-                    div
-                      class:strip
-                      widgets
-                        input:hypereval-data-editor-search-filter
-                          type:text
-                          title:Filter, keyboard shortcut F
-                          accesskey:F
-                          class:smaller
-                          onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-data-editor-search-btn').raise('onclick');return false;}"
-                          oninit
+                    input:hypereval-data-editor-search-filter
+                      type:text
+                      title:Filter, keyboard shortcut F
+                      accesskey:F
+                      class:smaller
+                      onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-data-editor-search-btn').raise('onclick');return false;}"
+                      oninit
 
-                            /*
-                             * Setting initial focus to filter textbox.
-                             */
-                            micro.page.set-focus:x:/../*/_event?value
-                            select-data:x:/*/*?count
-                            set-widget-property:x:/../*/_event?value
-                              placeholder:{0} items ...
-                                :x:/@select-data?value
+                        /*
+                         * Setting initial focus to filter textbox.
+                         */
+                        micro.page.set-focus:x:/../*/_event?value
+                        select-data:x:/*/*?count
+                        set-widget-property:x:/../*/_event?value
+                          placeholder:{0} items ...
+                            :x:/@select-data?value
 
-                        button:hypereval-data-editor-search-btn
-                          title:Search, keyboard shortcut S
-                          innerValue:@"<span class=""icon-search""></span>"
-                          accesskey:S
-                          onclick
+                    button:hypereval-data-editor-search-btn
+                      title:Search, keyboard shortcut S
+                      innerValue:@"<span class=""icon-search""></span>"
+                      accesskey:S
+                      onclick
 
-                            /*
-                             * Retrieving filter, storing it in ViewState, and re-databinding datagrid.
-                             */
-                            get-widget-property:hypereval-data-editor-search-filter
-                              value
+                        /*
+                         * Retrieving filter, storing it in ViewState, and re-databinding datagrid.
+                         */
+                        get-widget-property:hypereval-data-editor-search-filter
+                          value
 
-                            /*
-                             * Clearing our [offset] value.
-                             */
-                            p5.web.viewstate.set:hypereval.data-editor.offset
-                              src:int:0
+                        /*
+                         * Clearing our [offset] value.
+                         */
+                        p5.web.viewstate.set:hypereval.data-editor.offset
+                          src:int:0
 
-                            /*
-                             * Making sure we disable our "previous button".
-                             */
-                            set-widget-property:hypereval-data-editor-previous-btn
-                              disabled
-
-                            /*
-                             * Checking if filter is empty, and if so, making sure we remove the [filter] argument
-                             * to our databind invocation, disabling our "clear filter" button, and removing
-                             * our viewstate filter value.
-                             */
-                            if:x:/@get-widget-property/*/*?value
-                              =:
-
-                              /*
-                               * Filter is empty.
-                               */
-                              set-widget-property:hypereval-data-editor-clear-btn
-                                disabled
-                              p5.web.viewstate.set:hypereval.data-editor.filter
-                                src:
-
-                            else
-
-                              /*
-                               * Filter was not empty.
-                               */
-                              p5.web.viewstate.set:hypereval.data-editor.filter
-                                src:x:/@get-widget-property/*/*?value
-                              delete-widget-property:hypereval-data-editor-clear-btn
-                                disabled
-
-                            /*
-                             * Invoking our databind event.
-                             */
-                            eval-x:x:/+/*
-                            hypereval._database-editor.databind
-                              filter:x:/@get-widget-property/*/*?value
-                            if:x:/-?value
-                              =:bool:true
-                              delete-widget-property:hypereval-data-editor-next-btn
-                                disabled
-                            else
-                              set-widget-property:hypereval-data-editor-next-btn
-                                disabled
-                            micro.page.set-focus:hypereval-data-editor-search-filter
-
-                        button:hypereval-data-editor-clear-btn
-                          innerValue:@"<span class=""icon-cross""></span>"
-                          accesskey:X
-                          title:Clear filter, keyboard shortcut X
+                        /*
+                         * Making sure we disable our "previous button".
+                         */
+                        set-widget-property:hypereval-data-editor-previous-btn
                           disabled
-                          onclick
 
-                            /*
-                             * Clearing our viewstate offset value and filter condition, removing value
-                             * from filter textbox, and re-databinding grid.
-                             */
-                            p5.web.viewstate.set:hypereval.data-editor.offset
-                              src:int:0
-                            p5.web.viewstate.set:hypereval.data-editor.filter
-                              src:
-                            set-widget-property:hypereval-data-editor-search-filter
-                              value:
-                            hypereval._database-editor.databind
-                            if:x:/-?value
-                              =:bool:true
-                              delete-widget-property:hypereval-data-editor-next-btn
-                                disabled
+                        /*
+                         * Checking if filter is empty, and if so, making sure we remove the [filter] argument
+                         * to our databind invocation, disabling our "clear filter" button, and removing
+                         * our viewstate filter value.
+                         */
+                        if:x:/@get-widget-property/*/*?value
+                          =:
 
-                            /*
-                             * Disabling clear filter button, and previus button, and setting
-                             * focus to filter textbox.
-                             */
-                            set-widget-property:hypereval-data-editor-clear-btn
-                              disabled
-                            set-widget-property:hypereval-data-editor-previous-btn
-                              disabled
-                            micro.page.set-focus:hypereval-data-editor-search-filter
+                          /*
+                           * Filter is empty.
+                           */
+                          set-widget-property:hypereval-data-editor-clear-btn
+                            disabled
+                          p5.web.viewstate.set:hypereval.data-editor.filter
+                            src:
 
-                    div
-                      class:strip
-                      style:"margin-left:1rem;"
-                      widgets
+                        else
 
-                        button:hypereval-data-editor-previous-btn
-                          innerValue:@"<span class=""icon-arrow-left""></span>"
-                          accesskey:P
-                          title:Go to previous page, keyboard shortcut P
+                          /*
+                           * Filter was not empty.
+                           */
+                          p5.web.viewstate.set:hypereval.data-editor.filter
+                            src:x:/@get-widget-property/*/*?value
+                          delete-widget-property:hypereval-data-editor-clear-btn
+                            disabled
+
+                        /*
+                         * Invoking our databind event.
+                         */
+                        eval-x:x:/+/*
+                        hypereval._database-editor.databind
+                          filter:x:/@get-widget-property/*/*?value
+                        if:x:/-?value
+                          =:bool:true
+                          delete-widget-property:hypereval-data-editor-next-btn
+                            disabled
+                        else
+                          set-widget-property:hypereval-data-editor-next-btn
+                            disabled
+                        micro.page.set-focus:hypereval-data-editor-search-filter
+
+                    button:hypereval-data-editor-clear-btn
+                      innerValue:@"<span class=""icon-cross""></span>"
+                      accesskey:X
+                      title:Clear filter, keyboard shortcut X
+                      disabled
+                      onclick
+
+                        /*
+                         * Clearing our viewstate offset value and filter condition, removing value
+                         * from filter textbox, and re-databinding grid.
+                         */
+                        p5.web.viewstate.set:hypereval.data-editor.offset
+                          src:int:0
+                        p5.web.viewstate.set:hypereval.data-editor.filter
+                          src:
+                        set-widget-property:hypereval-data-editor-search-filter
+                          value:
+                        hypereval._database-editor.databind
+                        if:x:/-?value
+                          =:bool:true
+                          delete-widget-property:hypereval-data-editor-next-btn
+                            disabled
+
+                        /*
+                         * Disabling clear filter button, and previus button, and setting
+                         * focus to filter textbox.
+                         */
+                        set-widget-property:hypereval-data-editor-clear-btn
                           disabled
-                          onclick
+                        set-widget-property:hypereval-data-editor-previous-btn
+                          disabled
+                        micro.page.set-focus:hypereval-data-editor-search-filter
 
-                            /*
-                             * Retrieving current offset, decrementing it by 10, and re-databinding grid.
-                             */
-                            p5.web.viewstate.get:hypereval.data-editor.offset
-                            -:x:/@p5.web.viewstate.get/*?value.int
-                              _:10
-                            p5.web.viewstate.set:hypereval.data-editor.offset
-                              src:x:/@-?value
-                            p5.web.viewstate.get:hypereval.data-editor.filter
-                            eval-x:x:/+/*
-                            hypereval._database-editor.databind
-                              filter:x:/@p5.web.viewstate.get/*?value
-                              offset:x:/@-?value
+                    button:hypereval-data-editor-previous-btn
+                      innerValue:@"<span class=""icon-arrow-left""></span>"
+                      accesskey:P
+                      title:Go to previous page, keyboard shortcut P
+                      disabled
+                      onclick
 
-                            /*
-                             * Checking if we should disable previous button.
-                             */
-                            if:x:/@-?value.int
-                              =:int:0
-                              set-widget-property:hypereval-data-editor-previous-btn
-                                disabled
-                            delete-widget-property:hypereval-data-editor-next-btn
-                              disabled
+                        /*
+                         * Retrieving current offset, decrementing it by 10, and re-databinding grid.
+                         */
+                        p5.web.viewstate.get:hypereval.data-editor.offset
+                        -:x:/@p5.web.viewstate.get/*?value.int
+                          _:10
+                        p5.web.viewstate.set:hypereval.data-editor.offset
+                          src:x:/@-?value
+                        p5.web.viewstate.get:hypereval.data-editor.filter
+                        eval-x:x:/+/*
+                        hypereval._database-editor.databind
+                          filter:x:/@p5.web.viewstate.get/*?value
+                          offset:x:/@-?value
 
-                        button:hypereval-data-editor-next-btn
-                          innerValue:@"<span class=""icon-arrow-right""></span>"
-                          accesskey:N
-                          title:Go to next page, keyboard shortcut N
-                          onclick
+                        /*
+                         * Checking if we should disable previous button.
+                         */
+                        if:x:/@-?value.int
+                          =:int:0
+                          set-widget-property:hypereval-data-editor-previous-btn
+                            disabled
+                        delete-widget-property:hypereval-data-editor-next-btn
+                          disabled
 
-                            /*
-                             * Retrieving current offset, incrementing it by 10, and re-databinding grid.
-                             */
-                            p5.web.viewstate.get:hypereval.data-editor.offset
-                            +:x:/@p5.web.viewstate.get/*?value.int
-                              _:10
-                            p5.web.viewstate.set:hypereval.data-editor.offset
-                              src:x:/@+?value
-                            p5.web.viewstate.get:hypereval.data-editor.filter
-                            eval-x:x:/+/*
-                            hypereval._database-editor.databind
-                              filter:x:/@p5.web.viewstate.get/*?value
-                              offset:x:/@+?value
-                            delete-widget-property:hypereval-data-editor-previous-btn
-                              disabled
+                    button:hypereval-data-editor-next-btn
+                      innerValue:@"<span class=""icon-arrow-right""></span>"
+                      accesskey:N
+                      title:Go to next page, keyboard shortcut N
+                      onclick
 
-                            /*
-                             * Checking if we are at end of dataset.
-                             */
-                            if:x:/@hypereval._database-editor.databind?value
-                              not
-                              set-widget-property:hypereval-data-editor-next-btn
-                                disabled
+                        /*
+                         * Retrieving current offset, incrementing it by 10, and re-databinding grid.
+                         */
+                        p5.web.viewstate.get:hypereval.data-editor.offset
+                        +:x:/@p5.web.viewstate.get/*?value.int
+                          _:10
+                        p5.web.viewstate.set:hypereval.data-editor.offset
+                          src:x:/@+?value
+                        p5.web.viewstate.get:hypereval.data-editor.filter
+                        eval-x:x:/+/*
+                        hypereval._database-editor.databind
+                          filter:x:/@p5.web.viewstate.get/*?value
+                          offset:x:/@+?value
+                        delete-widget-property:hypereval-data-editor-previous-btn
+                          disabled
 
-                    div
-                      class:strip
-                      style:"margin-left:1rem;"
-                      widgets
-                        button
-                          innerValue:@"<span class=""icon-plus""></span>"
-                          title:Create new record(s), keyboard shortcut C
-                          accesskey:C
-                          onclick
+                        /*
+                         * Checking if we are at end of dataset.
+                         */
+                        if:x:/@hypereval._database-editor.databind?value
+                          not
+                          set-widget-property:hypereval-data-editor-next-btn
+                            disabled
 
-                            /*
-                             * Showing a modal window, with a Hyperlambda editor, allowing
-                             * user to create a new item.
-                             */
-                            create-widgets
-                              micro.widgets.modal:hypereval-data-editor-new-record-modal
+                    button
+                      innerValue:@"<span class=""icon-plus""></span>"
+                      title:Create new record(s), keyboard shortcut C
+                      accesskey:C
+                      onclick
+
+                        /*
+                         * Showing a modal window, with a Hyperlambda editor, allowing
+                         * user to create a new item.
+                         */
+                        create-widgets
+                          micro.widgets.modal:hypereval-data-editor-new-record-modal
+                            widgets
+                              h3
+                                innerValue:New records(s)
+                              p
+                                innerValue:Supply me with data for your record(s).
+                              micro.widgets.codemirror
+                                .data-field:content
+                              div
+                                class:right
                                 widgets
-                                  h3
-                                    innerValue:New records(s)
-                                  p
-                                    innerValue:Supply me with data for your record(s).
-                                  micro.widgets.codemirror
-                                    .data-field:content
                                   div
-                                    class:right
+                                    class:strip
                                     widgets
-                                      div
-                                        class:strip
-                                        widgets
-                                          button
-                                            innerValue:@"<span class=""icon-floppy-disk""></span>"
-                                            class:larger
-                                            title:Creates your new record(s)
-                                            onclick
+                                      button
+                                        innerValue:@"<span class=""icon-floppy-disk""></span>"
+                                        class:larger
+                                        title:Creates your new record(s)
+                                        onclick
 
-                                              /*
-                                               * Making sure we wrap out insert into a try/catch block, in case of errors.
-                                               */
-                                              try
+                                          /*
+                                           * Making sure we wrap out insert into a try/catch block, in case of errors.
+                                           */
+                                          try
 
-                                                /*
-                                                 * Retrieving Hyperlambda from Code-Mirror editor, and inserting
-                                                 * it into p5.data database.
-                                                 */
-                                                micro.form.serialize:hypereval-data-editor-new-record-modal
-                                                hyper2lambda:x:/@micro.form.serialize/*/content?value
-                                                add:x:/..try/*/insert-data
-                                                  src:x:/@hyper2lambda/*
-                                                insert-data
+                                            /*
+                                             * Retrieving Hyperlambda from Code-Mirror editor, and inserting
+                                             * it into p5.data database.
+                                             */
+                                            micro.form.serialize:hypereval-data-editor-new-record-modal
+                                            hyper2lambda:x:/@micro.form.serialize/*/content?value
+                                            add:x:/..try/*/insert-data
+                                              src:x:/@hyper2lambda/*
+                                            insert-data
 
-                                                /*
-                                                 * Deleting modal window.
-                                                 */
-                                                delete-widget:hypereval-data-editor-new-record-modal
+                                            /*
+                                             * Deleting modal window.
+                                             */
+                                            delete-widget:hypereval-data-editor-new-record-modal
 
-                                                /*
-                                                 * Re-databinding grid.
-                                                 */
-                                                p5.web.viewstate.get:hypereval.data-editor.filter
-                                                p5.web.viewstate.get:hypereval.data-editor.offset
-                                                if:x:/../*/p5.web.viewstate.get/[0,1]/*?value
-                                                  not
-                                                  or:x:/../*/p5.web.viewstate.get/[0,1]/*?value
-                                                    =:
-                                                  set:x:/..try/*/hypereval._database-editor.databind/*/filter
-                                                if:x:/../*/p5.web.viewstate.get/[1,2]/*?value
-                                                  not
-                                                  or:x:/../*/p5.web.viewstate.get/[1,2]/*?value
-                                                    =:
-                                                  set:x:/..try/*/hypereval._database-editor.databind/*/offset
-                                                eval-x:x:/+/*
-                                                hypereval._database-editor.databind
-                                                  filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
-                                                  offset:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+                                            /*
+                                             * Re-databinding grid.
+                                             */
+                                            p5.web.viewstate.get:hypereval.data-editor.filter
+                                            p5.web.viewstate.get:hypereval.data-editor.offset
+                                            if:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                              not
+                                              or:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                                =:
+                                              set:x:/..try/*/hypereval._database-editor.databind/*/filter
+                                            if:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+                                              not
+                                              or:x:/../*/p5.web.viewstate.get/[1,2]/*?value
+                                                =:
+                                              set:x:/..try/*/hypereval._database-editor.databind/*/offset
+                                            eval-x:x:/+/*
+                                            hypereval._database-editor.databind
+                                              filter:x:/../*/p5.web.viewstate.get/[0,1]/*?value
+                                              offset:x:/../*/p5.web.viewstate.get/[1,2]/*?value
 
-                                              catch
+                                          catch
 
-                                                /*
-                                                 * Displaying error to user.
-                                                 */
-                                                micro.windows.info:x:/@message?value
-                                                  class:micro-windows-info warning
+                                            /*
+                                             * Displaying error to user.
+                                             */
+                                            micro.windows.info:x:/@message?value
+                                              class:micro-windows-info warning
 
-                                          button
-                                            innerValue:@"<span class=""icon-cross""></span>"
-                                            title:Close window, without creating new record(s)
-                                            onclick
+                                      button
+                                        innerValue:@"<span class=""icon-cross""></span>"
+                                        title:Close window, without creating new record(s)
+                                        onclick
 
-                                              /*
-                                               * Deleting modal window.
-                                               */
-                                              delete-widget:hypereval-data-editor-new-record-modal
+                                          /*
+                                           * Deleting modal window.
+                                           */
+                                          delete-widget:hypereval-data-editor-new-record-modal
 
-                        button
-                          innerValue:@"<span class=""icon-eye""></span>"
-                          accesskey:A
-                          title:Advanced, keyboard shortcut A
-                          onclick
+                    button
+                      innerValue:@"<span class=""icon-eye""></span>"
+                      accesskey:A
+                      title:Advanced, keyboard shortcut A
+                      onclick
 
-                            /*
-                             * Toggling advanced editor parts.
-                             */
-                            get-widget-property:hypereval-data-editor-advanced
-                              visible
-                            if:x:/-/*/*?value
-                              =:bool:true
+                        /*
+                         * Toggling advanced editor parts.
+                         */
+                        get-widget-property:hypereval-data-editor-advanced
+                          visible
+                        if:x:/-/*/*?value
+                          =:bool:true
 
-                              /*
-                               * Hiding advanced widget.
-                               */
-                              set-widget-property:hypereval-data-editor-advanced
-                                visible:false
+                          /*
+                           * Hiding advanced widget.
+                           */
+                          set-widget-property:hypereval-data-editor-advanced
+                            visible:false
 
-                            else
+                        else
 
-                              /*
-                               * Showing advanced widget.
-                               */
-                              set-widget-property:hypereval-data-editor-advanced
-                                visible:true
+                          /*
+                           * Showing advanced widget.
+                           */
+                          set-widget-property:hypereval-data-editor-advanced
+                            visible:true
 
-                            /*
-                             * Toggling "toggled" CSS class for button.
-                             */
-                            micro.css.toggle:x:/../*/_event?value
-                              class:toggled
+                        /*
+                         * Toggling "toggled" CSS class for button.
+                         */
+                        micro.css.toggle:x:/../*/_event?value
+                          class:toggled
 
-                        button
-                          innerValue:@"<span class=""icon-download2""></span>"
-                          title:Download a backup of your database
-                          onclick
+                    button
+                      innerValue:@"<span class=""icon-download2""></span>"
+                      title:Download a backup of your database
+                      onclick
 
-                            /*
-                             * Loops through all database records, creating a backup zip file,
-                             * and downloading it to client.
-                             *
-                             * First making sure our temporary folder exists, and that it is empty.
-                             */
-                            if
-                              fetch:x:/0/0?value
-                                folder-exists:~/temp/p5-data-backup/
-                              not
+                        /*
+                         * Loops through all database records, creating a backup zip file,
+                         * and downloading it to client.
+                         *
+                         * First making sure our temporary folder exists, and that it is empty.
+                         */
+                        if
+                          fetch:x:/0/0?value
+                            folder-exists:~/temp/p5-data-backup/
+                          not
 
-                              /*
-                               * Creating temp folder to hold zip file, and backup files.
-                               */
-                              create-folder:~/temp/p5-data-backup/
+                          /*
+                           * Creating temp folder to hold zip file, and backup files.
+                           */
+                          create-folder:~/temp/p5-data-backup/
 
-                            else
+                        else
 
-                              /*
-                               * Deleting temp folder for any existing files and folders.
-                               */
-                              list-files:~/temp/p5-data-backup/
-                              delete-file:x:/-/*?name
-                              list-folders:~/temp/p5-data-backup/
-                              delete-folder:x:/-/*?name
+                          /*
+                           * Deleting temp folder for any existing files and folders.
+                           */
+                          list-files:~/temp/p5-data-backup/
+                          delete-file:x:/-/*?name
+                          list-folders:~/temp/p5-data-backup/
+                          delete-folder:x:/-/*?name
 
-                            /*
-                             * Looping through each database record, creating one Hyperlambda file, 
-                             * for every 50th record.
-                             */
-                            .offset:int:0
-                            .no:int:1
-                            while:bool:true
-                              +:x:/@.offset?value.int
-                                _:50
-                              select-data:x:/*/*/[{0},{1}]
-                                :x:/@.offset?value
-                                :x:/@+?value
-                              if:x:/@select-data/*
-                                not
-
-                                /*
-                                 * No more records.
-                                 */
-                                break
-
-                              /*
-                               * Transforming current result set to Hyperlambda, and stuffing it into a file,
-                               * in our temporary folder.
-                               */
-                              lambda2hyper:x:/@select-data/*
-                              save-file:"~/temp/p5-data-backup/db-{0:0000}.hl"
-                                :x:/@.no?value
-                                src:x:/@lambda2hyper?value
-                              set:x:/@.no?value
-                                +:x:/@.no?value
-                                  _:1
-                              set:x:/@.offset?value
-                                +:x:/@.offset?value
-                                  _:50
+                        /*
+                         * Looping through each database record, creating one Hyperlambda file, 
+                         * for every 50th record.
+                         */
+                        .offset:int:0
+                        .no:int:1
+                        while:bool:true
+                          +:x:/@.offset?value.int
+                            _:50
+                          select-data:x:/*/*/[{0},{1}]
+                            :x:/@.offset?value
+                            :x:/@+?value
+                          if:x:/@select-data/*
+                            not
 
                             /*
-                             * Zipping entire backup folder, and downloading to client.
-                             *
-                             * Making sure we delete any previously created backup zip files first.
+                             * No more records.
                              */
-                            if
-                              fetch:x:/0/0?value
-                                file-exists:~/temp/database-backup.zip
-                              delete-file:~/temp/database-backup.zip
+                            break
 
-                            /*
-                             * Creating zip file containing all p5.data records, 
-                             * and downloading it to the client.
-                             */
-                            zip:~/temp/database-backup.zip
-                              src:~/temp/p5-data-backup/
-                            micro.download.file:~/temp/database-backup.zip
+                          /*
+                           * Transforming current result set to Hyperlambda, and stuffing it into a file,
+                           * in our temporary folder.
+                           */
+                          lambda2hyper:x:/@select-data/*
+                          save-file:"~/temp/p5-data-backup/db-{0:0000}.hl"
+                            :x:/@.no?value
+                            src:x:/@lambda2hyper?value
+                          set:x:/@.no?value
+                            +:x:/@.no?value
+                              _:1
+                          set:x:/@.offset?value
+                            +:x:/@.offset?value
+                              _:50
+
+                        /*
+                         * Zipping entire backup folder, and downloading to client.
+                         *
+                         * Making sure we delete any previously created backup zip files first.
+                         */
+                        if
+                          fetch:x:/0/0?value
+                            file-exists:~/temp/database-backup.zip
+                          delete-file:~/temp/database-backup.zip
+
+                        /*
+                         * Creating zip file containing all p5.data records, 
+                         * and downloading it to the client.
+                         */
+                        zip:~/temp/database-backup.zip
+                          src:~/temp/p5-data-backup/
+                        micro.download.file:~/temp/database-backup.zip
 
                 div:hypereval-data-editor-advanced
                   visible:false

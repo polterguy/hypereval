@@ -502,6 +502,7 @@ create-event:hypereval.widgets.eval
               hypereval.widgets.eval.load-snippet:x:/@p5.web.session.get/*?value
 
           keys
+            Alt-E:p5.$('hypereval-evaluate-snippet').raise('onclick')
             Alt-V:p5.$('hypereval-view-output').raise('onclick')
             Alt-S:p5.$('hypereval-save-snippet').raise('onclick')
             Alt-L:p5.$('hypereval-load-snippet').raise('onclick')
@@ -536,7 +537,7 @@ create-event:hypereval.widgets.eval
          *
          * Notice, we'll need to wrap it in a wrapper widget, such that we are
          * able to toggle its visibility correctly.
-         * 
+         *
          */
         div:hypereval-output-wrapper
           visible:false
