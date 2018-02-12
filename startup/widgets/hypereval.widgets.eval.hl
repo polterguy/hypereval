@@ -1,6 +1,12 @@
 
 /*
  * Responsible for creating the Hypereval CodeMirror evaluator widget.
+ *
+ * This is most of the entire Hypereval app, allowing the user to load and save
+ * snippets, etc.
+ *
+ * The only parts that are not embedded in this widget is the export, upload
+ * and download buttons in Hypereval's top toolbar.
  */
 create-event:hypereval.widgets.eval
 
@@ -17,28 +23,16 @@ create-event:hypereval.widgets.eval
     throw:Hypereval is already running
 
   /*
-   * Figuring out font size to use for widget.
-   */
-  .defaults
-    font-size:9.25
-    theme:phosphorus
-    line-numbers:bool:true
-  p5.auth.my-settings.get
-
-  /*
    * Decorating widget with arguments.
    */
   add:x:/../*/return/*/container
     src:x:/@.signal/--/<-(!/_arg)
 
   /*
-   * Returning widget to caller.
+   * Returning widget to caller, making sure we forward evaluate all relevant arguments.
    */
-  eval-x:x:/+/**(/.theme|/.line-numbers|/.chrome)|/+/*/container/*/style
   return
     container
-      style:"font-size:{0}pt !important;"
-        :x:(/@p5.auth.my-settings.get/*/codemirror/*/font-size|/../*/.defaults/*/font-size)/$?value
       events
 
 
@@ -79,6 +73,10 @@ create-event:hypereval.widgets.eval
 
           /*
            * Storing the snippet's name in our session.
+           *
+           * This is done to make it easier to save snippet after modifications
+           * have been applied, by default decorating the snippet's filename and type,
+           * to whatever it was previously.
            */
           p5.web.session.set:hypereval.snippet-name
             src:x:/../*/_arg?value
@@ -90,7 +88,8 @@ create-event:hypereval.widgets.eval
             disabled
 
           /*
-           * Invoking event responsible for updating our header.
+           * Invoking event responsible for updating our header, passing in the
+           * name of the recently loaded snippet.
            */
           hypereval.set-header:x:/../*/_arg?value
 
@@ -115,10 +114,9 @@ create-event:hypereval.widgets.eval
             type:string
 
           /*
-           * Verifying there actually is any code.
+           * Retrieving CodeMirror editor's value.
            */
-          get-widget-property:hypereval-input
-            innerValue
+          micro.widgets.codemirror.get-value:hypereval-input
 
           /*
            * Inserting snippet into database.
@@ -126,7 +124,7 @@ create-event:hypereval.widgets.eval
           eval-x:x:/+/*
           hypereval.snippets.save:x:/../*/_arg?value
             type:x:/../*/type?value
-            content:x:/@get-widget-property/*/*?value
+            content:x:/@micro.widgets.codemirror.get-value/*?value
 
           /*
            * Making sure we store name used is session, in case
@@ -167,9 +165,8 @@ create-event:hypereval.widgets.eval
           /*
            * Retrieving textarea's content to caller.
            */
-          get-widget-property:hypereval-input
-            innerValue
-          return:x:/@get-widget-property/*/*?value
+          micro.widgets.codemirror.get-value:hypereval-input
+          return:x:/@micro.widgets.codemirror.get-value/*?value
 
 
         /*
@@ -193,11 +190,11 @@ create-event:hypereval.widgets.eval
             hyper2lambda:x:/../*/_arg?value
 
           /*
-           * Retrieving textarea's content to caller.
+           * Updates value of input CodeMirror editor.
            */
-          set-widget-property:hypereval-input
-            innerValue:x:/../*/_arg?value
-          p5.web.send-javascript:@"p5.hypereval_input.getDoc().setValue(p5.$('hypereval-input').el.value);"
+          eval-x:x:/+/*
+          micro.widgets.codemirror.set-value:hypereval-input
+            content:x:/../*/_arg?value
 
 
         /*
@@ -212,8 +209,7 @@ create-event:hypereval.widgets.eval
           /*
            * Retrieving Hyperlambda from CodeMirror editor.
            */
-          get-widget-property:hypereval-input
-            innerValue
+          micro.widgets.codemirror.get-value:hypereval-input
 
           /*
            * Checking to see if this is a saved snippet, at which point we
@@ -255,7 +251,7 @@ create-event:hypereval.widgets.eval
            */
           eval-x:x:/+/*
           return
-            content:x:/@get-widget-property/*/*?value
+            content:x:/@micro.widgets.codemirror.get-value/*?value
             name:x:(/@p5.web.session.get/*/hypereval.snippet-name|/@.defaults/*/hypereval.snippet-name)/$?value
             type:x:/@.defaults/*/type?value
 
@@ -354,83 +350,27 @@ create-event:hypereval.widgets.eval
           micro.evaluate.file:@HYPEREVAL/helpers/new-snippet.hl
 
 
-      oninit
-
-        /*
-         * Forward evaluated above.
-         */
-        .chrome:x:/../*/chrome?value
-
-        /*
-         * Including CodeMirror JavaScript, CSS, and JSON AutoComplete.
-         */
-        micro.widgets.codemirror._include-javascript
-        micro.widgets.codemirror._include-css
-        micro.widgets.codemirror._include-auto-complete
-
-        /*
-         * Including selected theme's CSS file.
-         */
-        .theme:x:(/@p5.auth.my-settings.get/*/codemirror/*/theme|/../*/.defaults/*/theme)/$?value
-        p5.web.include-css-file:@MICRO/media/codemirror/theme/{0}.css
-          :x:/@.theme?value
-
-        /*
-         * Transforming input textarea to CodeMirror instance.
-         */
-        .line-numbers:x:(/@p5.auth.my-settings.get/*/codemirror/*/line-numbers|/../*/.defaults/*/line-numbers)/$?value
-        set:x:/-?value
-          to-lower:x:/./-?value.string
-        p5.io.unroll-path:@HYPEREVAL/
-        p5.web.send-javascript:@"p5.hypereval_input = CodeMirror.fromTextArea(p5.$('hypereval-input').el, {{
-  mode:'hyperlambda',
-  theme:'{0}',
-  lineNumbers:{1},
-  styleActiveLine:true,
-  path:'{2}/media/codemirror/',
-  autofocus:true,
-  tabSize:2,
-  indentAuto:true,
-  autoCloseBrackets:true,
-  showTrailingSpace:true,
-  extraKeys: {{
-    'Ctrl-Space':'autocomplete',
-    'Shift-Tab':'indentLess',
-    'Tab':'indentMore',
-    'Alt-F': 'findPersistent',
-    'Alt-M':function(cm) {{cm.setOption('fullScreen', !cm.getOption('fullScreen'));}},
-    'Alt-E':function(cm) {{
-      p5.$('hypereval-evaluate-snippet').raise('onclick', {{
-        onsuccess:function(ret, evt) {{
-          if (ret.code) {{
-            p5.hypereval_output.getDoc().setValue(ret.code);
-          }}
-        }}
-      }});
-    }},
-    'Alt-V':function(cm) {{p5.$('hypereval-view-output').raise('onclick');}},
-    'Alt-S':function(cm) {{p5.$('hypereval-save-snippet').raise('onclick');}},
-    'Alt-L':function(cm) {{p5.$('hypereval-load-snippet').raise('onclick');}},
-    'Alt-D':function(cm) {{p5.$('hypereval-delete-snippet').raise('onclick');}},
-    'Alt-N':function(cm) {{p5.$('hypereval-new-snippet').raise('onclick');}},
-    'Alt-P':function(cm) {{p5.$('hypereval-preview-snippet').raise('onclick');}}
-}}
-}});
-p5.hypereval_input.on('change',function (cMirror) {{
-  p5.$('hypereval-input').el.value = cMirror.getValue();
-}});
-p5.hypereval_input.setSize('100%', '400px');"
-          :x:/@.theme?value
-          :x:/@.line-numbers?value
-          :x:/@p5.io.unroll-path?value
-
       widgets
-        literal:hypereval-input
-          element:textarea
-          style:"display:none;"
+
+        /*
+         * CodeMirror "input" widget.
+         */
+        micro.widgets.codemirror:hypereval-input
+          auto-focus:true
+          height:400px
+          keys
+            Alt-V:p5.$('hypereval-view-output').raise('onclick')
+            Alt-S:p5.$('hypereval-save-snippet').raise('onclick')
+            Alt-L:p5.$('hypereval-load-snippet').raise('onclick')
+            Alt-D:p5.$('hypereval-delete-snippet').raise('onclick')
+            Alt-N:p5.$('hypereval-new-snippet').raise('onclick')
+            Alt-P:p5.$('hypereval-preview-snippet').raise('onclick')
+
+        /*
+         * Toolbars wrapper.
+         */
         div
           class:right air-top
-          widgets:bottom-toolbars
           widgets
 
             /*
@@ -448,47 +388,16 @@ p5.hypereval_input.setSize('100%', '400px');"
               folder:@HYPEREVAL/helpers/bottom-toolbar-buttons/
               class:strip
 
-
+        /*
+         * CodeMirror "output" wrapper.
+         *
+         * Notice, we'll need to wrap it in a wrapper widget, such that we are
+         * able to toggle its visibility correctly.
+         * 
+         */
         div:hypereval-output-wrapper
           visible:false
-          style:"clear:both;"
           widgets
-            literal:hypereval-output
-              element:textarea
-              oninit
-
-                /*
-                 * Notice, since the output widget might be invisible, we defer
-                 * initializing it until it becomes visible.
-                 * Default values.
-                 */
-                .defaults
-                  font-size:9.25
-                  theme:phosphorus
-                  line-numbers:bool:true
-
-                /*
-                 * Retrieving settings for widget.
-                 */
-                p5.auth.my-settings.get
-                .line-numbers:x:(/@p5.auth.my-settings.get/*/codemirror/*/line-numbers|/@.defaults/*/line-numbers)/$?value
-                set:x:/-?value
-                  to-lower:x:/./-?value.string
-
-                /*
-                 * Transforming output textarea to CodeMirror instance.
-                 */
-                p5.io.unroll-path:@MICRO/
-                p5.web.send-javascript:@"p5.hypereval_output = CodeMirror.fromTextArea(p5.$('hypereval-output').el, {{
-  mode:'hyperlambda',
-  theme:'{0}',
-  lineNumbers:{1},
-  styleActiveLine:true,
-  path:'{2}/media/codemirror/',
-  tabSize:2,
-  indentAuto:true,
-  readOnly:true
-}});"
-                  :x:(/@p5.auth.my-settings.get/*/codemirror/*/theme|/../*/.defaults/*/theme)/$?value
-                  :x:/@.line-numbers?value
-                  :x:/@p5.io.unroll-path?value
+            micro.widgets.codemirror:hypereval-output
+              height:200px
+              read-only:true

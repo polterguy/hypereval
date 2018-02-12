@@ -32,7 +32,7 @@ create-event:hypereval.snippets.evaluate
    * Looping through each result, converting snippet to Hyperlambda,
    * passing in all arguments (except [_arg] and [type]), and evaluating snippet.
    */
-  for-each:x:/@hypereval.snippets.load/*/content?value
+  for-each:x:/@hypereval.snippets.load/*?value
 
     /*
      * Converting currently iterated snippet Hyperlambda to a lambda object.

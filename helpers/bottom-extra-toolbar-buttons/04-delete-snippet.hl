@@ -47,8 +47,7 @@ button:hypereval-delete-snippet
                        */
                       micro.page.set-focus:x:/../*/_event?value
 
-                    onclick:@"p5.$('hypereval-confirm-deletion-btn').raise('.onclick',{onsuccess:function(ret, evt){p5.hypereval_input.getDoc().setValue('');}});return false;"
-                    .onclick
+                    onclick
 
                       /*
                        * Figuring out which snippet user wants to delete, if any.
@@ -72,11 +71,14 @@ button:hypereval-delete-snippet
                           @name:x:/@p5.web.session.get/*?value
 
                       /*
+                       * Removing code from editor.
+                       */
+                      hypereval.widgets.eval.set-code
+
+                      /*
                        * Cleaning out session variables.
                        */
                       p5.web.session.set:hypereval.snippet-name
-                      p5.web.session.set:hypereval.code
-                      p5.web.session.set:hypereval.file-type
 
                       /*
                        * Making sure we disable delete snippet button, 

@@ -36,7 +36,7 @@ create-event:hypereval.snippets.load
      */
     set:x:/@_type-where?value
       src:"and type = @type"
-    add:x:/../*/p5.mysql.connect/*/for-each/*/p5.mysql.scalar
+    add:x:/../*/p5.mysql.connect/*/for-each/*/p5.mysql.select
       src
         @type:x:/@.signal/--/type?value
 
@@ -55,14 +55,14 @@ create-event:hypereval.snippets.load
       /*
        * Selecting currently iterated snippet.
        */
-      p5.mysql.scalar:@"select content from snippets where name = @name {0}"
+      p5.mysql.select:@"select content, name from snippets where name = @name {0}"
         :x:/@_type-where?value
         @name:x:/@_dp?value
 
       /*
        * Making sure that snippet actually exists.
        */
-      if:x:/@p5.mysql.scalar?value
+      if:x:/@p5.mysql.select/*
         not
         throw:The snippet '{0}' doesn't exist
           :x:/@_dp?value
@@ -71,10 +71,12 @@ create-event:hypereval.snippets.load
        * Making sure we return currently iterated snippet's Hyperlambda
        * as [content] back to caller.
        */
+      set:x:/+2/*/*?name
+        src:x:/@p5.mysql.select/*/*/name?value
       eval-x:x:/+/*/*
       add:x:/../*/return
         src
-          content:x:/@p5.mysql.scalar?value
+          foo:x:/@p5.mysql.select/*/*/content?value
 
   /*
    * Returning snippet to caller.

@@ -21,9 +21,8 @@ button:hypereval-evaluate-snippet
      *
      * First we retrieve code, and convert it to a lambda object.
      */
-    get-widget-property:hypereval-input
-      innerValue
-    hyper2lambda:x:/@get-widget-property/*/*?value
+    hypereval.widgets.eval.get-code
+    hyper2lambda:x:/@hypereval.widgets.eval.get-code?value
 
     /*
      * Then we append the lambda into a "reference node", which will allow us
@@ -69,6 +68,6 @@ button:hypereval-evaluate-snippet
        * Setting the results of our evaluation, and making sure we refetch the
        * code into CodeMirror editor on the client side of things.
        */
-      set-widget-property:hypereval-output
-        innerValue:x:/@lambda2hyper?value
-      p5.web.send-javascript:@"p5.hypereval_output.getDoc().setValue(p5.$('hypereval-output').el.value);"
+      eval-x:x:/+/*
+      micro.widgets.codemirror.set-value:hypereval-output
+        content:x:/@lambda2hyper?value
