@@ -1,12 +1,11 @@
-
 /*
- * Responsible for creating the Hypereval CodeMirror evaluator widget.
+ * Creates the Hypereval CodeMirror evaluator extension widget.
  *
- * This is most of the entire Hypereval app, allowing the user to load and save
- * snippets, etc.
+ * This is most of the entire Hypereval app, allowing the user to load, evaluate,
+ * and save snippets, etc.
  *
  * The only parts that are not embedded in this widget from the Hypereval app is
- * the export, upload and download buttons in Hypereval's top toolbar.
+ * the export, upload, and download buttons in Hypereval's top toolbar.
  *
  * Notice, we only allow one instance of this widget per page.
  */
@@ -48,6 +47,138 @@ create-event:hypereval.widgets.eval
            * is running.
            */
           return:bool:true
+
+
+        /*
+         * Helper event to programmatically evaluate whatever is in the CodeMirror editor.
+         */
+        hypereval.widgets.eval.evaluate
+
+          /*
+           * Retrieving Hyperlambda and evaluating it.
+           *
+           * Notice, we might want to show the results of evaluation in our output
+           * CodeMirror editor after evaluation. Hence, we'll need to use [eval-mutable],
+           * and apply some "eval trickery" here to be able to accomplish that.
+           *
+           * We do this by adding the lambda object into a reference node, which is
+           * necessary to be able to use [eval-mutable], and still have the main root
+           * node being the root node for our evaluation.
+           *
+           * First we retrieve code, and convert it to a lambda object.
+           */
+          hypereval.widgets.eval.get-code
+          hyper2lambda:x:/@hypereval.widgets.eval.get-code?value
+
+          /*
+           * Then we append the lambda into a "reference node", which will allow us
+           * to retrieve the lambda as it is after evaluation, while still having
+           * our root node being the root node for our [eval-mutable] invocation.
+           *
+           * Notice, since reference nodes are shallow copies, we'll need to first
+           * delete the results of any previous invocations to it.
+           * Otherwise the operation will accumulate all nodes from any previous
+           * evaluations.
+           */
+          .exe:node:"exe"
+          set:x:/@.exe/#/*
+
+          /*
+           * Adding above lambda into reference node above.
+           */
+          add:x:/@.exe/#
+            src:x:/@hyper2lambda/*
+
+          /*
+           * Evaluating reference node, now containing our lambda object.
+           */
+          eval-mutable:x:/@.exe/#
+
+          /*
+           * Then converting lambda result to Hyperlambda, and returning back to client as JSON
+           */
+          lambda2hyper:x:/@.exe/#/*
+
+          /*
+           * Checking if output widget is visible, and if so, making sure we set the results
+           * of evaluation.
+           */
+          if
+            fetch:x:/0/0/0?value
+              get-widget-property:hypereval-output-wrapper
+                visible
+
+            /*
+             * "Output" CodeMirror widget is visible.
+             *
+             * Setting the results of our evaluation, and making sure we refetch the
+             * code into CodeMirror editor on the client side of things.
+             */
+            eval-x:x:/+/*
+            micro.widgets.codemirror.set-value:hypereval-output
+              content:x:/@lambda2hyper?value
+
+
+        /*
+         * Helper event to preview whatever page snippet is currently loaded.
+         *
+         * Will only function correctly if currently loaded snippet is of type "page".
+         */
+        hypereval.widgets.eval.preview
+
+          /*
+           * Previewing "current snippet" in a new window.
+           *
+           * First we need to retrieve the name of the currently active snippet.
+           */
+          p5.web.session.get:hypereval.snippet-name
+
+          /*
+           * Then we need to URL encode the snippet's name.
+           */
+          p5.html.url-encode:x:/@p5.web.session.get/*?value
+
+          /*
+           * Figuring out root folder for Hypereval, to parametrize our
+           * JavaScript "window.open" invocation accordingly.
+           */
+          p5.io.unroll-path:@HYPEREVAL/
+          split:x:/@p5.io.unroll-path?value
+            =:/
+
+          /*
+           * Opening a window on the client side with the URL leading to our page snippet.
+           */
+          p5.web.send-javascript:@"window.open('/{0}/{1}');"
+            :x:/@split/0/-?name
+            :x:/@p5.html.url-encode?value
+
+
+        /*
+         * Helper event to toggle visibility of output widget.
+         */
+        hypereval.widgets.eval.toggle-output
+
+          /*
+           * Checking if output CodeMirror editor is already visible.
+           */
+          get-widget-property:hypereval-output-wrapper
+            visible
+          if:x:/@get-widget-property/*/*?value
+
+            /*
+             * Hiding "output" widget.
+             */
+            set-widget-property:hypereval-output-wrapper
+              visible:false
+
+          else
+
+            /*
+             * Showing "output" widget.
+             */
+            set-widget-property:hypereval-output-wrapper
+              visible:true
 
 
         /*
@@ -165,7 +296,7 @@ create-event:hypereval.widgets.eval
         hypereval.widgets.eval.get-code
 
           /*
-           * Retrieving textarea's content to caller.
+           * Retrieving CodeMirror editor's content to caller.
            */
           micro.widgets.codemirror.get-value:hypereval-input
           return:x:/@micro.widgets.codemirror.get-value/*?value
@@ -333,7 +464,7 @@ create-event:hypereval.widgets.eval
           /*
            * Providing feedback to user.
            */
-          micro.windows.info:{0} files successfully imported
+          micro.windows.info:{0} snuppets successfully imported
             :x:/@micro.evaluate.file?value
             class:micro-windows-info success
 

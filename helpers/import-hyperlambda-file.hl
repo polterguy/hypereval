@@ -1,9 +1,8 @@
-
 /*
  * Imports a single Hyperlambda file into snippets database.
  *
  * Expects [file] being filname of Hyperlambda file to import, in addition to
- * an open database connection.
+ * an open database connection to the Hypereval database.
  *
  * Notice, the filename has a convention, which is "snippet.name.foo.xxx.hl",
  * where "xxx" is its "type".

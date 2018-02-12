@@ -1,4 +1,3 @@
-
 /*
  * Responsible for handling an upload request for either a zip file, or a Hyperlambda file,
  * or any combination(s) of the above.
@@ -29,9 +28,13 @@ _count:int:0
 
 
 /*
- * Opening up a database connection, and associating a transaction with it.
+ * Opening up a database connection.
  */
 p5.mysql.connect:[hypereval]
+
+  /*
+   * Creating a database transaction to make sure we don't import partial files.
+   */
   p5.mysql.transaction.begin
 
     /*
@@ -50,41 +53,59 @@ p5.mysql.connect:[hypereval]
       /*
        * Checking what file type currently iterated file is.
        */
-      if:x:/@split/0/-?name
-        =:zip
+      switch:x:/@split/0/-?name
 
         /*
-         * Unzipping file.
+         * Zip file.
          */
-        unzip:x:/@_dp/#?value
-          dest:~/temp/
-
-        /*
-         * Mac OS X tends to create "funny additional" folders, which we simply remove.
-         */
-        set:x:/@unzip/*/~__MACOSX
-
-        /*
-         * Looping through each file inside of zip file, inserting content
-         * as a new snippet.
-         */
-        for-each:x:/@unzip/*?name
+        case:zip
 
           /*
-           * Verifying currently iterated unzipped file is a Hyperlambda file.
+           * Unzipping file, and importing every Hyperlambda file found within it.
            */
-          if
-            ends-with:x:/@_dp?value
-              src:.hl
-            not
+          unzip:x:/@_dp/#?value
+            dest:~/temp/
+
+          /*
+           * Looping through each file inside of zip file, inserting content
+           * as a new snippet.
+           */
+          for-each:x:/@unzip/*?name
 
             /*
-             * Simply ignoring file, since it's not a Hyperlambda file.
-             *
-             * This allows us to provide README.md files, and similar additional "meta information files"
-             * in backup packages, etc ...
+             * Verifying currently iterated unzipped file is a Hyperlambda file.
              */
-            continue
+            if
+              ends-with:x:/@_dp?value
+                src:.hl
+              not
+
+              /*
+               * Simply ignoring file, since it's not a Hyperlambda file.
+               *
+               * This allows us to provide README.md files, and similar additional "meta information files"
+               * in backup packages, etc ...
+               */
+              continue
+
+            /*
+             * Incrementing file counter.
+             */
+            set:x:/@_count?value
+              +:x:/@_count?value
+                _:1
+
+            /*
+             * Invoking file responsible for importing a single Hyperlambda file.
+             */
+            eval-x:x:/+/*
+            micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
+              file:x:/@_dp?value
+
+        /*
+         * Hyperlambda file.
+         */
+        case:hl
 
           /*
            * Incrementing file counter.
@@ -100,34 +121,21 @@ p5.mysql.connect:[hypereval]
           micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
             file:x:/@_dp?value
 
-      else-if:x:/@split/0/-?name
-        =:hl
+        default
 
-        /*
-         * Incrementing file counter.
-         */
-        set:x:/@_count?value
-          +:x:/@_count?value
-            _:1
-
-        /*
-         * Invoking file responsible for importing a single Hyperlambda file.
-         */
-        eval-x:x:/+/*
-        micro.evaluate.file:@HYPEREVAL/helpers/import-hyperlambda-file.hl
-          file:x:/@_dp?value
-
-      else
-
-        /*
-         * Unsupported file extension.
-         */
-        throw:'{0}' is an unsupported file type
-          :x:/@split/0/-?name
+          /*
+           * Unsupported file extension.
+           */
+          throw:You can't import '{0}' files
+            :x:/@_dp/#?value
 
     /*
-     * Committing database transaction, and returning (total) file count to caller.
+     * Committing database transaction.
      */
     p5.mysql.transaction.commit
-    return:x:/@_count?value
+
+/*
+ * Returning the number of snippets that were imported to caller.
+ */
+return:x:/@_count?value
 

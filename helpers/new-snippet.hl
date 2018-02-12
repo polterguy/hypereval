@@ -1,4 +1,3 @@
-
 /*
  * Displays a modal window showing all templates for new snippets, allowing
  * user to select a template, or create an empty snippet.

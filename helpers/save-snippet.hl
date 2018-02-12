@@ -1,4 +1,3 @@
-
 /*
  * Verifying that there actually is any code in CodeMirror editor.
  */
@@ -70,7 +69,7 @@ create-widgets
         text
           info:Name
           .data-field:name
-          onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-save-modal-button').raise('onclick');return false;}"
+          onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-save-modal-button').raise('onclick');return false;} else if (event.keyCode == 27) {p5.$('hypereval-close-save-modal').raise('onclick');return false;}"
           oninit
 
             /*
@@ -119,7 +118,7 @@ create-widgets
                  */
                 delete-widget:hypereval-save-modal
 
-            button
+            button:hypereval-close-save-modal
               innerValue:Cancel
               title:Closes your save window without saving
               onclick

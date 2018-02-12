@@ -1,4 +1,3 @@
-
 /*
  * Shows a modal widget with each snippet from database, allowing
  * the user to load a snippet from database.
@@ -136,7 +135,7 @@ create-widgets
                 type:text
                 class:smaller
                 placeholder:Filter ...
-                onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-search-snippets-btn').raise('onclick');return false;}"
+                onkeydown:@"if (event.keyCode == 13) {p5.$('hypereval-search-snippets-btn').raise('onclick');return false;} else if (event.keyCode == 27) {p5.$('hypereval-close-load-snippets').raise('onclick');return false;}"
                 oninit
 
                   /*
@@ -331,7 +330,7 @@ create-widgets
                     set-widget-property:hypereval-search-snippets-next
                       disabled
 
-              button
+              button:hypereval-close-load-snippets
                 innerValue:Close
                 title:Close window without loading snippet
                 onclick

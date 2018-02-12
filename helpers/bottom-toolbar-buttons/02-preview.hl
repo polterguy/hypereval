@@ -1,4 +1,3 @@
-
 /*
  * Preview button.
  */
@@ -44,28 +43,6 @@ button:hypereval-preview-snippet
   onclick
 
     /*
-     * Previewing "current snippet" in a new window.
-     *
-     * First we need to retrieve the name of the currently active snippet.
+     * Invoking API event.
      */
-    hypereval.widgets.eval.get-current-snippet
-
-    /*
-     * Then we need to URL encode the snippet's name.
-     */
-    p5.html.url-encode:x:/@hypereval.widgets.eval.get-current-snippet/*/name?value
-
-    /*
-     * Figuring out root folder for Hypereval, to parametrize our
-     * JavaScript "window.open" invocation accordingly.
-     */
-    p5.io.unroll-path:@HYPEREVAL/
-    split:x:/@p5.io.unroll-path?value
-      =:/
-
-    /*
-     * Opening a window on the client side with the URL leading to our page snippet.
-     */
-    p5.web.send-javascript:@"window.open('/{0}/{1}');"
-      :x:/@split/0/-?name
-      :x:/@p5.html.url-encode?value
+    hypereval.widgets.eval.preview
