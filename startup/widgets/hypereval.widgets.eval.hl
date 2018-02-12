@@ -5,8 +5,10 @@
  * This is most of the entire Hypereval app, allowing the user to load and save
  * snippets, etc.
  *
- * The only parts that are not embedded in this widget is the export, upload
- * and download buttons in Hypereval's top toolbar.
+ * The only parts that are not embedded in this widget from the Hypereval app is
+ * the export, upload and download buttons in Hypereval's top toolbar.
+ *
+ * Notice, we only allow one instance of this widget per page.
  */
 create-event:hypereval.widgets.eval
 
@@ -20,7 +22,7 @@ create-event:hypereval.widgets.eval
    */
   if
     hypereval.widgets.eval.is-running
-    throw:Hypereval is already running
+    throw:Hypereval is already open
 
   /*
    * Decorating widget with arguments.
@@ -358,6 +360,16 @@ create-event:hypereval.widgets.eval
         micro.widgets.codemirror:hypereval-input
           auto-focus:true
           height:400px
+          oninit
+
+            /*
+             * Checking if we have previously loaded a snippet in the current session,
+             * and if so, making sure we reload it for convenience.
+             */
+            p5.web.session.get:hypereval.snippet-name
+            if:x:/@p5.web.session.get/*?value
+              hypereval.widgets.eval.load-snippet:x:/@p5.web.session.get/*?value
+
           keys
             Alt-V:p5.$('hypereval-view-output').raise('onclick')
             Alt-S:p5.$('hypereval-save-snippet').raise('onclick')

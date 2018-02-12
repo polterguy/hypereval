@@ -6,20 +6,6 @@ button:hypereval-delete-snippet
   innerValue:@"<span class=""icon-bin""></span>"
   title:Deletes snippet - Alt+D
   disabled
-  oninit
-
-    /*
-     * Checking if we have a "current snippet", and if so, enabling our delete snippet button.
-     */
-    p5.web.session.get:hypereval.snippet-name
-    if:x:/-/*?value
-
-      /*
-       * There's a "current snippet" loaded in our editor.
-       */
-      delete-widget-property:hypereval-delete-snippet
-        disabled
-
   onclick
 
     /*
