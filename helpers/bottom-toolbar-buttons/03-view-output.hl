@@ -4,15 +4,23 @@
 button:hypereval-view-output
   innerValue:@"<span class=""icon-eye""></span>"
   title:View the output code, which results from evaluating your code - Alt+V
+  events
+
+    /*
+     * Adding sink to make sure we toggle button when output widget is toggled.
+     */
+    hypereval.widgets.eval.toggle-output
+
+      /*
+       * Toggling "toggled" state to our button.
+       */
+      micro.css.toggle:x:/../*/_event?value
+        class:toggled
+
+
   onclick
 
     /*
      * Using API event to toggle visibility of output widget.
      */
     hypereval.widgets.eval.toggle-output
-
-    /*
-     * Toggling "toggled" state to our button.
-     */
-    micro.css.toggle:x:/../*/_event?value
-      class:toggled

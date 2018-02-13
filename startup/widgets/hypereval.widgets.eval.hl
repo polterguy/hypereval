@@ -412,6 +412,17 @@ create-event:hypereval.widgets.eval
 
 
         /*
+         * Helper event to programmatically open delete snippet window.
+         */
+        hypereval.widgets.eval.show-delete-window
+
+          /*
+           * To make it simple, we simply "click" "load snippet button" programmatically.
+           */
+          micro.evaluate.file:@HYPEREVAL/helpers/delete-snippet.hl
+
+
+        /*
          * Helper event to download current code snippet.
          */
         hypereval.widgets.eval.download-current-snippet
