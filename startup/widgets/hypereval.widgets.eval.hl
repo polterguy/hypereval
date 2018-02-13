@@ -8,6 +8,8 @@
  * the export, upload, and download buttons in Hypereval's top toolbar.
  *
  * Notice, we only allow one instance of this widget per page.
+ * Notice also that you can override [height] and [auto-focus], which will be passed
+ * into your CodeMirror input widget as arguments.
  */
 create-event:hypereval.widgets.eval
 
@@ -15,6 +17,13 @@ create-event:hypereval.widgets.eval
    * Used to separate arguments from the rest of our lambda.
    */
   .signal
+
+  /*
+   * Default arguments to CodeMirror input widget.
+   */
+  .defaults
+    height:400px
+    auto-focus:bool:true
 
   /*
    * Checking if Hypereval is already running, and if so, throwing an exception.
@@ -27,7 +36,13 @@ create-event:hypereval.widgets.eval
    * Decorating widget with arguments.
    */
   add:x:/../*/return/*/container
-    src:x:/@.signal/--/<-(!/_arg)
+    src:x:/@.signal/--/<-(!/_arg!/auto-focus!/height)
+
+  /*
+   * Decorating CodeMirror widget with arguments.
+   */
+  add:x:/../*/return/*/container/**/micro.widgets.codemirror/=hypereval-input
+    src:x:(/@.signal/--(/auto-focus|/height)|/@.defaults/*(/auto-focus|/height))/$
 
   /*
    * Returning widget to caller, making sure we forward evaluate all relevant arguments.
@@ -500,8 +515,6 @@ create-event:hypereval.widgets.eval
          * CodeMirror "input" widget.
          */
         micro.widgets.codemirror:hypereval-input
-          auto-focus:true
-          height:400px
           oninit
 
             /*
