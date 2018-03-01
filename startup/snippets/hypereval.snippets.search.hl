@@ -55,7 +55,7 @@ create-event:hypereval.snippets.search
       src:name like @name
     add:x:/../*/p5.mysql.connect/*/p5.mysql.select
       src
-        @name::x:/../*/_arg?value
+        @name:x:/../*/_arg?value
 
   /*
    * Checking if caller provided a [type] argument, at which point we
