@@ -128,13 +128,6 @@ create-widget
               view
                 name:Tab view 2
                 widgets
-                  h3
-                    innerValue:This is ANOTHER tab view
-                  p
-                    innerValue:This is just another paragraph
-              view
-                name:Tab view 3
-                widgets
 
                   /*
                    * TreeView widget.
@@ -159,6 +152,37 @@ create-widget
                               class:tree-leaf
                       return
                         items
+
+              view
+                name:Tab view 3
+                widgets
+
+                  /*
+                   * TreeView widget.
+                   */
+                  micro.widgets.tree
+                    class:micro-widgets-tree micro-widgets-tree-navbar
+                    items
+                      :/
+                    .onexpand
+                      list-folders:x:/../*/_item-id?value
+                      for-each:x:/@list-folders/*?name
+                        list-folders:x:/@_dp?value
+                        split:x:/@_dp?value
+                          =:/
+                        add:x:/../*/return/*
+                          src:@"{0}:{1}"
+                            :x:/@split/0/-?name
+                            :x:/@_dp?value
+                        if:x:/@list-folders/*
+                          not
+                          add:x:/../*/return/*/items/0/-
+                            src
+                              class:tree-leaf
+                      return
+                        items
+                    .onselect
+                      micro.windows.info:x:/../*/items/0?name
 
     div
       class:row
