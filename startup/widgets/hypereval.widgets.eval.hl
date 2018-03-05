@@ -547,7 +547,6 @@ create-event:hypereval.widgets.eval
             micro.widgets.file
               folder:@HYPEREVAL/helpers/bottom-extra-toolbar-buttons/
               class:strip
-              style:"margin-right:1rem;"
 
             /*
              * Main toolbars, for evaluating Hyperlambda, etc.
