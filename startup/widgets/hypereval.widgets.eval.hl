@@ -53,6 +53,13 @@ create-event:hypereval.widgets.eval
 
 
         /*
+         * Help context Active Event.
+         */
+        desktop.help.get-context
+          return:@HYPEREVAL/help-files/Hypereval/index.hl
+
+
+        /*
          * Returns true if Hypereval is already running on page.
          */
         hypereval.widgets.eval.is-running
