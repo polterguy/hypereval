@@ -1,18 +1,19 @@
 ## Introduction to Hypereval
 
 Hypereval is a Phosphorus Five module that allows you to easily store snippets of Hyperlambda in
-your MySQL database. This has a lot of benefits, such as allowing you to create spikes and snippets
-of code, which you can more easily move around, and are more _"dynamic"_ in nature, than a fully
-fledged app or module.
+your MySQL database. In addition, it allows you to evaluate _"Hyperlambda snippets"_ in immediate
+mode. This has a lot of benefits, such as allowing you to create spikes and snippets
+of code, which you can more easily move around. Such snippets are (obviously) more dynamic in nature,
+than fully fledged apps or modules. Hypereval should also be your primary choice for administrating
+your Phosphorus Five installation, to for instance create backups of your system, etc. You can think
+of Hypereval as a _"terminal"_, in addition to a _"snippets database"_.
 
-Hypereval allows you to store these snippets as _"startup"_ snippets, _"page"_ snippets, or simply
+Hypereval allows you to store Hyperlambda snippets as _"startup"_ snippets, _"page"_ snippets, or simply
 _"snippets"_. A startup snippet is a snippet that is evaluated every time your web server process
 is restarted, which makes it easy for you to for instance create dynamic Active Events, which are
 created every time your server restarts. A page snippet is a web page, and has its own unique URL,
-and can be launched through `/hypereval/your-page-name`. A plain snippet is simply a snippet, and
-are not evaluated in any ways, unless you explicitly request evaluating it somehow.
-
-Below is a screenshot of Hypereval.
+and can be launched through `/hypereval/your-snippet-name`. A plain snippet is simply a snippet, and
+are not evaluated in any ways, unless you explicitly evaluate it somehow. Below is a screenshot of Hypereval.
 
 https://phosphorusfive.files.wordpress.com/2018/02/hypereval-screenshot.png
 
@@ -22,15 +23,9 @@ its API methods. Hypereval has the following features.
 * Easily Create, Read, Update and Delete (CRUD) your snippets
 * Evaluate Hyperlambda in _"immediate mode"_
 * View output or result of evaluation
-* Download your snippets, either individually or all of them combined in a _"backup zip file"_
+* Download your snippets, either individually, or all of them combined in a _"backup zip file"_
 * Easily upload one or more snippets, either as individual Hyperlambda files, or contained in a backup zip file
 * Easily create _"web pages"_, which are snippets, having their own unique (and search engine friendly) URLs
-
-**Notice** - Hypereval is _not installed by the main Phosphorus Five installation file_. If you want to
-use Hypereval, you'll need to [install it explicitly through the Bazar](/bazar?app=hypereval). Hypereval
-also depends upon MySQL. So you'll need access to some MySQL database to use it. You might also have
-to edit your _"web.config"_ file, to make sure your MySQL connection string is correctly pointing to
-your database server.
 
 ### Keyboard shortcuts
 
@@ -49,11 +44,15 @@ to indent and deindent your code (selection?), etc.
 ### Consuming Hypereval as a _"plugin"_
 
 Hypereval can also be consumed as a _"plugin"_, allowing you to use it yourself, in your own apps. This is
-quite useful when you are debugging your apps for instance, to give you meta capabilities during runtime,
-in your debugging environment. To instantiate Hypereval as a _"plugin"_, you can simply create an instance
-of the **[hypereval.widgets.eval]** widget. Below is an example.
+quite useful when you are debugging your apps for instance, to give you meta information during runtime.
+To instantiate Hypereval as a _"plugin"_, you can simply create an instance of the **[hypereval.widgets.eval]**
+widget. Below is an example.
 
 ```hyperlambda-snippet
+/*
+ * Creates a modal widget, instantiating Hypereval as
+ * an extension widget.
+ */
 create-widgets
   micro.widgets.modal:sample-modal
     widgets
@@ -69,5 +68,5 @@ create-widgets
               delete-widget:sample-modal
 ```
 
-In fact, if you have installed Hypereval, you can open it up as a _"plugin"_ from Hyper IDE, by clicking the flash
-button in the top toolbar of Hyper IDE.
+You can also instantiate Hypereval from within Hyper IDE, due to one of the plugins in Hyper IDE, giving
+you the ability to play around with code, and snippets of code, in a more _"immediate"_ environment.

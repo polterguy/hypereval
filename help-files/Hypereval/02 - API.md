@@ -1,15 +1,14 @@
 ## Hypereval's API
 
-Hypereval has a very rich API, allowing you to automate it, or extend it as you see fit. Every single operation
-that Hypereval can do, can be automated or evaluated through its Active Event API. Hypereval can also be
-instantiated as an extension widget, allowing you to consume it in your own modules or apps. Below is the
-list of API events that Hypereval contains.
+Hypereval contains a rich API, allowing you to automate it, or extend it as you see fit. Every single operation
+that Hypereval can do, can be automated or evaluated through its Active Event API. Below is a list of its API
+events.
 
 ### API events
 
 These events are available at any time, and you can use them as you see fit, to retrieve, update, evaluate, or
 somehow modify your snippets. These are probably the most important events, as they allow you to easily consume
-snippets in your own apps and/or modules, allowing for you to easily orchestrate multiple snipepts together,
+snippets in your own apps and/or modules, allowing for you to easily orchestrate multiple snippets together,
 incrementally and dynamically building your apps as you see fit.
 
 * __[hypereval.snippets.evaluate]__ - Evaluate the specified snippet(s)
@@ -19,12 +18,30 @@ incrementally and dynamically building your apps as you see fit.
 * __[hypereval.snippets.export]__ - Exports snippets from your database
 * __[hypereval.snippets.delete]__ - Deletes the specified snippet from your database
 
+In addition to the above events, you can consume Hypereval as an extension widget, by instantiating it with
+the event **[hypereval.widgets.eval]**. Below is an example.
+
+```hyperlambda-snippet
+/*
+ * Creates a modal widget, instantiating Hypereval as
+ * an extension widget.
+ */
+create-widgets
+  micro.widgets.modal:sample-modal
+    widgets
+
+      /*
+       * The actual Hypereval widget.
+       */
+      hypereval.widgets.eval
+```
+
 ### Automation events
 
 These events are only available while Hypereval is physically loaded somehow on your page, and allows you to
-automate parts of Hypereval as you see fit. Probably not as useful as the first list of events, but allows you
-to extend Hypereval if you wish, and provide your own logic, instead of its default logic, dictated by its
-pre-existing UX.
+automate parts of Hypereval as you see fit. This list is probably not as useful as the first list of events,
+but allows you to extend Hypereval if you wish, and provide your own logic, instead of its default logic,
+dictated by Hypereval's existing UI.
 
 * __[hypereval.widgets.eval.is-running]__ - Returns boolean "true" if Hypereval is running on your page
 * __[hypereval.widgets.eval.load-snippet]__ - Loads specified __[\_arg]__ snippet
@@ -44,6 +61,6 @@ pre-existing UX.
 
 ### Event sinks
 
-The **[hypereval.widgets-eval]** event will raise an Active Event every time its content has been programmatically
+The **[hypereval.widgets.eval]** widget will raise an Active Event every time its content has been programmatically
 changed, due to saving or loading a new snippet for instance. If you are interested in _"listening in"_ on this
 event, feel free to subscribe to it by for instance creating your own widget lambda event, and name it **[hypereval.widgets.eval.active-snippet-changed]**.

@@ -1,10 +1,11 @@
 ## Managing your Hypereval database
 
-You can easily export your snippets database, and import it on another server, or send parts of your snippets
-to a friend, or publish them somehow - Allowing for sharing your snippets, or parts of them, with whom ever you
+You can easily export your snippets database, and import it on another server - Or send parts of your snippets
+to a friend, or publish them somehow - Allowing for sharing your snippets, with whom ever you
 want to share them with. To export your entire snippet collection, you can click the _"zip file icon"_ in Hypereval. This will download
 a zip file to your client, containing all snippets from your database. To download a single snippet, simply
-open your snippet in Hypereval, and click the download button. To upload a snippet, click the upload icon.
+open your snippet in Hypereval, and click the download button. To upload a snippet, or a zip file containing
+multiple snippet, simply click the upload icon.
 Below is a screenshot emphasizing these icons for you.
 
 https://phosphorusfive.files.wordpress.com/2018/02/hypereval-manage-snippets-screenshot.png

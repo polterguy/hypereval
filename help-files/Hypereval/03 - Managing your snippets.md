@@ -1,6 +1,6 @@
 ## Managing your snippets
 
-As previously said, Hypereval has a very rich API, allowing you to easily create,read, update and delete
+As previously said, Hypereval has a very rich API, allowing you to easily create, read, update and delete
 snippets as you see fit. In addition, it also easily allows you to evaluate snippets. This gives you a
 highly dynamic environment for storing Hyperlambda snippets within.
 
@@ -39,10 +39,13 @@ allowing you to load multiple snippets at the same time.
 
 ```hyperlambda-snippet
 /*
- * Loads the snippet we created above, and displays it
- * in a modal window.
+ * Loads the snippet we created above.
  */
 hypereval.snippets.load:foo-bar
+
+/*
+ * Displays our snippet in a modal widget.
+ */
 eval-x:x:/+/*/*/*/pre/*/innerValue
 create-widgets
   micro.widgets.modal:samples-modal
@@ -125,32 +128,9 @@ Try to evaluate the above snippet, and then open up the [following link](/hypere
 a new browser tab.
 
 Notice, if you want to create your snippets more _"semantically correct"_, you can choose to pass
-in your lambda as a lambda object, instead of a piece of text. This will not save any of your comments,
-but might still make it easier for you to create your snippets in a semantically correct manner. Below
-is an example.
-
-```hyperlambda-snippet
-/*
- * Creates a snippet with the name of "foo-bar"
- * and saves it to your snippets database.
- */
-hypereval.snippets.save:foo-bar
-  content
-    create-widgets
-      micro.widgets.modal:foo-bar
-        widgets
-          h3
-            innerValue:Foo bar
-          p
-            innerValue:Hello World
-          div
-            class:right
-            widgets
-              button
-                innerValue:Close
-                onclick
-                  delete-widget:foo-bar
-```
+in your lambda as a lambda object, instead of as a piece of text. This will not save any of your comments,
+but might still make it easier for you to create your snippets in a more _"semantically correct manner"_.
+The above example illustrates this point.
 
 ### Querying your snippet database
 
@@ -190,10 +170,10 @@ parametrize your search by adding a **[type]** criteria, being either _"page"_ o
 instance.
 
 **[limit]** implies how many snippets to return, and **[offset]** is an offset integer value from the
-beginning of its result set, allowing you to easily implement paging and similar types of techniques,
+beginning of its result set, allowing you to easily implement paging and similar types of constructs,
 if you want to display your snippets in a datagrid or something.
 
-In addition, you can query your snippets with a **[content]** argument, implying that you snippet must
+In addition, you can query your snippets with a **[content]** argument, implying that your snippet must
 contain the **[content]** parts in its Hyperlambda. To for instance search for all snippets containing
 the text _"create-widget"_, you could use something resembling the following.
 
@@ -227,7 +207,7 @@ create-widgets
               delete-widget:foo-bar
 ```
 
-To retrieve the first 2 snippets of **[type]** "page", you could use the following code.
+To retrieve the first 2 snippets of **[type]** page, you could use the following code.
 
 ```hyperlambda-snippet
 /*
@@ -266,10 +246,18 @@ For instance, if you wish to evaluate both the _"kitchen-sink"_ and the _"page-v
 you can pass in an expression leading to multiple results. Below is an example.
 
 ```hyperlambda-snippet
+/*
+ * Evaluates multiple snippets in one go.
+ */
 .snippets
   widgets-kitchen-sink
   page-viewer
 hypereval.snippets.evaluate:x:/-/*?name
+
+/*
+ * Providing some information.
+ */
+micro.windows.info:Scroll to the bottom of your page to see the results.
 ```
 
 And of course, you can combine any of these Active Events as you see fit, having the results of one becoming
@@ -320,6 +308,9 @@ that are easily consumed in your own apps and modules. Below is an example of ho
 extension widget.
 
 ```hyperlambda-snippet
+/*
+ * Creates a snippet which actually serves as an extension widget.
+ */
 hypereval.snippets.save:examples.widgets.foo
   content
     eval-x:x:/+/*/literal/*/innerValue
@@ -333,20 +324,19 @@ hypereval.snippets.save:examples.widgets.foo
 Then to consume the above extension widget, you could do something resembling the following.
 
 ```hyperlambda-snippet
+/*
+ * Consumes the extension widget snippet we created above
+ * in a modal widget.
+ */
 create-widgets
   micro.widgets.modal:foo-bar
     widgets
-      h3
-        innerValue:Extension widget snippet
+
+      /*
+       * Our extension widget snippet.
+       */
       hypereval.snippets.evaluate:examples.widgets.foo
         text:Hello World!
-      div
-        class:right
-        widgets
-          button
-            innerValue:Close
-            onclick
-              delete-widget:foo-bar
 ```
 
 The above allows you by properly namespacing your Hypereval extension snippets, to easily for instance

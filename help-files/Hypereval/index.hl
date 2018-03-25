@@ -1,13 +1,28 @@
-﻿/*
+/*
  * This is our main "landing page" for our Hypereval help files.
  */
 h2
   innerValue:Hypereval
 
+img
+  style:"margin-left:1rem; float:right;max-width: 25%;"
+  src:"https://phosphorusfive.files.wordpress.com/2018/03/terminal-hypereval.png"
+
 p
   innerValue:@"Hypereval is a module that allows you to evaluate Hyperlambda in <em>'immediate'</em> mode. These parts of the documentation
-expects you to understand at least some basic Hyperlambda."
+expects you to understand at least some basic Hyperlambda, which you can probably pick up in a couple of hours
+by reading through the <em>'Hyperlambda'</em> section of the documentation."
 
+p
+  innerValue:@"Hypereval also allows you to store <em>'snippets'</em> of Hyperlambda in your MySQL database, making
+your snippets easily evailable from any app, and such provides a database of Hyperlambda snippets, which
+you can consume and easily manage from your own apps."
+
+p
+  innerValue:@"Hypereval is particularly useful when combined with for instance the Magic Menu, since this
+combination allows you to separate your concerns - AKA; UI and implementation. It is also highly useful
+for performing administrative tasks, by tapping into the API of the different modules, to for instance
+create backups, etc. You can think of it as the <em>'terminal windows'</em> of Phosphorus Five."
 
 /*
  * All files at "root" of sub section.
