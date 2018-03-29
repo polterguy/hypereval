@@ -1,7 +1,6 @@
-
 /*
  * Help file Active Event sink.
  */
-create-event:desktop.help-files.hypereval
+create-event:desktop.help-files.06-hypereval
 
   return:@HYPEREVAL/help-files/Hypereval/
