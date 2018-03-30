@@ -1,15 +1,13 @@
-
 /*
  * Desktop widget.
  */
 container
   element:a
-  class:desktop-app button shaded
+  class:jumbo-button
   title:Evaluate Hyperlambda in immediate mode
   widgets
+    span
+      innerValue:Hypereval
     literal
       element:span
-      class:icon-terminal desktop-app-icon
-    span
-      class:desktop-app-text
-      innerValue:Hypereval
+      class:icon-terminal
