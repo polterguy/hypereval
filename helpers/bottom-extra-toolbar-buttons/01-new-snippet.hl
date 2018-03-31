@@ -8,6 +8,23 @@ button:hypereval-new-snippet
   onclick
 
     /*
+     * Verifying user has evaluation rights.
+     */
+    p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+      .read-only
+    get-widget-property:x:/-/*/*?value
+      .read-only
+    if:x:/-/*/*?value.bool
+      =:bool:true
+
+      /*
+       * Sorry, not evaluation rights on Hypereval.
+       */
+      micro.windows.info:Access denied!
+        class:micro-windows-info warning
+      return
+
+    /*
      * Using our API event.
      */
     hypereval.widgets.eval.new-snippet

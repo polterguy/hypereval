@@ -45,10 +45,31 @@ create-event:hypereval.widgets.eval
     src:x:(/@.signal/--(/auto-focus|/height)|/@.defaults/*(/auto-focus|/height))/$
 
   /*
+   * Verifying user has access to Hypereval.
+   *
+   * This has to be done here, since Hypereval is also possible to load as a "plugin extension widget",
+   * which implies that it can be loaded from a different URL than its normal URL, at which point we
+   * need to check if user has access to it, and if not, we remove all buttons that allows the user
+   * to save, create and evaluate snippets - But keep the rest of these!
+   */
+  if
+    p5.auth.has-access-to-path:bool:false
+      filter:p5.module
+      path:/modules/hypereval/
+    not
+
+    /*
+     * Making sure we turn widget into "read only" mode.
+     */
+    set:x:/../*/return/*/container/*/.read-only?value
+      src:true
+
+  /*
    * Returning widget to caller, making sure we forward evaluate all relevant arguments.
    */
   return
     container
+      .read-only:false
       events
 
 

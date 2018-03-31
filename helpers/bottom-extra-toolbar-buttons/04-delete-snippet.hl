@@ -8,6 +8,23 @@ button:hypereval-delete-snippet
   onclick
 
     /*
+     * Verifying user has evaluation rights.
+     */
+    p5.web.widgets.find-first-ancestor:x:/../*/_event?value
+      .read-only
+    get-widget-property:x:/-/*/*?value
+      .read-only
+    if:x:/-/*/*?value.bool
+      =:bool:true
+
+      /*
+       * Sorry, not evaluation rights on Hypereval.
+       */
+      micro.windows.info:Access denied!
+        class:micro-windows-info warning
+      return
+
+    /*
      * Using API event to ask user to confirm deletion of snippet.
      */
     hypereval.widgets.eval.show-delete-window
