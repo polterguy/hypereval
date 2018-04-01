@@ -1,0 +1,56 @@
+
+/*
+ * Creates a page with a grid widget in it.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:Grid widget
+
+            /*
+             * Our actual datagrid.
+             */
+            micro.widgets.grid:my-grid
+              class:striped
+              columns
+                Name
+                Phone
+                Address
+
+            /*
+             * This button dynamically "databinds" the grid.
+             */
+            button
+              innerValue:Databind grid
+              onclick
+
+                /*
+                 * Dynamically databinds the datagrid we created above.
+                 */
+                micro.widgets.grid.databind:my-grid
+                  item
+                    Name:Thomas Hansen
+                    Phone:90909090
+                    Address:Foo bar st. 57
+                  item
+                    Name:John Doe
+                    Phone:98989898
+                    Address:Foo bar st. 67
+                  item
+                    Name:Jane Doe
+                    Phone:37474747
+                    Address:Foo bar st. 77

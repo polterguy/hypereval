@@ -1,0 +1,48 @@
+
+/*
+ * Creates a page with a button in it, which once clicked
+ * creates a cover widget.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:Cover widget
+
+            /*
+             * This button will create a cover widget,
+             * and then call the server again 2 seconds afterwards,
+             * at which point the cover widget is deleted again.
+             */
+            button
+              innerValue:Cover
+              onclick
+
+                /*
+                 * Creating a cover widget.
+                 */
+                create-widgets
+                  micro.widgets.cover:cover-widget
+                    message:Please wait for 2 seconds ...
+
+                /*
+                 * Creating a timer that invokes our server
+                 * 2 seconds from now, for then to delete our cover widget.
+                 */
+                micro.lambda.create-timeout
+                  milliseconds:2000
+                  onfinish
+                    delete-widget:cover-widget

@@ -1,0 +1,115 @@
+/*
+ * Creates a page with multiple columns in it.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:Column one
+                p
+                  innerValue:This is your first column
+        div
+          class:col
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:Column second
+                p
+                  innerValue:This is your second column
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:Column one
+                p
+                  innerValue:This is your first column
+        div
+          class:col
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:Column second
+                p
+                  innerValue:This is your second column
+        div
+          class:col
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:Column third
+                p
+                  innerValue:This is your third column
+    div
+      class:row
+      widgets
+        div
+          class:col-60
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:60%
+                p
+                  innerValue:This is your first column
+        div
+          class:col
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:Default width
+                p
+                  innerValue:This is your second column
+    div
+      class:row
+      widgets
+        div
+          class:col-40 offset-20
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:40% offset 20
+                p
+                  innerValue:This is your first column
+        div
+          class:col
+          widgets
+            div
+              class:rounded shaded air-inner
+              widgets
+                h1
+                  innerValue:Default width
+                p
+                  innerValue:This is your second column

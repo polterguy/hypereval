@@ -1,0 +1,44 @@
+/*
+ * Creates a page with a PayPal button widget in it.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+    /*
+     * Including PayPal script.
+     *
+     * Notice, if you want to use the PayPal button, you will have
+     * to make sure you invoke this event during the initial pageload
+     * of your request - Otherwise the button won't work.
+     */
+    micro.widgets.paypal-button.ensure-checkout-js
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:PayPal widget - Donate example
+
+            /*
+             * Our actualy PayPal button.
+             */
+            micro.widgets.paypal-button
+              price:5
+              custom:Donate
+              .onok
+
+                /*
+                 * Displaying some info to user.
+                 */
+                micro.windows.info:Thank you for sponsoring me with a coffee
+

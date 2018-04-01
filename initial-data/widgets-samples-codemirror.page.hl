@@ -1,0 +1,34 @@
+
+/*
+ * Creates a page with a CodeMirror widget in it.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:Wizard widget
+
+            /*
+             * Our CodeMirror widget.
+             */
+            micro.widgets.codemirror
+              class:air-bottom
+              mode:javascript
+              value:@"
+function foo() {
+  alert('Holla senior!');
+}
+foo();"

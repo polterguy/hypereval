@@ -1,24 +1,12 @@
 /*
- * Creates a default page, with the default wiring.
- *
- * Notice, you'd probably want to save this as a "page" snippet.
- */
-
-
-/*
- * Creates a default page, with a header and a paragraph.
+ * Creates a page with most widgets from Micro in it.
  */
 create-widget
   class:container
   oninit
 
     /*
-     * Including Micro CSS file, serious skin, and fonts.
-     *
-     * Notice, this is being done in [oninit] instead of at root of Hyperlambda file,
-     * since this would allow us to "controlify" the page later, as long as developer
-     * doesn't add any additional root nodes, beside the one that's already there -
-     * [create-widget] that is.
+     * Including Micro CSS file.
      */
     micro.css.include
 

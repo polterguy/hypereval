@@ -1,0 +1,37 @@
+
+/*
+ * Creates a page with an upload button widget in it.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:File upload button widget
+
+            /*
+             * Used to displat the results of file upload operation.
+             */
+            pre:upload-result
+              innerValue:result ...
+
+            /*
+             * Our actual upload-button widget.
+             */
+            micro.widgets.upload-button
+              multiple
+              .onupload
+                set-widget-property:upload-result
+                  innerValue:x:/..

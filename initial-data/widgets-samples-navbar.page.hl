@@ -1,0 +1,50 @@
+
+/*
+ * Creates a page with a navbar widget in it, which displays
+ * all the folders on disc.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:Tree view widget (navbar mode)
+
+            /*
+             * This is our treeview widget.
+             */
+            micro.widgets.tree
+              class:micro-widgets-tree micro-widgets-tree-navbar
+              items
+                root:/
+
+              /*
+               * This one will be invoked when the tree needs items.
+               * It will be given an [_item-id] argument.
+               *
+               * We simply list the folders of the item the tree needs
+               * children for here.
+               */
+              .onexpand
+                list-folders:x:/../*/_item-id?value
+                for-each:x:/@list-folders/*?name
+                  split:x:/@_dp?value
+                    =:/
+                  add:x:/../*/return/*
+                    src:@"{0}:{1}"
+                      :x:/@split/0/-?name
+                      :x:/@_dp?value
+                return
+                  items

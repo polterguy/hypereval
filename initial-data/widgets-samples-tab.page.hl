@@ -1,0 +1,39 @@
+
+/*
+ * Creates a page with a tab widget in it.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:Tab widget
+
+            /*
+             * Our actual tab widget.
+             */
+            micro.widgets.tab
+              view
+                name:Tab view 1
+                widgets
+                  p
+                    innerValue:Tab 1
+              view
+                name:Tab view 2
+                widgets
+                  p
+                    innerValue:Tab 2
+            p
+              innerValue:Foo

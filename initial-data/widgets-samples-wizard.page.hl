@@ -1,0 +1,73 @@
+
+/*
+ * Creates a page with a wizard widget in it.
+ */
+create-widget
+  class:container
+  oninit
+
+    /*
+     * Including Micro CSS file.
+     */
+    micro.css.include
+
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col
+          widgets
+            h1
+              innerValue:Wizard widget
+
+            /*
+             * Our actual "wizard widget".
+             */
+            micro.widgets.wizard-form:wizard-form
+              text
+                info:Name
+                .data-field:name
+              textarea
+                info:Address
+                .data-field:address
+              checkbox
+                info:Permanent
+                .data-field:permanent
+              radio-group
+                .data-field:sex
+                options
+                  Male:male
+                  Female:female
+              select
+                .data-field:hair
+                info:Hair
+                options
+                  Short:short
+                  Long:long
+
+              /*
+               * A button that serializes the wizard widget, and displays
+               * another modal widget with the result.
+               */
+              button
+                innerValue:Save
+                onclick
+
+                  /*
+                   * Serializing wizard widget.
+                   */
+                  micro.form.serialize:wizard-form
+
+                  /*
+                   * Creating another modal widget, with the results
+                   * from our above serialization.
+                   */
+                  eval-x:x:/+/*/*/*/*/innerValue
+                  create-widgets
+                    micro.widgets.modal:modal-widget
+                      widgets
+                        h3
+                          innerValue:Values
+                        pre
+                          innerValue:x:/@micro.form.serialize
