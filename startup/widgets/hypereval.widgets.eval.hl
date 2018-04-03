@@ -159,7 +159,7 @@ create-event:hypereval.widgets.eval
              */
             eval-x:x:/+/*
             micro.widgets.codemirror.set-value:hypereval-output
-              content:x:/@lambda2hyper?value
+              value:x:/@lambda2hyper?value
 
 
         /*
@@ -370,7 +370,7 @@ create-event:hypereval.widgets.eval
            */
           eval-x:x:/+/*
           micro.widgets.codemirror.set-value:hypereval-input
-            content:x:/../*/_arg?value
+            value:x:/../*/_arg?value
 
 
         /*
