@@ -18,89 +18,56 @@ if:x:/@p5.web.session.get/*?value
 /*
  * Showing a modal widget, asking user to confirm deletion.
  */
-create-widgets
-  micro.widgets.modal:hypereval-confirm-snippet-deletion
-    widgets
-      h3
-        innerValue:Confirm deletion
-      p
-        innerValue:Are you sure you want to delete this snippet? This action is permanent.
-      div
-        class:right
-        widgets
-          div
-            class:strip
-            widgets
-              button:hypereval-confirm-deletion-btn
-                innerValue:Yes
-                oninit
+micro.windows.confirm
+  message:Confirm deletion
+  body:Are you sure you want to delete this snippet? This action is permanent.
+  onok
 
-                  /*
-                   * Setting initial focus to "Yes" button.
-                   */
-                  micro.page.set-focus:x:/../*/_event?value
+    /*
+     * Figuring out which snippet user wants to delete, if any.
+     */
+    p5.web.session.get:hypereval.snippet-name
+    if:x:/@p5.web.session.get/*?value
+      not
+      or:x:/@p5.web.session.get/*?value
+        =:
 
-                onclick
+      /*
+       * Snippet is probably not saved yet.
+       */
+      return
 
-                  /*
-                   * Figuring out which snippet user wants to delete, if any.
-                   */
-                  p5.web.session.get:hypereval.snippet-name
-                  if:x:/@p5.web.session.get/*?value
-                    not
-                    or:x:/@p5.web.session.get/*?value
-                      =:
+    /*
+     * Opening database, and deleting snippet from snippet collection.
+     */
+    p5.mysql.connect:[hypereval]
+      p5.mysql.delete:@"delete from snippets where name = @name"
+        @name:x:/@p5.web.session.get/*?value
 
-                    /*
-                     * Snippet is probably not saved yet.
-                     */
-                    return
+    /*
+     * Removing code from editor.
+     */
+    hypereval.widgets.eval.set-code
 
-                  /*
-                   * Opening database, and deleting snippet from snippet collection.
-                   */
-                  p5.mysql.connect:[hypereval]
-                    p5.mysql.delete:@"delete from snippets where name = @name"
-                      @name:x:/@p5.web.session.get/*?value
+    /*
+     * Cleaning out session variables.
+     */
+    p5.web.session.set:hypereval.snippet-name
 
-                  /*
-                   * Removing code from editor.
-                   */
-                  hypereval.widgets.eval.set-code
+    /*
+     * Making sure we disable delete snippet button, 
+     * since there are no active snippets now.
+     */
+    set-widget-property:hypereval-delete-snippet
+      disabled
 
-                  /*
-                   * Cleaning out session variables.
-                   */
-                  p5.web.session.set:hypereval.snippet-name
+    /*
+     * Disabling preview pagebutton.
+     */
+    set-widget-property:hypereval-preview-snippet
+      disabled
 
-                  /*
-                   * Making sure we disable delete snippet button, 
-                   * since there are no active snippets now.
-                   */
-                  set-widget-property:hypereval-delete-snippet
-                    disabled
-
-                  /*
-                   * Deleting modal window.
-                   */
-                  delete-widget:hypereval-confirm-snippet-deletion
-
-                  /*
-                   * Disabling preview pagebutton.
-                   */
-                  set-widget-property:hypereval-preview-snippet
-                    disabled
-
-                  /*
-                   * Setting header with empty value, changes it to its default value.
-                   */
-                  hypereval.set-header
-
-              button
-                innerValue:No
-                onclick
-
-                  /*
-                   * Simply deleting modal window.
-                   */
-                  delete-widget:hypereval-confirm-snippet-deletion
+    /*
+     * Setting header with empty value, changes it to its default value.
+     */
+    hypereval.set-header
