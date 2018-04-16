@@ -32,10 +32,6 @@ desktop.help.widgets.help-index
   folder:@HYPEREVAL/help-files/Hypereval/
 
 
-h3
-  innerValue:Files meta information
-
-
 /*
  * Meta information for all files in module.
  */
