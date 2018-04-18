@@ -1,0 +1,38 @@
+micro.css.include
+create-widget
+  class:container
+  widgets
+    div
+      class:row
+      widgets
+        div
+          class:col-100
+          widgets
+            h1
+              class:center
+              innerValue:Sales per person
+        div
+          class:col-30
+          widgets
+            p
+              innerValue:@"An example of a pie chart. Notice how you can click the 'Peter' legen label, in addition to
+how the chart flows with the flow of the rest of your page."
+            p
+              innerValue:@"You can also override the color for any of your slices, such as illustrated with the 'Unknown' slice."
+            p
+              innerValue:@"The pie chart is rendered exclusively with CSS as an SVG element, making it highly responsive, and easily
+styled - In addition to very lightweight on your bandwidth. Try to resize the page, such that it becomes less than 800 pixels in width for instance."
+        div
+          class:col-70
+          widgets
+            micro.widgets.chart.pie
+              data
+                Johnny:40
+                Thomas:120
+                Lisbeth:35
+                Trond:300
+                Peter:120
+                  onclick
+                    micro.windows.info:Hello Bar item!
+                Unknown:35
+                  color:red
