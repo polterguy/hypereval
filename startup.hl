@@ -1,7 +1,7 @@
 /*
  * Startup file.
  *
- * Creates "path" event and evaluates all files in "/startup/" folder for module.
+ * Creates our _"path"_ Active Event and evaluates all files in the _"/startup/"_ folder.
  */
 
 

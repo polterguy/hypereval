@@ -1,15 +1,14 @@
-
 /*
- * Creates a new snippet.
+ * Creates the __[hypereval.snippets.save]__ Active Event that creates a new snippet.
  *
- * It expects the snippet's name to be given as [_arg], and its Hyperlambda to
- * be found in [content]. In addition, you can optionally pass in [type] being
- * the type of snippet, which can be e.g. "page", "startup" or "snippet".
- * The default [type] is "snippet".
+ * The event expects the snippet's name to be given as __[\_arg]__, and its Hyperlambda to
+ * be found in __[content]__. In addition, you can optionally pass in __[type]__ being
+ * the type of snippet, which can be e.g. _"page"_, _"startup"_ or _"snippet"_.
+ * The default __[type]__ is _"snippet"_.
  *
- * Notice, you can (optionally) avoid giving [content] a value, and instead pass
- * in lambda as children of [content], which then will be converted into Hyperlambda,
- * and treated as content of your snippet.
+ * __Notice__, you can (optionally) avoid giving __[content]__ a value, and instead pass
+ * in your lambda as children of your __[content]__ argument, which then will be converted
+ * into Hyperlambda, and treated as the actual content of your snippet.
  */
 create-event:hypereval.snippets.save
 

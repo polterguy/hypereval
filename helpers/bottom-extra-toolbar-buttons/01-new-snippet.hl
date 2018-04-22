@@ -1,6 +1,5 @@
-
 /*
- * New snippet button.
+ * New snippet toolbar button.
  */
 button:hypereval-new-snippet
   innerValue:@"<span class=""icon-plus""></span>"

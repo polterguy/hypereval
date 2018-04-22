@@ -1,6 +1,5 @@
-
 /*
- * Home button.
+ * Home toolbar button.
  */
 a
   class:button

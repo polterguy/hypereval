@@ -1,3 +1,6 @@
+/*
+ * Creates a page with a _"pie chart"_ in it, to demonstrate usage of the Micro pie chart widget.
+ */
 micro.css.include
 create-widget
   class:container

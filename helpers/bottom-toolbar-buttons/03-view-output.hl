@@ -1,5 +1,5 @@
 /*
- * View "Output" button.
+ * View _"output"_ toolbar button.
  */
 button:hypereval-view-output
   innerValue:@"<span class=""icon-eye""></span>"

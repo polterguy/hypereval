@@ -1,7 +1,7 @@
 /*
- * Creates a form that allows the user to edit contents in p5.data database.
+ * Creates a _"page"_ snippet that allows the user to edit his contents of his p5.data database.
  *
- * Requires you to be logged in as "root", but will ask the user to login,
+ * Requires you to be logged in as _"root"_, but will ask the user to login,
  * if he is not already logged in.
  */
 

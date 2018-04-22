@@ -1,8 +1,6 @@
-
 /*
- * Deletes the specified snippet(s).
- *
- * It expects [_arg] being name of snippet(s) to delete.
+ * Creates the **[hypereval.snippets.delete]** Active Event that
+ * deletes the specified __[\_arg]__ snippet(s) from the Hypereval database.
  */
 create-event:hypereval.snippets.delete
 

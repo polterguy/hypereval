@@ -1,11 +1,15 @@
 /*
  * Imports a single Hyperlambda file into snippets database.
  *
- * Expects [file] being filname of Hyperlambda file to import, in addition to
- * an open database connection to the Hypereval database.
+ * Expects __[file]__ being the fully qualified filename of Hyperlambda file to import,
+ * in addition to an open database connection to the Hypereval database.
  *
- * Notice, the filename has a convention, which is "snippet.name.foo.xxx.hl",
- * where "xxx" is its "type".
+ * Notice, the filename has a convention, which is _"snippet.name.foo.xxx.hl"_,
+ * where _"xxx"_ is its _"type"_, which normally can be any of the given values.
+ *
+ * - _"snippet"_ - Default value, simply a normal snippet
+ * - _"page"_ - A page type of snippet, that can be _"launched"_ using Hypereval's URL resolver
+ * - _"startup"_ - A startup Hypereval snippet, that will be automatically evaluated every time the web server process is started
  */
 
 

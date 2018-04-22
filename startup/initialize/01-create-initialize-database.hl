@@ -1,3 +1,6 @@
+/*
+ * Creates the Hypereval database during startup.
+ */
 
 /*
  * Verifying that MySQL is installed, and if not, returning early.

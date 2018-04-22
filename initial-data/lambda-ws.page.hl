@@ -1,6 +1,29 @@
-
 /*
- * Creates a lambda Web Service endpoint.
+ * Creates a lambda Web Service endpoint. __Notice__, this is a simple web service endpoint
+ * example, illustrating using a __[eval-whitelist]__ invocation to (securely) evaluate a
+ * lambda web service, where the client supplies the Hyperlambda to evaluate on the web server's
+ * endpoint.
+ *
+ * This particular web service endpoint doesn't really allow the client to do much, since only
+ * basic Active Events have been whitelisted - However, it serves as a template and example for
+ * you to create your own lambda web services.
+ *
+ * Combined with the _"invoke-lambda-ws.page.hl"_ snippet though, it allows you to play around
+ * with lambda web services, by using _"localhost"_ as your web service endpoint, to get a feel for
+ * how a lambda web service might be implemented. This particular web service endpoint only enables
+ * the following Active Events.
+ *
+ * - __[set]__
+ * - __[add]__
+ * - __[insert-before]__
+ * - __[insert-after]__
+ * - __[src]__
+ * - __[+]__
+ * - __[-]__
+ * - __[/]__
+ * - __[*]__
+ * - __[for-each]__
+ * - __[return]__
  */
 
 

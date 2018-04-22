@@ -1,5 +1,5 @@
 /*
- * Delete snippet button.
+ * Delete snippet toolbar button.
  */
 button:hypereval-delete-snippet
   innerValue:@"<span class=""icon-bin""></span>"

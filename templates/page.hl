@@ -1,8 +1,6 @@
-
 /*
- * Creates a default page, with the default wiring.
- *
- * Notice, you'd probably want to save this as a "page" snippet.
+ * Creates our _"create new page"_ snippet template, which you can choose
+ * as a _"template"_ snippet when you create a new snippet.
  */
 
 

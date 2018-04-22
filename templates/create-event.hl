@@ -1,8 +1,6 @@
-
 /*
- * Creates an Active Event.
- *
- * Notice, you'd probably want to save this as a "startup" snippet.
+ * Creates our _"create Active Event"_ snippet template, which you can choose
+ * as a _"template"_ snippet when you create a new snippet.
  */
 
 

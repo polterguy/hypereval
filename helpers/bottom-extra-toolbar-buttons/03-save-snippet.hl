@@ -1,6 +1,5 @@
-
 /*
- * Save snippet button.
+ * Save snippet toolbar button.
  */
 button:hypereval-save-snippet
   innerValue:@"<span class=""icon-floppy-disk""></span>"

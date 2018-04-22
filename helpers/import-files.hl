@@ -1,6 +1,6 @@
 /*
- * Responsible for handling an upload request for either a zip file, or a Hyperlambda file,
- * or any combination(s) of the above.
+ * Responsible for handling an upload request for either one or more zip file(s),
+ * or one or more Hyperlambda file(s), or any combination(s) of the above.
  */
 
 

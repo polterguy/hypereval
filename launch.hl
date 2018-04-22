@@ -1,10 +1,10 @@
-
 /*
- * File responsible for starting "Hypereval".
+ * File responsible for launching Hypereval.
  *
- * Notice, this file also seconds as a URL resolver for evaluating "page" Hyperlambda snippets.
- * Basically, just add the name of your snippet as the second part of the URL when loading Hypereval,
- * and it will load that snippet as a page, instead of loading Hypereval itself.
+ * Notice, this file also seconds as a URL resolver for evaluating _"page"_ Hypereval snippets.
+ * To load a page Hypereval snippet simply add the name of your snippet as the second part of your
+ * URL, and it will load that snippet as a page, instead of launching
+ * Hypereval itself. Example `/hypereval/some-page-snippet`.
  */
 
 

@@ -1,8 +1,6 @@
-
 /*
- * Creates an extension widget.
- *
- * Notice, you'd probably want to save this as a "startup" snippet.
+ * Creates our _"create extension widget"_ snippet template, which you can choose
+ * as a _"template"_ snippet when you create a new snippet.
  */
 
 

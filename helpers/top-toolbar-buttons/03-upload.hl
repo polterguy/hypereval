@@ -1,6 +1,5 @@
-
 /*
- * Upload Hyperlambda button.
+ * Upload Hyperlambda file toolbar button.
  */
 micro.widgets.upload-button
   title:Upload snippet

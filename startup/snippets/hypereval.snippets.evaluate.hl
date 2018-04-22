@@ -1,10 +1,10 @@
-
 /*
- * Creates evaluate snippet Active Event.
+ * Creates the __[hypereval.snippets.evaluate]__ Active Event that
+ * evaluates the specified __[\_arg]__ snippet(s).
  *
  * This event will allow you to evaluate a snippet by name.
- * Pass in the name of the snippet(s) you want to evaluate as [_arg].
- * Optionally pass in [type] being for instance "page" or "startup".
+ * Pass in the name of the snippet(s) you want to evaluate as __[\_arg]__.
+ * Optionally pass in __[type]__ being for instance _"page"_ or _"startup"_.
  */
 create-event:hypereval.snippets.evaluate
 

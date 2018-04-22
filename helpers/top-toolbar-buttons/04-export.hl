@@ -1,6 +1,6 @@
-
 /*
- * Export all snippets button.
+ * Export all snippets toolbar button. Allows the user to download his entire Hypereval database
+ * as a zip file containing all snippets from his database.
  */
 button
   innerValue:@"<span class=""icon-file-zip""></span>"

@@ -1,3 +1,6 @@
+/*
+ * Evaluates all _"startup"_ type of snippets during startup.
+ */
 
 /*
  * Verifying that MySQL is installed, and if not, returning early.

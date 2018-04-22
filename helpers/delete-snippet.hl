@@ -1,7 +1,8 @@
+/*
+ * Deletes currently loaded snippet in Hypereval, asking user to confirm deletion first.
+ */
 
 /*
- * Deletes currently loaded snippet, asking user to confirm deletion first.
- *
  * First verifying that there actually is a snippet currently loaded.
  */
 p5.web.session.get:hypereval.snippet-name

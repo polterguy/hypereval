@@ -1,6 +1,5 @@
-
 /*
- * Load snippet button.
+ * Load snippet toolbar button.
  */
 button:hypereval-load-snippet
   innerValue:@"<span class=""icon-folder-open""></span>"

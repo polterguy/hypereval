@@ -1,6 +1,8 @@
-
 /*
- * Starts main "Hypereval" app.
+ * Launches Hypereval module. __Notice__, this is the file doing the _"heavy lifting"_ when it
+ * comes to actually launching Hypereval, due to that the _"launch.hl"_ Hypereval file also
+ * seconds as a URL resolver, and we don't want to clutter it with too much irrelevant code, if
+ * user simply wants to launch a snippet, instead of launching Hypereval.
  */
 
 

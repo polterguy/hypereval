@@ -1,5 +1,5 @@
 /*
- * Evaluate Hyperlambda button.
+ * Evaluate Hyperlambda toolbar button.
  */
 button:hypereval-evaluate-snippet
   innerValue:@"<span class=""icon-flash""></span>"

@@ -1,6 +1,5 @@
-
 /*
- * Settings button.
+ * Settings toolbar button. Shows a modal window, allowing the user to modify his settings.
  */
 button
   innerValue:@"<span class=""icon-cog""></span>"

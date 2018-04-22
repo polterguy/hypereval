@@ -1,4 +1,9 @@
 /*
+ * Allows the user to save the active snippet, if any, by displaying a modal
+ * window, asking him for a name for his snippet.
+ */
+
+/*
  * Verifying that there actually is any code in CodeMirror editor.
  */
 if

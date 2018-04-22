@@ -1,6 +1,5 @@
-
 /*
- * Download Hyperlambda button.
+ * Download Hyperlambda toolbar button.
  */
 button:hypereval-download-button
   innerValue:@"<span class=""icon-download2""></span>"

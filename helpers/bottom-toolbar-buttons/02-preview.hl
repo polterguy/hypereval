@@ -1,5 +1,6 @@
 /*
- * Preview button.
+ * Preview toolbar button. Notice, this button is only enabled if currently active snippet
+ * has been saved as a _"page"_ type of snippet.
  */
 button:hypereval-preview-snippet
   innerValue:@"<span class=""icon-play3""></span>"
