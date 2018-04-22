@@ -4,9 +4,11 @@
 h2
   innerValue:Hypereval
 
-img
-  class:desktop-help-icon-image
-  src:"https://phosphorusfive.files.wordpress.com/2018/03/terminal-hypereval-2.png"
+micro.widgets.file
+  style:"float:right; margin-left: 1rem; margin-bottom: 1rem;"
+  files
+    /modules/hypereval/desktop.hl
+      href:/hypereval/
 
 p
   innerValue:@"Hypereval is a module that allows you to evaluate Hyperlambda in <em>'immediate'</em> mode. These parts of the documentation
