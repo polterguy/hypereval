@@ -1,6 +1,5 @@
 /*
- * Creates a page with multiple Micro CSS _"columns"_ in it,
- * to illustrate the _"CSS grid"_ system in Micro.
+ * Creates a page with multiple columns in it.
  */
 create-widget
   class:container

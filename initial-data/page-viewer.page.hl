@@ -2,6 +2,9 @@
  * Page that allows user to view all pages in system.
  * Notice, there are no requirements for an actual user being logged in
  * to evaluate this page.
+ *
+ * Since this snippet is so small, it also serves as a great example by
+ * itself, of how to use e.g. the Micro datagrid, etc.
  */
 
 

@@ -1,9 +1,7 @@
+
 /*
- * Creates an example _"page"_ snippet, that allows the caller to invoke a lambda web service,
- * passing in his own Hyperlambda to be evaluated, and some URL of where to invoke the web service.
- *
- * Useful for testing lambda web services created with similar logic as the _"lambda-ws.page.hl"_
- * example snippet.
+ * Creates an example page, which allows the caller to invoke a lambda web service,
+ * passing in his own Hyperlambda to be evaluated.
  */
 create-widget
   class:container

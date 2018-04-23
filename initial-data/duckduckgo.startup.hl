@@ -1,10 +1,11 @@
 /*
- * Creates a _"startup"_ snippet that creates the **[duckduckgo.search]** Active
- * Event that searches for something using the DuckDuckGo search engine.
+ * Creates the Active Event that searches for something using DuckDuckGo.
  *
- * The **[duckduckgo.search]** event expects __[\_arg]__ being some string to search for,
- * and it will return one __[item]__ for each result, having one __[url]__ and a __[text]__ for
+ * Expects [_arg] being some string to search for.
+ * Will return one [item] for each result, having one [url] and a [text] for
  * each match given by DuckDuckGo.
+ *
+ * Also serves as an example of how to create an Active Event in Hyperlambda.
  */
 create-event:duckduckgo.search
 

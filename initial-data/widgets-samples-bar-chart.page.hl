@@ -15,25 +15,25 @@ create-widget
           class:col-30
           widgets
             p
-              innerValue:@"An example of a pie chart. Notice how you can click the 'Unknown' legend label, in addition to
+              innerValue:@"An example of a bar chart. Notice how you can click the 'Unknown' label, in addition to
 how the chart flows with the flow of the rest of your page."
             p
-              innerValue:@"You can also override the color for any of your slices, such as illustrated with the 'Unknown' slice."
+              innerValue:@"You can also override the color for any of your bars, such as illustrated with the 'Unknown' bar."
             p
-              innerValue:@"The pie chart is rendered exclusively with CSS as an SVG element, making it highly responsive, and easily
+              innerValue:@"The bar chart is rendered exclusively with CSS as an SVG element, making it highly responsive, and easily
 styled - In addition to very lightweight on your bandwidth. Try to resize the page, such that it becomes less than 800 pixels in width for instance."
         div
           class:col-40
           widgets
-            micro.widgets.chart.pie
+            micro.widgets.chart.column
               data
-                Johnny:40
-                Thomas:120
-                Lisbeth:35
-                Trond:300
-                Peter:120
-                Unknown:35
-                  color:#ffa0a0
+                Thomas:1200
+                Lisbeth:750
+                Foo Bar:-750
+                Trond:3000
+                Peter Has a very Long Name:1550
+                Unknown:250
+                  color:#a0fea0
                   onclick
                     micro.windows.info:We don't know who sold these items!
                       class:micro-windows-info warning
@@ -41,4 +41,5 @@ styled - In addition to very lightweight on your bandwidth. Try to resize the pa
           class:col-30
           widgets
             p
-              innerValue:And as you can see from the source of this page, the widget perfectly floats correctly in the Micro CSS grid system.
+              innerValue:@"And as you can see from the source of this page, the widget perfectly floats correctly in the Micro CSS grid system.
+Notice how negative values are rendered as red by default."
