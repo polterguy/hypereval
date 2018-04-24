@@ -1,5 +1,10 @@
+
 /*
- * Creates version Active Event.
+ * Creates our version Active Event for the Hypereval module.
+ */
+
+/*
+ * This event returns the version number of the Hypereval module.
  */
 create-event:hypereval.version
 

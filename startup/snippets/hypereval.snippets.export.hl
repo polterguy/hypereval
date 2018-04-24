@@ -1,13 +1,17 @@
+
 /*
- * Creates the **[hypereval.snippets.export]** Active Event, that allows you
- * to export a zip file containing all snippets from database to client.
+ * Creates the **[hypereval.snippets.export]** Active Event.
+ */
+
+/* This event allows you to export a zip file containing all snippets from your
+ * Hypereval database to the client.
  *
  * Optionally pass in __[filter]__ which will be used as a filter criteria to which
  * snippets will actually be a part of the backup zip file.
  * If a __[filter]__ is supplied, it will only export snippets mathing the
  * specified __[filter]__ condition.
- * You can use wildcards in your __[filter]__ by adding _'%'_ characters being your wildcard
- * characters.
+ * You can use wildcards in your __[filter]__ by adding for instance _'%'_
+ * characters being your wildcard characters.
  */
 create-event:hypereval.snippets.export
 

@@ -1,11 +1,16 @@
+
 /*
- * Creates the __[hypereval.snippets.load]__ Active Event that retrieves the Hyperlambda
- * for the snippet(s) with the specified __[\_arg]__ name(s).
+ * Creates the __[hypereval.snippets.load]__ Active Event.
+ */
+
+/* This event retrieves the Hyperlambda for the snippet(s) with the specified
+ * __[\_arg]__ name(s).
  *
  * This event will return the Hyperlambda of all snippets matching the specified __[\_arg]__.
  * Optionally pass in __[type]__ of snippet being e.g. _"page"_ or _"startup"_.
  * The snippet(s) Hyperlambda will be found in a __[content]__ return node.
- * One __[content]__ for each snippet matching criteria will be returned to caller.
+ * One __[content]__ will be returned for each snippet matching your specified
+ * criteria.
  */
 create-event:hypereval.snippets.load
 

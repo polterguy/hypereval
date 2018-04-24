@@ -1,5 +1,9 @@
+
 /*
- * Creates the __[hypereval.snippets.save]__ Active Event that creates a new snippet.
+ * Creates the __[hypereval.snippets.save]__ Active Event.
+ */
+
+/* This event creates a new Hypereval snippet.
  *
  * The event expects the snippet's name to be given as __[\_arg]__, and its Hyperlambda to
  * be found in __[content]__. In addition, you can optionally pass in __[type]__ being

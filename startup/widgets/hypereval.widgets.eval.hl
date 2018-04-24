@@ -1,15 +1,18 @@
+
 /*
- * Creates the __[hypereval.widgets.eval]__ Active Event that creates the Hypereval
- * CodeMirror evaluator extension widget.
+ * Creates the __[hypereval.widgets.eval]__ extension widget.
+ */
+
+/* This widget instantiates the Hypereval CodeMirror evaluator extension widget.
  *
- * This widget is arguably the _"gjist"_ of the Hypereval module, allowing the user
+ * This widget is arguably the _"ghist"_ of the Hypereval module, allowing the user
  * to load, evaluate, and save snippets, etc. The only parts that are not embedded
  * in this widget from the Hypereval module is the export, upload, and download
  * buttons in Hypereval's top toolbar.
  *
  * __Notice__, we only allow one instance of this widget per page.
  * Notice also that you can override __[height]__ and __[auto-focus]__, which will be passed
- * into your CodeMirror input widget as arguments.
+ * into your CodeMirror input widget as arguments as the widget is created.
  */
 create-event:hypereval.widgets.eval
 
