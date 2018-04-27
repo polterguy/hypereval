@@ -5,7 +5,9 @@
 
 
 /*
- * Creates an Active Event, returning 57.
+ * _"New startup template"_ file.
+ *
+ * This event simply creates an Active Event, returning 57.
  */
 create-event:foo.bar
   return:int:57

@@ -5,7 +5,10 @@
 
 
 /*
- * Creates an extension widget, which you can consume in other places of your project.
+ * _"New startup extension widget template"_ file.
+ *
+ * This event simply creates an extension widget, which simply says _"Hello World!"_,
+ * that you can consume in other places of your project.
  */
 create-event:foo.widgets.bar
   return
