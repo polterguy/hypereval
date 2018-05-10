@@ -93,6 +93,7 @@ create-widgets
                       name:{0} ({1})
                         :x:/@_dp/#/*/name?value
                         :x:/@_dp/#/*/type?value
+                        style:"cursor:pointer;"
 
 
             /*
