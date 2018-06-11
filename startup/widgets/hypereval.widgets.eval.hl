@@ -56,7 +56,7 @@ create-event:hypereval.widgets.eval
    * to save, create and evaluate snippets - But keep the rest of these!
    */
   if
-    p5.auth.has-access-to-path:bool:false
+    p5.auth.has-access:bool:false
       filter:p5.module
       path:/modules/hypereval/
     not
