@@ -235,6 +235,7 @@ if:x:/-?value
      *
      * Notice, this is done to allow for evaluating multiple Hyperlambda snippets in one go.
      */
+    .result
     for-each:x:/@p5.web.request.parse-mime/**/application/=x-hyperlambda/*/content
 
       /*
@@ -259,7 +260,7 @@ if:x:/-?value
          * Simple value return.
          */
         eval-x:x:/+/*/*/*/content
-        add:x:/..for-each/./*/p5.web.echo-mime/*
+        add:x:/@.result
           src
             text:plain
               content:x:/@eval-whitelist?value
@@ -271,29 +272,63 @@ if:x:/-?value
          */
         add:x:/+/*/*/*/content
           src:x:/@eval-whitelist/*
-        add:x:/..for-each/./*/p5.web.echo-mime/*
+        add:x:/@.result
           src
             application:x-hyperlambda
               content
 
     /*
-     * Encrypting the returned MIME envelope for the PGP key that was used to sign it.
+     * Adding all [.result] nodes to echo MIME invocation, making sure we only return
+     * a simple (but encrypted and signed) "application/x-hyperlambda" entity if there's
+     * only one entity - Otherwise returning all entities as "multipart/mixed".
+     */
+    if:x:/@.result/*?count
+      =:int:1
+
+      /*
+       * Single part MIME entity return.
+       */
+      add:x:/..else/*/p5.web.echo-mime
+        src:x:/@.result/*
+
+    else-if:x:/@.result/*?count
+      >:int:1
+
+      /*
+       * Multipart MIME entity return.
+       */
+      add:x:/..else/*/p5.web.echo-mime
+        src
+          multipart:mixed
+      add:x:/..else/*/p5.web.echo-mime/*
+        src:x:/@.result/*
+
+    else
+
+      /*
+       * Not a valid web service request.
+       */
+      p5.web.response.set-status-code:400
+      p5.web.echo:You didn't supply any Hyperlambda
+      return
+
+    /*
+     * Encrypting and signing the returned MIME envelope for the PGP key that was used to sign it.
+     *
+     * If you wish to use another PGP key to sign your envelopes, you can add a [fingerprint]
+     * and a [password] to the [sign] argument below.
      */
     eval-x:x:/+/*/*/*/fingerprint
-    add:x:/..if/./*/p5.web.echo-mime/*
+    add:x:/./*/p5.web.echo-mime/*
       src
+        sign
         encrypt
           fingerprint:x:/@p5.web.request.parse-mime/*/*/signature/*/*/fingerprint?value
 
     /*
      * Echoing MIME envelope to caller.
-     *
-     * If you wish to use another PGP key to sign your envelopes, you can add a [fingerpint]
-     * and a [password] to the [sign] argument in the invocation below.
      */
     p5.web.echo-mime
-      multipart:mixed
-        sign
 
   /*
    * Returning early to avoid evaluating the rest of our file.
