@@ -1,16 +1,88 @@
 /*
- * Creates a white listed Hyperlambda lambda web service.
+ * Creates a white listed Hyperlambda PGP lambda web service.
  *
- * If the initial HTTP request is of type POST, it'll act as a web service,
- * if not it will create a GUI, allowing the visitor to play around with the web service,
+ * If the initial HTTP request is of type POST, it'll act as a web service -
+ * If not it will create a GUI, allowing the visitor to play around with the web service,
  * creating his own Hyperlambda, using a CodeMirror editor to write code, and see the results
- * of his evaluation in a modal window.
+ * of his evaluation in a modal window. Both modes requires you to only use the _"whitelisted"_
+ * set of Active Events, and will choke if you try to use any Active Events that are not
+ * _"whitelisted"_. This makes it fairly secure and allows you to securely allow clients
+ * to execute Hyperlambda on your server - Assuming you don't modify its settings, such
+ * that you make it insecure.
  *
- * Notice, you can deny the creation of a GUI by modifying the endpoint's settings.
+ * To allow a client to use the web service, you'll need to use _"Peeples"_ to allow for
+ * a _"guest"_ account to have _"Module access"_ to _"/hypereval/lambda-ws"_ - Assuming
+ * you don't change its URL somehow.
  *
- * Notice, the web service allows you to change its settings easily, by editing the top parts
- * of its code, to for instance require the caller to cryptographically sign and encrypt his
- * Hyperlambda, etc ...
+ * Notice, you can deny the creation of a GUI by modifying the endpoint's settings. You can
+ * also modify a bunch of other settings, such as the whitelisted Active Events, etc. If you
+ * choose to do the latter, I _highly recommend_ you read about how the **[eval-whitelist]**
+ * event is implemented, by reading the documentation for the _"/Plugins/p5.lambda"_ project,
+ * since otherwise you might unintentionally create security holes in your app. You can also
+ * enforce usage of PGP to invoke it, and create a list of whitelisted PGP keys, only allowing
+ * these to invoke your web service, etc. In its simplest form, you can simply pass in Hyperlambda
+ * as the body of your request, at which point the _"Content-Type"_ HTTP header of your request
+ * must be _"application/x-hyperlambda"_. All other Content-Types will be assumed to be some
+ * sort of MIME envelope, expecting to find the _entire_ MIME message in the body of your request.
+ *
+ * If you simply push Hyperlambda as the body of your request, the server will return a
+ * _"Content-Type"_ of _"application/x-hyperlambda"_. If you push a MIME envelope to the server,
+ * it will return a _"Content-Type"_ of _"X-MIME-Envelope"_.
+ *
+ * #### Using the web service with MIME and PGP.
+ *
+ * You can also transfer cryptographically signed and encrypted MIME envelopes for being executed
+ * on the server, in addition to simply supplying your Hyperlambda as the body of your HTTP
+ * request. If you do, each MIME entity of type "application/x-hyperlambda" will be sequentially
+ * executed, and if it returns something using **[return]**, will result in a returned MIME entity
+ * of type "application/x-hyperlambda". If you have multiple Hyperlambda snippets passed into
+ * the server like this, the server will return a _"multipart/mixed"_ MIME envelope, containing
+ * all of your results as children _"application/x-hyperlambda"_ leaf MIME entities. Otherwise
+ * a single "application/x-hyperlambda" entity will be returned. If you pass in MIME content,
+ * it is expected that you _at least_ cryptographically sign your MIME entity, preferably also
+ * encrypt it, using your own private PGP key. If you pass in a cryptographically signed MIME
+ * envelope to be executed, the same PGP key will be used to encrypt the returned MIME entity,
+ * and the entity will be cryptographically signed with the current server's private PGP key.
+ *
+ * You can also give specific PGP keys _"extended rights"_, by implementing a
+ * **[hypereval.lambda-ws.authorize-fingerprint]** Active Event, which will be invoked with the
+ * PGP key's fingerprint that was used to sign the MIME envelope as **[\_arg]**. If you choose to
+ * do this, you can check the fingerprint given to your event as **[\_arg]**, and if you want to
+ * give that fingerprint extended rights, you can return a bunch of _additional_ Active Event
+ * names, that will be added to the existing rights any other callers might have.
+ *
+ * Each MIME entity of type _"application/x-hyperlambda"_ will be sequentially executed, and
+ * have anything they somehow return serialized back to caller in a MIME entity. If an exception
+ * occurs during execution of one of your MIME entities, a MIME header for that specific return
+ * MIME entity called _"X-Exception"_ will be found in the MIME entity, containing the type of
+ * exception - At which point the exception's error message can be found as the content of your
+ * MIME entity.
+ *
+ * You can also _identity_ each of your _"application/x-hyperlambda"_ MIME entities, passing in
+ * an **[X-Hyperlambda-ID]** MIME header for that specific part, which will be returned to you
+ * in your _"application/x-hyperlambda"_ returned MIME leaf entity, allowing you to identify
+ * which MIME entity returned what. If your Hyperlambda snippet does not return anything,
+ * then _"SUCCESS"_ will be returned as the content of a _"text/plain"_ part, with the
+ * _"X-Hyperlambda-ID"_ of your currently iterated snippet - Assuming your Hyperlambda did
+ * not create an exception during execution.
+ *
+ * If your snippet returns a simple value, a _"text/plain"_ MIME entity will be returned
+ * containing your content. If it returns lambda, an _"application/x-hyperlambda"_ MIME entity
+ * will be returned.
+ *
+ * You can also reference attachments in your MIME envelope, since the entire **[p5.web.request.parse-mime]**
+ * invocation's result is passed into your Hyperlambda snippets as a **[mime]** argument by
+ * reference. Allowing you to de-reference any files passed into the web service. You can
+ * also return files, since also a **[result]** argument is passed into your Hyperlambda,
+ * allowing you to create MIME entites yourself, that can contain for instance **[filename]**
+ * arguments, etc. At which point you'll obviously need to have read access to these files.
+ * The latter you can accomplish by whitelisting e.g. **[login]**, giving your user context
+ * extended rights, assuming you have a user on the server where you're trying to execute
+ * your Hyperlambda.
+ *
+ * Notice, if you try to add files you don't have read access to, an exception will be raised
+ * when the MIME envelope is attempted tobe serialized back to client, and a status code of
+ * _"NotFound"_ will be returned.
  */
 
 
@@ -97,6 +169,14 @@
   trim
   trim-left
   trim-right
+  =
+  !=
+  >
+  <
+  >=
+  <=
+  ~
+  !~
 
 
 /*
@@ -196,145 +276,234 @@ if:x:/-?value
       attachment-folder:~/temp/
 
     /*
-     * Verifying that MIME envelope was cryptographically signed, and that the signature
-     * was verified.
+     * To make sure we're able to delete any temporary files submitted by caller, we
+     * wrap the rest of our logic in a try/catch block.
      */
-    if:x:/@p5.web.request.parse-mime/*/*/signature/*?value
-      !=:bool:true
+    try
 
       /*
-       * Signature of MIME envelope did not verify.
+       * Verifying that MIME envelope was cryptographically signed, and that the signature
+       * was verified.
        */
-      p5.web.response.set-status-code:401
-      p5.web.echo:Your PGP signature did not verify correctly.
-      return
-
-    /*
-     * Checking if endpoint is configured to only allow for some specific PGP signatures
-     * to be used.
-     */
-    if:x:/@.force-pgp/*/whitelisted-servers/*
-
-      /*
-       * One or more PGP keys have been whitelisted, checking that envelope was signed
-       * by one of these keys.
-       */
-      if:x:/@.force-pgp/*/whitelisted-servers/*/={0}
-        :x:/@p5.web.request.parse-mime/*/*/signature/*/*/fingerprint?value
-        not
+      if:x:/@p5.web.request.parse-mime/*/*/signature/*?value
+        !=:bool:true
 
         /*
-         * Fingerprint was not accepted.
+         * Signature of MIME envelope did not verify.
          */
         p5.web.response.set-status-code:401
-        p5.web.echo:Sorry, you're not 'white' enough to enter.
+        p5.web.echo:Your PGP signature did not verify correctly.
         return
 
-    /*
-     * Iterating through each "application/x-hyperlambda" part from MIME envelope.
-     *
-     * Notice, this is done to allow for evaluating multiple Hyperlambda snippets in one go.
-     */
-    .result
-    for-each:x:/@p5.web.request.parse-mime/**/application/=x-hyperlambda/*/content
-
       /*
-       * Evaluating currently iterated "application/x-hyperlambda" MIME entity.
-       *
-       * Notice, to allow caller to gain access to files and such that were transmitted
-       * as attachments, we pass in the entire [p5.web.request.parse-mime] node to evaluation
-       * as a reference node argument.
-       *
-       * Also notice, that to allow caller to access the result node directly, to add for instance
-       * file attachments, etc - We also pass in the [.result] node directly to evaluation, such
-       * that caller can modify it himself, as he see fit, by adding for instance a [filename] type
-       * of MIME entity to it.
+       * Checking if endpoint is configured to only allow for some specific PGP signatures
+       * to be used.
        */
-      eval-x:x:/+/*(/mime|/.result)
-      eval-whitelist:x:/@_dp/#
-        mime:x:/@p5.web.request.parse-mime
-        .result:x:/@.result
-        events
-
-      /*
-       * Checking type of return.
-       */
-      if:x:/@eval-whitelist/*
-        not
+      if:x:/@.force-pgp/*/whitelisted-servers/*
 
         /*
-         * Simple value return.
+         * One or more PGP keys have been whitelisted, checking that envelope was signed
+         * by one of these keys.
          */
-        eval-x:x:/+/*/*/*/content
-        add:x:/@.result
+        if:x:/@.force-pgp/*/whitelisted-servers/*/={0}
+          :x:/@p5.web.request.parse-mime/*/*/signature/*/*/fingerprint?value
+          not
+
+          /*
+           * Fingerprint was not accepted.
+           */
+          p5.web.response.set-status-code:401
+          p5.web.echo:Sorry, you're not 'white' enough to enter.
+          return
+
+      /*
+       * Invoking plugin event to see if the sigature PGP key has additional rights on the server.
+       *
+       * This is a non-existing Active Event that allows you to create a callback returning a bunch
+       * of Active Event names according to the [fingerprint] of the PGP key that was used to sign
+       * the MIME envelope.
+       *
+       * If you return Active Event names in this event, these will be ADDED as extended execution rights
+       * for that specific fingerprint. This allows you to have specific fingerprints, implying PGP keys,
+       * to use additional Active Events in their Hyperlambda content.
+       */
+      hypereval.lambda-ws.authorize-fingerprint:x:/@p5.web.request.parse-mime/*/*/signature/*/*/fingerprint?value
+      add:x:/./*/for-each/*/try/*/eval-whitelist/*/events
+        src:x:/@hypereval.lambda-ws.authorize-fingerprint/*
+
+      /*
+       * Iterating through each "application/x-hyperlambda" part from MIME envelope.
+       *
+       * Notice, this is done to allow for evaluating multiple Hyperlambda snippets in one go.
+       */
+      .result
+      for-each:x:/@p5.web.request.parse-mime/**/application/=x-hyperlambda/*/content
+
+        /*
+         * Making sure we wrap execution in a try/catch block, in case an exception occurs during
+         * execution, such that we're able to return intelligent feedback to caller.
+         */
+        try
+
+          /*
+           * Evaluating currently iterated "application/x-hyperlambda" MIME entity.
+           *
+           * Notice, to allow caller to gain access to files and such that were transmitted
+           * as attachments, we pass in the entire [p5.web.request.parse-mime] node to evaluation
+           * as a reference node argument.
+           *
+           * Also notice, that to allow caller to access the result node directly, to add for instance
+           * file attachments, etc - We also pass in the [.result] node directly by reference to evaluation,
+           * such that the caller can modify it himself, as he see fit, and add for instance a [filename] type
+           * of MIME entity to it.
+           */
+          eval-x:x:/+/*(/mime|/result)
+          eval-whitelist:x:/@_dp/#
+            mime:x:/@p5.web.request.parse-mime
+            result:x:/@.result
+            events
+
+          /*
+           * Checking type of return.
+           *
+           * Notice, we only create a result node if currently iterated Hyperlambda snippet
+           * actually returned something.
+           */
+          if:x:/@eval-whitelist?value
+
+            /*
+             * Simple value return.
+             */
+            eval-x:x:/+/*/*/*/content
+            add:x:/@.result
+              src
+                text:plain
+                  content:x:/@eval-whitelist?value
+
+          else-if:x:/@eval-whitelist/*
+
+            /*
+             * Lambda return.
+             */
+            add:x:/+/*/*/*/content
+              src:x:/@eval-whitelist/*
+            add:x:/@.result
+              src
+                application:x-hyperlambda
+                  content
+
+          else
+
+            /*
+             * No return value.
+             */
+            add:x:/@.result
+              src
+                text:plain
+                  content:SUCCESS
+
+          /*
+           * Adding any "X-Hyperlambda-ID" headers in currently iterated MIME entity back to
+           * caller, to allow him to uniquely identify each returned MIME entity easily.
+           */
+          add:x:/@.result/0/-
+            src:x:/@_dp/#/./*/X-Hyperlambda-ID
+
+        catch
+
+          /*
+           * Exception occurred during execution of currently iterated lambda, making sure
+           * we return intelligent feedback to caller explaining what went wrong.
+           */
+          eval-x:x:/+/*/*/*
+          add:x:/@.result
+            src
+              application:x-hyperlambda
+                X-Exception:x:/..catch/*/type?value
+                content:x:/..catch/*/message?value
+
+      /*
+       * Adding all [.result] nodes to echo MIME invocation, making sure we only return
+       * a simple (but encrypted and signed) "application/x-hyperlambda" entity if there's
+       * only one entity - Otherwise returning all entities as "multipart/mixed".
+       */
+      if:x:/@.result/*?count
+        =:int:1
+
+        /*
+         * Single part MIME entity return.
+         */
+        add:x:/..try/*/p5.web.echo-mime
+          src:x:/@.result/*
+
+      else-if:x:/@.result/*?count
+        >:int:1
+
+        /*
+         * Multipart MIME entity return.
+         */
+        add:x:/..try/*/p5.web.echo-mime
+          src
+            multipart:mixed
+        add:x:/..try/*/p5.web.echo-mime/*
+          src:x:/@.result/*
+
+      else-if:x:/@.result/*?count
+        =:int:0
+
+        /*
+         * None of the Hyperlambda snippets actually returned anything.
+         */
+        add:x:/..try/*/p5.web.echo-mime
           src
             text:plain
-              content:x:/@eval-whitelist?value
+              content:No code were supplied!
 
-      else
+      /*
+       * Encrypting and signing the returned MIME envelope for the PGP key that was used to sign it.
+       *
+       * If you wish to use another PGP key to sign your envelopes, you can add a [fingerprint]
+       * and a [password] to the [sign] argument below.
+       */
+      eval-x:x:/+/*/*/*/fingerprint
+      add:x:/..try/*/p5.web.echo-mime/*
+        src
+          sign
+          encrypt
+            fingerprint:x:/@p5.web.request.parse-mime/*/*/signature/*/*/fingerprint?value
+
+      /*
+       * Echoing MIME envelope to caller, making sure we create a custom HTTP header
+       * to signal type of response.
+       */
+      p5.web.header.set:Content-Type
+        src:X-MIME-Envelope
+      p5.web.echo-mime
+
+    finally
+
+      /*
+       * Deleting all file attachments from MIME message to clean up after invocation.
+       */
+      for-each:x:/@p5.web.request.parse-mime/**/Content-Disposition/=~attachment;/./*/filename/*/prefix/.
 
         /*
-         * Lambda return.
+         * Checking that file exists since it might have been deleted by caller.
          */
-        add:x:/+/*/*/*/content
-          src:x:/@eval-whitelist/*
-        add:x:/@.result
-          src
-            application:x-hyperlambda
-              content
+        if
+          fetch:x:/0/0?value
+            file-exists:{0}{1}{2}
+              :x:/@_dp/#/*/folder?value
+              :x:/@_dp/#/*/prefix?value
+              :x:/@_dp/#?value
 
-    /*
-     * Adding all [.result] nodes to echo MIME invocation, making sure we only return
-     * a simple (but encrypted and signed) "application/x-hyperlambda" entity if there's
-     * only one entity - Otherwise returning all entities as "multipart/mixed".
-     */
-    if:x:/@.result/*?count
-      =:int:1
-
-      /*
-       * Single part MIME entity return.
-       */
-      add:x:/..else/*/p5.web.echo-mime
-        src:x:/@.result/*
-
-    else-if:x:/@.result/*?count
-      >:int:1
-
-      /*
-       * Multipart MIME entity return.
-       */
-      add:x:/..else/*/p5.web.echo-mime
-        src
-          multipart:mixed
-      add:x:/..else/*/p5.web.echo-mime/*
-        src:x:/@.result/*
-
-    else
-
-      /*
-       * Not a valid web service request.
-       */
-      p5.web.response.set-status-code:400
-      p5.web.echo:You didn't supply any Hyperlambda
-      return
-
-    /*
-     * Encrypting and signing the returned MIME envelope for the PGP key that was used to sign it.
-     *
-     * If you wish to use another PGP key to sign your envelopes, you can add a [fingerprint]
-     * and a [password] to the [sign] argument below.
-     */
-    eval-x:x:/+/*/*/*/fingerprint
-    add:x:/./*/p5.web.echo-mime/*
-      src
-        sign
-        encrypt
-          fingerprint:x:/@p5.web.request.parse-mime/*/*/signature/*/*/fingerprint?value
-
-    /*
-     * Echoing MIME envelope to caller.
-     */
-    p5.web.echo-mime
+          /*
+           * Temporary file still exists, hence deleting it.
+           */
+          delete-file:{0}{1}{2}
+            :x:/@_dp/#/*/folder?value
+            :x:/@_dp/#/*/prefix?value
+            :x:/@_dp/#?value
 
   /*
    * Returning early to avoid evaluating the rest of our file.
@@ -359,6 +528,7 @@ if:x:/@.gui-allowed?value
 /*
  * Creates a GUI wrapper for our web service.
  */
+p5.web.page.set-title:PGP/lambda web service
 join:x:/@.events/*
   sep:</li><li>
 create-widget
@@ -471,16 +641,15 @@ will return its results as a PGP encrypted and signed MIME envelope."
                   innerValue:@"p5.http.post:""{0}""
   .onrequest
     .p5.mime.serialize-to-stream
-      multipart:mixed
+      application:x-hyperlambda
         encrypt
         sign
-        application:x-hyperlambda
-          content
-            +:int:7
-              *:int:20
-                _:10
-            eval-x:x:/+/*
-            return:x:/@+?value
+        content
+          split:Thomas Hansen is pretty cool
+            =:"" ""
+          add:x:/+
+            src:x:/@split/*?name
+          return
   .onresponse
     .p5.mime.load-from-stream"
                     :x:/@p5.web.get-location-url?value
@@ -495,6 +664,9 @@ as you see fit. Any file attachments will have their names 'randomised' and be s
               innerValue:@"You can also of course use CURL or other types of clients, as long as you pass in valid Hyperlambda, and make
 sure you set the 'Content-Type' HTTP header correctly to 'application/x-hyperlambda', assuming you want to pass in your code as clear text, and not
 cryptographically signed or encrypted."
+            p
+              innerValue:@"If you choose to supply multiple 'application/x-hyperlambda' MIME parts, you'll obviously have to wrap
+them somehow inside of some sort of 'multipart'."
             h3
               innerValue:Configuring the web service
             p
@@ -506,3 +678,5 @@ one or more specified PGP keys to be able to invoke it, changing the whitelisted
             ul
               innerValue:<li>{0}</li>
                 :x:/@join?value
+            p
+              innerValue:@"See the Hyperlambda code in Hypereval for more information about how to consume and configure the web service."
