@@ -244,10 +244,16 @@ if:x:/-?value
        * Notice, to allow caller to gain access to files and such that were transmitted
        * as attachments, we pass in the entire [p5.web.request.parse-mime] node to evaluation
        * as a reference node argument.
+       *
+       * Also notice, that to allow caller to access the result node directly, to add for instance
+       * file attachments, etc - We also pass in the [.result] node directly to evaluation, such
+       * that caller can modify it himself, as he see fit, by adding for instance a [filename] type
+       * of MIME entity to it.
        */
-      eval-x:x:/+/*/mime
+      eval-x:x:/+/*(/mime|/.result)
       eval-whitelist:x:/@_dp/#
         mime:x:/@p5.web.request.parse-mime
+        .result:x:/@.result
         events
 
       /*
