@@ -1,4 +1,3 @@
-
 /*
  * Creates a page with a tab widget in it.
  */
@@ -35,5 +34,3 @@ create-widget
                 widgets
                   p
                     innerValue:Tab 2
-            p
-              innerValue:Foo
